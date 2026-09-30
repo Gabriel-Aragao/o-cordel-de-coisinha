@@ -57,9 +57,11 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ---
 
 ### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
+* **Sistema de 3 Vidas & Moitas:** Moitas de cactos (-1 HP + grito) e frutas (+1 HP) mantidas.
 * **Topologia Fechada de Lotes & Paredes Perimétricas:**
-  - Paredes sólidas de limite ao redor de cada lote, abertas **apenas nas conexões oficiais**:
-    * **Lote 0:** Conexão à direita com **Lote 2a** (Pedra da botija na saída).
+  - Paredes sólidas de limite ao redor de cada lote, abertas apenas nas conexões oficiais:
+    * **Lote 0:** Conexão à direita com **Lote 2a**.
+      - **Pedra da Botija:** Em corredor estreito sem legenda; tropeçar exibe diálogos cômicos (*"Coisinha, tropeçou!"*, *"Coisinha vai arrancar um dedo!"*, *"Coisinha tá adivinhando butija!"*).
     * **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
     * **Lote 1a:** Conexão à direita com **Lote 1b**.
     * **Lote 3a:** Conexão à direita com **Lote 3b**.

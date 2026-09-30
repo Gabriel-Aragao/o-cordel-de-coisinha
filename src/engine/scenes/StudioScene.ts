@@ -1,5 +1,5 @@
-import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText } from '../../renderer/shapes';
+import { IScene, IGameEngine, InputState, SceneId, Entity } from '../types';
+import { drawText, renderEntity, drawChaoEstudioMadeira, drawMolduraCordel } from '../../renderer/shapes';
 
 interface CordelFloorTrigger {
   id: SceneId;
@@ -65,9 +65,12 @@ export class StudioScene implements IScene {
   private infoMessage: string = 'Pise em um cordel no chão para entrar no conto!';
   private pulseGlow: number = 0;
 
+  private stepTimer: number = 0;
+
   public init(engine: IGameEngine): void {
     this.player.x = 480;
     this.player.y = 430;
+    this.stepTimer = 0;
 
     this.triggers = [
       {
@@ -135,6 +138,16 @@ export class StudioScene implements IScene {
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
 
+    if (dx !== 0 || dy !== 0) {
+      this.stepTimer += dt;
+      if (this.stepTimer >= 0.35) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+      }
+    } else {
+      this.stepTimer = 0.2;
+    }
+
     // Limites da tela
     const halfW = this.player.width / 2;
     const halfH = this.player.height / 2;
@@ -160,6 +173,7 @@ export class StudioScene implements IScene {
         Math.abs(this.player.y - t.y) < (this.player.height + t.height) / 2
       ) {
         this.infoMessage = `Entrando em: ${t.name}...`;
+        engine.sound.playCordelFolhear();
         engine.switchScene(t.id);
         return;
       }
@@ -171,6 +185,7 @@ export class StudioScene implements IScene {
       if (allCompleted) {
         this.infoMessage = '✨ 4 ITENS REUNIDOS! Aperte [E / Enter] para estampar seu cordel mestre!';
         if (input.interact) {
+          engine.sound.playPrensaImpacto();
           engine.switchScene('VICTORY');
           return;
         }
@@ -194,6 +209,7 @@ export class StudioScene implements IScene {
         Math.abs(this.player.x - this.door.x) < (this.player.width + this.door.width) / 2 &&
         Math.abs(this.player.y - this.door.y) < (this.player.height + this.door.height) / 2
       ) {
+        engine.sound.playPrensaImpacto();
         engine.switchScene('VICTORY');
         return;
       }
@@ -204,19 +220,11 @@ export class StudioScene implements IScene {
   }
 
   public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
-    // Fundo do Estúdio
-    ctx.fillStyle = '#1c150e';
-    ctx.fillRect(0, 0, 960, 540);
+    // 1. Piso Rústico de Tábuas de Madeira do Estúdio
+    drawChaoEstudioMadeira(ctx, 0, 0, 960, 540);
 
-    // Linhas de tábuas de madeira rústica
-    ctx.strokeStyle = '#2d2216';
-    ctx.lineWidth = 1;
-    for (let x = 40; x < 960; x += 40) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, 540);
-      ctx.stroke();
-    }
+    // 2. Moldura de Xilogravura do Estúdio
+    drawMolduraCordel(ctx, 12, 10, 936, 520, { borderWeight: 3 });
 
     // Render dos 4 Cordéis no chão
     for (let i = 0; i < this.triggers.length; i++) {

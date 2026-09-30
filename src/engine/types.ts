@@ -1,3 +1,5 @@
+import { ISoundManager } from '../audio/types';
+
 export type SceneId =
   | 'STUDIO'
   | 'STAGE_1_CHUPACABRA'
@@ -69,6 +71,7 @@ export interface IGameEngine {
   inventory: InventoryState;
   playerName: string;
   fps: number;
+  sound: ISoundManager;
   switchScene(sceneId: SceneId): void;
   unlockItem(item: MysticItemId): void;
   setPlayerName(name: string): void;

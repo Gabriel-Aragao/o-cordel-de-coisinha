@@ -7,6 +7,8 @@ import {
   InputState
 } from './types';
 import { InputManager } from './input';
+import { SoundManager } from '../audio/SoundManager';
+import { ISoundManager, BGMTrackId } from '../audio/types';
 import { StudioScene } from './scenes/StudioScene';
 import { Stage1ChupaCabraScene } from './scenes/Stage1ChupaCabraScene';
 import { Stage2FulozinhaScene } from './scenes/Stage2FulozinhaScene';
@@ -26,6 +28,7 @@ export class GameEngine implements IGameEngine {
   };
   public playerName: string = 'Coisinha';
   public fps: number = 60;
+  public sound: ISoundManager;
 
   private scenes: Map<SceneId, IScene> = new Map();
   private currentScene: IScene | null = null;
@@ -46,6 +49,7 @@ export class GameEngine implements IGameEngine {
     }
     this.ctx = context;
     this.inputManager = new InputManager(this.canvas);
+    this.sound = new SoundManager();
 
     this.registerScenes();
   }
@@ -66,6 +70,23 @@ export class GameEngine implements IGameEngine {
     requestAnimationFrame((time) => this.loop(time));
   }
 
+  private sceneToBgmTrack(sceneId: SceneId): BGMTrackId {
+    switch (sceneId) {
+      case 'STUDIO':
+        return 'STUDIO';
+      case 'STAGE_1_CHUPACABRA':
+        return 'STAGE1_CHUPACABRA';
+      case 'STAGE_2_FULOZINHA':
+        return 'STAGE2_FULOZINHA';
+      case 'STAGE_3_RASGAMORTALHA':
+        return 'STAGE3_RASGAMORTALHA';
+      case 'STAGE_4_BOTIJA':
+        return 'STAGE4_BOTIJA';
+      case 'VICTORY':
+        return 'VICTORY';
+    }
+  }
+
   public switchScene(sceneId: SceneId): void {
     if (this.currentScene) {
       this.currentScene.destroy();
@@ -80,6 +101,10 @@ export class GameEngine implements IGameEngine {
     this.currentSceneId = sceneId;
     this.currentScene = nextScene;
     this.currentScene.init(this);
+
+    // Transição da trilha BGM
+    const bgmTrack = this.sceneToBgmTrack(sceneId);
+    this.sound.playBGM(bgmTrack);
 
     if (this.onStateChange) {
       this.onStateChange(this);

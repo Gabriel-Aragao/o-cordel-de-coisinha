@@ -95,10 +95,36 @@ body {
 
 .header-right {
   display: flex;
+  align-items: center;
   gap: 16px;
   font-size: 0.9rem;
   color: #d6ba94;
   font-family: monospace;
+}
+
+.btn-audio {
+  background: #382c21;
+  border: 1px solid #8b5a2b;
+  color: #fef08a;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-audio:hover {
+  background: #5a3e26;
+  border-color: #facc15;
+  color: #fff;
+}
+
+.btn-audio.muted {
+  background: #2a1b15;
+  border-color: #ef4444;
+  color: #fca5a5;
 }
 
 #canvas-container {

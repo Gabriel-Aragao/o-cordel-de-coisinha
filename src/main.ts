@@ -17,8 +17,33 @@ window.addEventListener('DOMContentLoaded', () => {
   const itemTinta = document.getElementById('item-tinta');
   const nicknameInput = document.getElementById('player-nickname') as HTMLInputElement;
   const btnUnlockAll = document.getElementById('btn-unlock-all');
+  const btnAudioToggle = document.getElementById('btn-audio-toggle') as HTMLButtonElement;
 
   const engine = new GameEngine(canvas);
+
+  // Inicialização do Web Audio no primeiro gesto do usuário
+  const unlockAudio = () => {
+    engine.sound.init();
+    window.removeEventListener('click', unlockAudio);
+    window.removeEventListener('keydown', unlockAudio);
+    window.removeEventListener('touchstart', unlockAudio);
+  };
+  window.addEventListener('click', unlockAudio);
+  window.addEventListener('keydown', unlockAudio);
+  window.addEventListener('touchstart', unlockAudio);
+
+  // Controle de Mute / Áudio Toggle
+  if (btnAudioToggle) {
+    btnAudioToggle.addEventListener('click', () => {
+      engine.sound.init();
+      const isMuted = engine.sound.toggleMute();
+      btnAudioToggle.textContent = isMuted ? '🔇 Som: OFF' : '🔊 Som: ON';
+      btnAudioToggle.className = `btn-audio ${isMuted ? 'muted' : ''}`;
+      if (!isMuted) {
+        engine.sound.playUIClick();
+      }
+    });
+  }
 
   // Listener para o Nickname
   if (nicknameInput) {
@@ -31,6 +56,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Listener para desbloqueio rápido de todos os itens no modo Debug
   if (btnUnlockAll) {
     btnUnlockAll.addEventListener('click', () => {
+      engine.sound.playPickup();
       engine.unlockItem('carimbo');
       engine.unlockItem('folha');
       engine.unlockItem('pena');
@@ -83,6 +109,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById(btnId);
     if (btn) {
       btn.addEventListener('click', () => {
+        engine.sound.playUIClick();
         engine.switchScene(sceneId);
       });
     }

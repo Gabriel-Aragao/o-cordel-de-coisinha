@@ -1,5 +1,14 @@
 import { IScene, IGameEngine, InputState, SceneId } from '../types';
-import { drawText } from '../../renderer/shapes';
+import {
+  drawText,
+  drawMolduraCordel,
+  drawCoisinha,
+  drawItemCarimbo,
+  drawItemFolha,
+  drawItemPena,
+  drawItemTinta,
+  XILO_COLORS,
+} from '../../renderer/shapes';
 
 export class VictoryScene implements IScene {
   public id: SceneId = 'VICTORY';
@@ -18,126 +27,136 @@ export class VictoryScene implements IScene {
     this.animTimer = 0;
   }
 
-  public update(dt: number, _input: InputState, _engine: IGameEngine): void {
+  public update(dt: number, _input: InputState, engine: IGameEngine): void {
     this.animTimer += dt;
     if (!this.isPrinted) {
       this.printProgress += dt * 0.9;
       if (this.printProgress >= 1) {
         this.printProgress = 1;
         this.isPrinted = true;
+        engine.sound.playPrensaImpacto();
+        engine.sound.playVictoryJingle();
       }
     }
   }
 
   public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
-    // Fundo Papel de Cordel Envelhecido
-    ctx.fillStyle = '#fef3c7';
+    // 1. Fundo Papel Kraft / Folheto de Cordel Envelhecido
+    ctx.fillStyle = XILO_COLORS.kraftPaper;
     ctx.fillRect(0, 0, 960, 540);
 
-    // Moldura Dupla de Xilogravura
-    ctx.strokeStyle = '#18181b';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(30, 20, 900, 500);
-
-    ctx.strokeStyle = '#18181b';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(40, 30, 880, 480);
-
-    // Ornamentos nos 4 Cantos
-    const corners = [
-      { x: 50, y: 40 },
-      { x: 910, y: 40 },
-      { x: 50, y: 500 },
-      { x: 910, y: 500 }
-    ];
-    ctx.fillStyle = '#18181b';
-    for (const c of corners) {
-      ctx.fillRect(c.x - 6, c.y - 6, 12, 12);
+    // Textura sutil de papel artesanal
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    for (let py = 10; py < 530; py += 30) {
+      ctx.fillRect(20, py, 920, 1);
     }
 
-    // Cabeçalho do Folheto
-    ctx.fillStyle = '#18181b';
-    ctx.font = 'bold 22px "Courier New", Courier, monospace';
+    // 2. Moldura Ornamental Clássica de Xilogravura
+    drawMolduraCordel(ctx, 24, 16, 912, 508, { borderWeight: 5 });
+
+    // 3. Cabeçalho do Folheto de Cordel
+    ctx.fillStyle = XILO_COLORS.black;
+    ctx.font = 'bold 20px "Courier New", Courier, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('FOLHETO DE CORDEL DO VELHO SERTÃO', 480, 65);
+    ctx.fillText('FOLHETO DE CORDEL DO VELHO SERTÃO', 480, 52);
 
-    ctx.font = '16px "Courier New", Courier, monospace';
-    ctx.fillText('═════════════════════════════════════════════════════════════', 480, 85);
+    ctx.font = '14px "Courier New", Courier, monospace';
+    ctx.fillText('═══════════════════════════════════════════════════════════════════', 480, 70);
 
-    // Título Personalizado com Nickname
+    // 4. Título Personalizado com Nickname do Herói
     const displayName = (engine.playerName || 'Coisinha').toUpperCase();
-    ctx.font = 'bold 26px "Courier New", Courier, monospace';
-    ctx.fillText(`"O CORDEL DE ${displayName}:`, 480, 125);
-    ctx.fillText('O HERÓI DO SERTÃO"', 480, 160);
+    ctx.font = 'bold 24px "Courier New", Courier, monospace';
+    ctx.fillText(`"O CORDEL DE ${displayName}:`, 480, 102);
+    ctx.fillText('O HERÓI DO SERTÃO"', 480, 130);
 
-    ctx.font = '16px "Courier New", Courier, monospace';
-    ctx.fillText('═════════════════════════════════════════════════════════════', 480, 185);
+    ctx.font = '14px "Courier New", Courier, monospace';
+    ctx.fillText('═══════════════════════════════════════════════════════════════════', 480, 148);
 
-    // Gravura Central de Xilogravura
-    ctx.fillStyle = '#18181b';
-    ctx.fillRect(360, 200, 240, 170);
-    ctx.fillStyle = '#fef3c7';
-    ctx.fillRect(370, 210, 220, 150);
+    // 5. Gravura Central de Xilogravura com Moldura de Entalhe
+    const gx = 360;
+    const gy = 160;
+    const gw = 240;
+    const gh = 180;
 
-    // Desenho do Chapéu de Couro Sertanejo & Cacto
-    ctx.fillStyle = '#18181b';
-    ctx.beginPath();
-    ctx.arc(480, 280, 32, 0, Math.PI * 2);
-    ctx.fill();
+    // Fundo da xilo
+    ctx.fillStyle = XILO_COLORS.black;
+    ctx.fillRect(gx, gy, gw, gh);
+    ctx.fillStyle = XILO_COLORS.kraftLight;
+    ctx.fillRect(gx + 6, gy + 6, gw - 12, gh - 12);
+    ctx.strokeStyle = XILO_COLORS.black;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(gx + 6, gy + 6, gw - 12, gh - 12);
 
-    ctx.beginPath();
-    ctx.ellipse(480, 255, 48, 14, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Herói Coisinha Ilustrado no Centro da Capa
+    drawCoisinha(ctx, 480, 245, 50, 64, {
+      time: this.animTimer,
+      isMoving: false,
+    });
 
+    // Elementos Sertanejos Laterais (Cacto & Sol de Xilo)
+    ctx.fillStyle = XILO_COLORS.black;
     ctx.font = 'bold 18px monospace';
-    ctx.fillText('🌵   ⭐   🌵', 480, 340);
+    ctx.fillText('🌵', 400, 275);
+    ctx.fillText('🌵', 560, 275);
+    ctx.fillText('⭐', 480, 185);
 
-    // 4 Selos Místicos Conquistados
+    // 6. Os 4 Selos Místicos Conquistados (Arte em Xilo)
     const items = [
-      { name: 'Carimbo Mágico', icon: '🪓', desc: 'Chupa-Cabra' },
-      { name: 'Página Rasgada', icon: '📄', desc: 'Cumade Fulô' },
-      { name: 'Pena Encantada', icon: '🪶', desc: 'Rasga-Mortalha' },
-      { name: 'Tinta Encantada', icon: '🖋️', desc: 'Mané Monteiro' }
+      { name: 'Carimbo Mágico', desc: 'Chupa-Cabra', draw: drawItemCarimbo, color: XILO_COLORS.goldAccent },
+      { name: 'Página Rasgada', desc: 'Cumade Fulô', draw: drawItemFolha, color: XILO_COLORS.greenAccent },
+      { name: 'Pena Encantada', desc: 'Rasga-Mortalha', draw: drawItemPena, color: XILO_COLORS.purpleAccent },
+      { name: 'Tinta Encantada', desc: 'Mané Monteiro', draw: drawItemTinta, color: XILO_COLORS.cyanAccent },
     ];
 
     for (let i = 0; i < items.length; i++) {
       const it = items[i];
-      const ix = 120 + i * 240;
-      const iy = 405;
+      const ix = 140 + i * 225;
+      const iy = 385;
 
-      ctx.fillStyle = '#18181b';
-      ctx.fillRect(ix - 50, iy - 20, 100, 45);
-      ctx.fillStyle = '#fef3c7';
-      ctx.fillRect(ix - 48, iy - 18, 96, 41);
+      // Card de Selo
+      ctx.fillStyle = XILO_COLORS.black;
+      ctx.fillRect(ix - 55, iy - 24, 110, 52);
+      ctx.fillStyle = XILO_COLORS.kraftLight;
+      ctx.fillRect(ix - 52, iy - 21, 104, 46);
+      ctx.strokeStyle = it.color;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(ix - 52, iy - 21, 104, 46);
 
-      ctx.fillStyle = '#18181b';
-      ctx.font = '14px monospace';
-      ctx.fillText(`${it.icon} ${it.name.split(' ')[0]}`, ix, iy);
+      // Desenho do Ícone Xilogravado
+      it.draw(ctx, ix - 30, iy + 2, 22);
+
+      // Nome do Item
+      ctx.fillStyle = XILO_COLORS.black;
+      ctx.font = 'bold 10px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(it.name.split(' ')[0], ix - 12, iy - 2);
       ctx.font = '9px monospace';
-      ctx.fillText(it.desc, ix, iy + 14);
+      ctx.fillStyle = '#525252';
+      ctx.fillText(it.desc, ix - 12, iy + 12);
+      ctx.textAlign = 'center';
     }
 
-    // Feedback de Prensagem / Conclusão
+    // 7. Feedback de Prensagem / Conclusão
     if (this.isPrinted) {
       const pulse = Math.sin(this.animTimer * 5) * 2;
-      drawText(ctx, '✨ A GRANDE PORTA SE ABRIU! VOCÊ CONQUISTOU A CHAVE DO SERTÃO! ✨', 480, 475 + pulse, {
-        font: 'bold 14px "Courier New", monospace',
+      drawText(ctx, '✨ A GRANDE PORTA SE ABRIU! VOCÊ CONQUISTOU A CHAVE DO SERTÃO! ✨', 480, 460 + pulse, {
+        font: 'bold 13px "Courier New", monospace',
         color: '#15803d',
         align: 'center',
-        shadow: false
+        shadow: false,
       });
-      drawText(ctx, 'O seu cordel agora é eterno nas feiras da Paraíba!', 480, 498, {
+      drawText(ctx, 'O seu cordel agora é eterno nas feiras e cantorias da Paraíba!', 480, 482, {
         font: '12px "Courier New", monospace',
-        color: '#18181b',
+        color: XILO_COLORS.black,
         align: 'center',
-        shadow: false
+        shadow: false,
       });
     } else {
-      drawText(ctx, `Prensando matriz de xilogravura com os 4 elementos... ${Math.round(this.printProgress * 100)}%`, 480, 480, {
+      drawText(ctx, `Prensando matriz de xilogravura com os 4 elementos... ${Math.round(this.printProgress * 100)}%`, 480, 470, {
         font: 'bold 13px "Courier New", monospace',
         color: '#b45309',
         align: 'center',
-        shadow: false
+        shadow: false,
       });
     }
   }

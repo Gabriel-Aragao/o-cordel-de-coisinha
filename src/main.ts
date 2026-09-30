@@ -92,6 +92,36 @@ window.addEventListener('DOMContentLoaded', () => {
       itemTinta.className = `inv-badge ${eng.inventory.tinta ? 'unlocked' : 'locked'}`;
     }
 
+    // Sincronização do painel de mensagens DOM (#game-message-panel)
+    const panel = document.getElementById('game-message-panel');
+    const messageSpeaker = document.getElementById('message-speaker');
+    const messageText = document.getElementById('message-text');
+    const messageHint = document.getElementById('message-hint');
+
+    const dialogData = eng.messages.getActiveDialogData();
+    const toastData = eng.messages.getActiveToastData();
+
+    if (dialogData) {
+      if (panel) panel.classList.add('active');
+      if (messageSpeaker) {
+        messageSpeaker.textContent = dialogData.speaker.toUpperCase();
+        messageSpeaker.className = `message-badge ${dialogData.isGlitchName ? 'censored' : ''}`;
+      }
+      if (messageText) messageText.textContent = dialogData.text;
+      if (messageHint) messageHint.textContent = dialogData.prompt || '[ Solte E para Avançar ]';
+    } else if (toastData) {
+      if (panel) panel.classList.add('active');
+      if (messageSpeaker) {
+        messageSpeaker.textContent = toastData.speaker.toUpperCase();
+        messageSpeaker.className = `message-badge ${toastData.isError ? 'error' : toastData.isSuccess ? 'success' : ''}`;
+      }
+      if (messageText) messageText.textContent = toastData.text;
+      if (messageHint) messageHint.textContent = toastData.prompt || '';
+    } else {
+      if (panel) panel.classList.remove('active');
+      if (messageText) messageText.textContent = '';
+    }
+
     // Atualiza botões ativos na barra de debug
     document.querySelectorAll('.btn-debug').forEach((btn) => {
       btn.classList.remove('active');

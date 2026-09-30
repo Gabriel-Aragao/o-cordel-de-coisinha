@@ -26,18 +26,16 @@
       </header>
 
       <main id="canvas-container">
-        <canvas id="game-canvas" width="960" height="600"></canvas>
+        <canvas id="game-canvas" width="960" height="540"></canvas>
       </main>
 
-      <!-- Painel Dedicado de Diálogos & Mensagens (100% livre de sobreposição com a tela de jogo) -->
+      <!-- Painel Dedicado de Diálogos & Mensagens (100% fora do canvas, exibido estritamente sob demanda via .active) -->
       <section id="game-message-panel" class="game-message-panel">
         <div class="message-panel-header">
           <span class="message-badge" id="message-speaker">📜 NARRADOR</span>
           <span class="message-hint" id="message-hint">[ Solte E para Avançar ]</span>
         </div>
-        <div class="message-panel-body" id="message-text">
-          Bem-vindo ao Sertão! Explore o estúdio e desvende os mistérios dos folhetos de cordel.
-        </div>
+        <div class="message-panel-body" id="message-text"></div>
       </section>
 
       <footer id="game-footer">

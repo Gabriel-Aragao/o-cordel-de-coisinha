@@ -175,6 +175,11 @@ export class GameEngine implements IGameEngine {
       this.currentScene.update(dt, input, this);
     }
 
+    // Notificar mudanças de estado a cada frame para sincronizar UI do DOM imediatamente
+    if (this.onStateChange) {
+      this.onStateChange(this);
+    }
+
     // Render da cena ativa com screen shake
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

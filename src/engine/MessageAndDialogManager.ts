@@ -1,5 +1,4 @@
 import { IGameEngine, InputState } from './types';
-import { drawCaixaDialogoXilo, drawMolduraCordel } from '../renderer/xilogravura';
 
 export interface DialogLine {
   speaker: string;
@@ -175,73 +174,43 @@ export class MessageAndDialogManager {
   }
 
   /**
-   * RENDERIZAÇÃO ESTREITA NO PAINEL DEDICADO NA BASE (Y: 460 a 600, Altura 140px)
-   * ESTREITAMENTE SOB DEMANDA: Ocultado 100% no estado ocioso para não cobrir o cenário!
+   * Retorna os dados do diálogo ativo para sincronização com o DOM (#game-message-panel)
    */
-  public renderBottomPanel(ctx: CanvasRenderingContext2D, width: number = 960, _height: number = 600): void {
-    // SE NÃO HOUVER DIÁLOGO NEM TOAST ATIVO: NÃO DESENHAR ABSOLUTAMENTE NADA!
-    if (!this.isDialogActive && !this.activeToast) {
-      return;
-    }
+  public getActiveDialogData(): { speaker: string; text: string; isGlitchName?: boolean; prompt?: string } | null {
+    if (!this.isDialogActive || this.currentLines.length === 0) return null;
+    const line = this.currentLines[this.currentLineIdx];
+    if (!line) return null;
+    return {
+      speaker: `${line.avatarIcon} ${line.speaker}`,
+      text: line.text,
+      isGlitchName: line.isGlitchName,
+      prompt: 'Aperte [E / Enter] para Avançar ▶'
+    };
+  }
 
-    const panelY = 460;
-    const panelH = 140;
+  /**
+   * Retorna os dados do toast/alerta ativo para sincronização com o DOM (#game-message-panel)
+   */
+  public getActiveToastData(): { speaker: string; text: string; icon?: string; isError?: boolean; isSuccess?: boolean; prompt?: string } | null {
+    if (!this.activeToast) return null;
+    const toast = this.activeToast;
+    const speakerName = toast.isError ? 'ALERTA DO SERTÃO' : toast.isSuccess ? 'VITÓRIA' : 'ORIENTAÇÃO DO CORDEL';
+    return {
+      speaker: `${toast.icon || '📜'} ${speakerName}`,
+      text: toast.message,
+      icon: toast.icon,
+      isError: toast.isError,
+      isSuccess: toast.isSuccess,
+      prompt: this.toastQueue.length > 0 ? `+${this.toastQueue.length} na fila` : ''
+    };
+  }
 
-    ctx.save();
-
-    // 1. Fundo e Moldura do Painel Base
-    ctx.fillStyle = '#1e1814';
-    ctx.fillRect(0, panelY, width, panelH);
-
-    // Divisória de Madeira Entalhada entre Gameplay e Painel de Diálogo
-    ctx.strokeStyle = '#8b5a2b';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, panelY);
-    ctx.lineTo(width, panelY);
-    ctx.stroke();
-
-    drawMolduraCordel(ctx, 6, panelY + 4, width - 12, panelH - 8, { borderWeight: 2 });
-
-    // 2. Se houver Diálogo Ativo: Renderiza Fala do Personagem no Painel Inferior
-    if (this.isDialogActive && this.currentLines.length > 0) {
-      const line = this.currentLines[this.currentLineIdx];
-      if (line) {
-        const boxX = 20;
-        const boxY = panelY + 12;
-        const boxW = width - 40;
-        const boxH = panelH - 24;
-
-        drawCaixaDialogoXilo(ctx, boxX, boxY, boxW, boxH, `${line.avatarIcon} ${line.speaker}`, line.text, {
-          speakerColor: line.isGlitchName ? '#ef4444' : '#fef08a',
-          prompt: 'Aperte [E / Enter] para Avançar ▶',
-          borderWeight: 2
-        });
-      }
-      ctx.restore();
-      return;
-    }
-
-    // 3. Se houver Toast/Instrução Ativa na Fila
-    if (this.activeToast) {
-      const toast = this.activeToast;
-      const boxX = 20;
-      const boxY = panelY + 12;
-      const boxW = width - 40;
-      const boxH = panelH - 24;
-
-      const speakerColor = toast.isError ? '#ef4444' : toast.isSuccess ? '#22c55e' : '#f59e0b';
-      const speakerName = toast.isError ? 'ALERTA DO SERTÃO' : toast.isSuccess ? 'VITÓRIA' : 'ORIENTAÇÃO DO CORDEL';
-
-      drawCaixaDialogoXilo(ctx, boxX, boxY, boxW, boxH, `${toast.icon || '📜'} ${speakerName}`, toast.message, {
-        speakerColor,
-        prompt: this.toastQueue.length > 0 ? `+${this.toastQueue.length} na fila` : '',
-        borderWeight: 2
-      });
-      ctx.restore();
-      return;
-    }
-
-    ctx.restore();
+  /**
+   * ZERO RENDERIZAÇÃO NO CANVAS:
+   * Mantém 100% dos pixels do canvas de jogo dedicados ao mapa e itens,
+   * sem desenhar absolutamente nada sobre o canvas!
+   */
+  public renderBottomPanel(_ctx: CanvasRenderingContext2D, _width: number = 960, _height: number = 540): void {
+    // Zero renderização sobre o canvas! Todos os diálogos e mensagens são sincronizados no DOM (#game-message-panel).
   }
 }

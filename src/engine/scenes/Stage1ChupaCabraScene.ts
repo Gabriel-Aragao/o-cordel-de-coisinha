@@ -1,5 +1,13 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
+import {
+  drawCoisinha,
+  drawBode,
+  drawChupaCabra,
+  drawFazendeiro,
+  drawMoita,
+  drawChaoTerraBatida
+} from '../../renderer/xilogravura';
 
 interface Bush {
   id: string;
@@ -36,8 +44,8 @@ export class Stage1ChupaCabraScene implements IScene {
     id: 'hero',
     x: 960,
     y: 650,
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 50,
     color: '#3b82f6',
     label: '[HEROI]',
     shape: 'rect',
@@ -48,8 +56,8 @@ export class Stage1ChupaCabraScene implements IScene {
     id: 'curral',
     x: 960,
     y: 540,
-    width: 200,
-    height: 150,
+    width: 220,
+    height: 160,
     color: '#713f12',
     label: '[CURRAL]',
     shape: 'rect'
@@ -59,8 +67,8 @@ export class Stage1ChupaCabraScene implements IScene {
     id: 'fazendeiro',
     x: 960,
     y: 490,
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 50,
     color: '#15803d',
     label: '[FAZENDEIRO]',
     shape: 'rect'
@@ -70,8 +78,8 @@ export class Stage1ChupaCabraScene implements IScene {
     id: 'chupa',
     x: 200,
     y: 200,
-    width: 36,
-    height: 36,
+    width: 44,
+    height: 44,
     color: '#dc2626',
     label: '[CHUPA-CABRA]',
     shape: 'triangle',
@@ -96,6 +104,9 @@ export class Stage1ChupaCabraScene implements IScene {
   private rosnadoTimer: number = 0;
   private actionSoundTriggered: boolean = false;
   private lastActionWasGrito: boolean = false;
+  private animTime: number = 0;
+  private facing: 'left' | 'right' | 'up' | 'down' = 'down';
+  private isMoving: boolean = false;
 
   public init(engine: IGameEngine): void {
     this.player.x = 960;
@@ -111,17 +122,18 @@ export class Stage1ChupaCabraScene implements IScene {
     this.rosnadoTimer = 0;
     this.actionSoundTriggered = false;
     this.lastActionWasGrito = false;
+    this.animTime = 0;
 
     // Moitas espalhadas pelo mapa amplo
     this.bushes = [
-      { id: 'b1', x: 450, y: 300, radius: 42, hasItem: 'corda', isSearched: false, hidingGoatId: 'goat_1' },
-      { id: 'b2', x: 1450, y: 300, radius: 42, hasItem: 'candeeiro', isSearched: false, hidingGoatId: 'goat_2' },
-      { id: 'b3', x: 400, y: 800, radius: 45, isSearched: false, hidingGoatId: 'goat_3' },
-      { id: 'b4', x: 1500, y: 800, radius: 45, isSearched: false, hidingGoatId: 'goat_4' },
-      { id: 'b5', x: 960, y: 220, radius: 40, isSearched: false },
-      { id: 'b6', x: 960, y: 880, radius: 40, isSearched: false },
-      { id: 'b7', x: 250, y: 540, radius: 38, isSearched: false },
-      { id: 'b8', x: 1680, y: 540, radius: 38, isSearched: false }
+      { id: 'b1', x: 450, y: 300, radius: 46, hasItem: 'corda', isSearched: false, hidingGoatId: 'goat_1' },
+      { id: 'b2', x: 1450, y: 300, radius: 46, hasItem: 'candeeiro', isSearched: false, hidingGoatId: 'goat_2' },
+      { id: 'b3', x: 400, y: 800, radius: 48, isSearched: false, hidingGoatId: 'goat_3' },
+      { id: 'b4', x: 1500, y: 800, radius: 48, isSearched: false, hidingGoatId: 'goat_4' },
+      { id: 'b5', x: 960, y: 220, radius: 44, isSearched: false },
+      { id: 'b6', x: 960, y: 880, radius: 44, isSearched: false },
+      { id: 'b7', x: 250, y: 540, radius: 42, isSearched: false },
+      { id: 'b8', x: 1680, y: 540, radius: 42, isSearched: false }
     ];
 
     // 4 bodes com 100 HP cada
@@ -130,8 +142,8 @@ export class Stage1ChupaCabraScene implements IScene {
         id: 'goat_1',
         x: 450,
         y: 300,
-        width: 26,
-        height: 26,
+        width: 36,
+        height: 32,
         color: '#f8fafc',
         label: '[BODE 1]',
         shape: 'circle',
@@ -148,8 +160,8 @@ export class Stage1ChupaCabraScene implements IScene {
         id: 'goat_2',
         x: 1450,
         y: 300,
-        width: 26,
-        height: 26,
+        width: 36,
+        height: 32,
         color: '#f8fafc',
         label: '[BODE 2]',
         shape: 'circle',
@@ -166,8 +178,8 @@ export class Stage1ChupaCabraScene implements IScene {
         id: 'goat_3',
         x: 400,
         y: 800,
-        width: 26,
-        height: 26,
+        width: 36,
+        height: 32,
         color: '#f8fafc',
         label: '[BODE 3]',
         shape: 'circle',
@@ -184,8 +196,8 @@ export class Stage1ChupaCabraScene implements IScene {
         id: 'goat_4',
         x: 1500,
         y: 800,
-        width: 26,
-        height: 26,
+        width: 36,
+        height: 32,
         color: '#f8fafc',
         label: '[BODE 4]',
         shape: 'circle',
@@ -206,6 +218,8 @@ export class Stage1ChupaCabraScene implements IScene {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    this.animTime += dt;
+
     if (this.stateStatus !== 'PLAYING') {
       this.endTimer += dt;
       if (this.endTimer >= 2.5) {
@@ -218,28 +232,41 @@ export class Stage1ChupaCabraScene implements IScene {
     let dx = 0;
     let dy = 0;
 
-    if (input.left) dx -= 1;
-    if (input.right) dx += 1;
-    if (input.up) dy -= 1;
-    if (input.down) dy += 1;
+    if (input.left) {
+      dx -= 1;
+      this.facing = 'left';
+    }
+    if (input.right) {
+      dx += 1;
+      this.facing = 'right';
+    }
+    if (input.up) {
+      dy -= 1;
+      this.facing = 'up';
+    }
+    if (input.down) {
+      dy += 1;
+      this.facing = 'down';
+    }
 
-    if (dx !== 0 && dy !== 0) {
+    this.isMoving = dx !== 0 || dy !== 0;
+
+    if (this.isMoving) {
       const len = Math.sqrt(dx * dx + dy * dy);
       dx /= len;
       dy /= len;
+
+      this.stepTimer += dt;
+      if (this.stepTimer >= 0.32) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+        engine.juice.particles.emit('dust', this.player.x, this.player.y + 20, { count: 3, speed: 30 });
+      }
     }
 
     const speed = this.player.speed || 240;
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
-
-    if (dx !== 0 || dy !== 0) {
-      this.stepTimer += dt;
-      if (this.stepTimer >= 0.32) {
-        this.stepTimer = 0;
-        engine.sound.playPassos();
-      }
-    }
 
     this.player.x = Math.max(30, Math.min(this.mapWidth - 30, this.player.x));
     this.player.y = Math.max(30, Math.min(this.mapHeight - 30, this.player.y));
@@ -258,6 +285,8 @@ export class Stage1ChupaCabraScene implements IScene {
         if (!this.lastActionWasGrito) {
           this.lastActionWasGrito = true;
           engine.sound.playGrito();
+          engine.juice.shake.addTrauma(0.4);
+          engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 70 });
         }
       } else {
         // Aboio Suave
@@ -267,6 +296,7 @@ export class Stage1ChupaCabraScene implements IScene {
         if (!this.actionSoundTriggered) {
           this.actionSoundTriggered = true;
           engine.sound.playAboio(1.2);
+          engine.juice.particles.emit('note', this.player.x, this.player.y - 20, { count: 2, speed: 20 });
         }
       }
     } else {
@@ -283,14 +313,17 @@ export class Stage1ChupaCabraScene implements IScene {
         if (Math.hypot(this.player.x - bush.x, this.player.y - bush.y) < bush.radius + 30) {
           if (!bush.isSearched) {
             bush.isSearched = true;
+            engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 40 });
             if (bush.hasItem === 'corda' && !this.hasRope) {
               this.hasRope = true;
               this.message = '🪢 CORDA ENCONTRADA NA MOITA! Agora você pode laçar os bodes!';
               engine.sound.playPickup();
+              engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
             } else if (bush.hasItem === 'candeeiro' && !this.hasLantern) {
               this.hasLantern = true;
               this.message = '🏮 CANDEEIRO ENCONTRADO NA MOITA! Iluminação expandida na caatinga!';
               engine.sound.playPickup();
+              engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
             }
           }
 
@@ -305,6 +338,7 @@ export class Stage1ChupaCabraScene implements IScene {
               this.message = '🐐 Você descobriu um bode escondido na moita!';
               engine.sound.playBerroBode(false);
               engine.sound.playItemDescobrir();
+              engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 6, speed: 35 });
             }
           }
         }
@@ -370,6 +404,7 @@ export class Stage1ChupaCabraScene implements IScene {
               this.rosnadoTimer = 0;
               engine.sound.playChupaCabraRosnado();
               engine.sound.playBerroBode(true);
+              engine.juice.shake.addTrauma(0.3);
             }
 
             // Verificação de Morte do Bode ➔ FALHA!
@@ -407,6 +442,7 @@ export class Stage1ChupaCabraScene implements IScene {
         g.isRescued = true;
         g.isLeashed = false;
         engine.sound.playPickup();
+        engine.juice.particles.emit('sparkle', g.x, g.y, { count: 6, speed: 40 });
         continue;
       }
 
@@ -414,6 +450,7 @@ export class Stage1ChupaCabraScene implements IScene {
       if (this.hasRope && distToHero < 70) {
         if (!g.isLeashed) {
           engine.sound.playBerroBode(false);
+          engine.juice.particles.emit('dust', g.x, g.y, { count: 4, speed: 20 });
         }
         g.isLeashed = true;
       }
@@ -478,6 +515,7 @@ export class Stage1ChupaCabraScene implements IScene {
       engine.unlockItem('carimbo');
       this.message = '🎉 TODOS OS 4 BODES SALVOS! O Fazendeiro entregou o 🪓 Carimbo Mágico!';
       engine.sound.playVictoryJingle();
+      engine.juice.particles.emit('sparkle', this.fazendeiro.x, this.fazendeiro.y, { count: 20, speed: 60 });
     }
   }
 
@@ -486,25 +524,8 @@ export class Stage1ChupaCabraScene implements IScene {
     // Aplica Câmera do mundo
     ctx.translate(-this.camera.x, -this.camera.y);
 
-    // Fundo da Caatinga Ampla
-    ctx.fillStyle = '#26170d';
-    ctx.fillRect(0, 0, this.mapWidth, this.mapHeight);
-
-    // Grid do terreno
-    ctx.strokeStyle = '#382214';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < this.mapWidth; x += 100) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, this.mapHeight);
-      ctx.stroke();
-    }
-    for (let y = 0; y < this.mapHeight; y += 100) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(this.mapWidth, y);
-      ctx.stroke();
-    }
+    // 1. Piso de Terra Batida da Caatinga (Xilogravura da Maya)
+    drawChaoTerraBatida(ctx, 0, 0, this.mapWidth, this.mapHeight);
 
     // Iluminação do Candeeiro
     if (this.hasLantern) {
@@ -527,7 +548,13 @@ export class Stage1ChupaCabraScene implements IScene {
     }
 
     // Curral Central
-    renderEntity(ctx, this.curral);
+    ctx.fillStyle = '#451a03';
+    ctx.fillRect(
+      this.curral.x - this.curral.width / 2,
+      this.curral.y - this.curral.height / 2,
+      this.curral.width,
+      this.curral.height
+    );
     ctx.strokeStyle = '#a16207';
     ctx.lineWidth = 4;
     ctx.strokeRect(
@@ -536,33 +563,37 @@ export class Stage1ChupaCabraScene implements IScene {
       this.curral.width,
       this.curral.height
     );
+    drawText(ctx, '[CURRAL]', this.curral.x, this.curral.y - 10, {
+      font: 'bold 12px monospace',
+      color: '#facc15',
+      align: 'center'
+    });
 
-    renderEntity(ctx, this.fazendeiro);
+    // Fazendeiro (Xilogravura da Maya)
+    drawFazendeiro(ctx, this.fazendeiro.x, this.fazendeiro.y, this.fazendeiro.width, this.fazendeiro.height);
 
-    // Moitas no Terreno
+    // Moitas no Terreno (Xilogravura da Maya)
     for (const bush of this.bushes) {
-      ctx.save();
-      ctx.fillStyle = bush.isSearched ? '#15803d' : '#166534';
-      ctx.beginPath();
-      ctx.arc(bush.x, bush.y, bush.radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#22c55e';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      drawMoita(ctx, bush.x, bush.y, bush.radius, {
+        hasItem: !bush.isSearched,
+        searched: bush.isSearched
+      });
 
-      drawText(ctx, bush.hidingGoatId ? '🌿 [MOITA - RUGIDO]' : '🌿 [MOITA]', bush.x, bush.y - 6, {
+      drawText(ctx, bush.hidingGoatId ? '🌿 [RUGIDO]' : '🌿', bush.x, bush.y - 12, {
         font: 'bold 10px monospace',
         color: '#fef08a',
         align: 'center'
       });
-      ctx.restore();
     }
 
-    // Bodes (apenas os fora de moitas)
+    // Bodes (Xilogravura da Maya)
     for (const g of this.goats) {
       if (g.hiddenInBushId) continue;
 
-      renderEntity(ctx, g);
+      drawBode(ctx, g.x, g.y, g.width, g.height, {
+        isMoving: !g.isRescued,
+        time: this.animTime
+      });
 
       // Barra de HP
       const barW = 36;
@@ -579,9 +610,9 @@ export class Stage1ChupaCabraScene implements IScene {
       ctx.strokeRect(g.x - barW / 2, g.y - 24, barW, barH);
 
       if (g.isRescued) {
-        drawText(ctx, '✓ Salvo', g.x, g.y + 16, { font: 'bold 10px monospace', color: '#4ade80', align: 'center' });
+        drawText(ctx, '✓ Salvo', g.x, g.y + 18, { font: 'bold 10px monospace', color: '#4ade80', align: 'center' });
       } else if (g.isLeashed) {
-        drawText(ctx, '🪢 Preso', g.x, g.y + 16, { font: 'bold 10px monospace', color: '#facc15', align: 'center' });
+        drawText(ctx, '🪢 Preso', g.x, g.y + 18, { font: 'bold 10px monospace', color: '#facc15', align: 'center' });
         ctx.strokeStyle = '#d97706';
         ctx.lineWidth = 2;
         ctx.beginPath();
@@ -591,9 +622,11 @@ export class Stage1ChupaCabraScene implements IScene {
       }
     }
 
-    // Chupa-Cabra
+    // Chupa-Cabra (Xilogravura da Maya)
     if (this.chupaCabra.active) {
-      renderEntity(ctx, this.chupaCabra);
+      drawChupaCabra(ctx, this.chupaCabra.x, this.chupaCabra.y, this.chupaCabra.width, this.chupaCabra.height, {
+        time: this.animTime
+      });
     }
 
     // Efeito Visual de Som
@@ -616,8 +649,12 @@ export class Stage1ChupaCabraScene implements IScene {
       ctx.restore();
     }
 
-    // Jogador
-    renderEntity(ctx, this.player);
+    // Herói Coisinha (Xilogravura da Maya)
+    drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
+      facing: this.facing,
+      isMoving: this.isMoving,
+      time: this.animTime
+    });
 
     ctx.restore(); // Restaura Câmera para renderizar HUD estático fixo na tela
 

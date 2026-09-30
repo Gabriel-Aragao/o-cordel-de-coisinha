@@ -9,6 +9,7 @@ import {
 import { InputManager } from './input';
 import { SoundManager } from '../audio/SoundManager';
 import { ISoundManager, BGMTrackId } from '../audio/types';
+import { JuiceManager } from './juice';
 import { StudioScene } from './scenes/StudioScene';
 import { Stage1ChupaCabraScene } from './scenes/Stage1ChupaCabraScene';
 import { Stage2FulozinhaScene } from './scenes/Stage2FulozinhaScene';
@@ -29,6 +30,7 @@ export class GameEngine implements IGameEngine {
   public playerName: string = 'Coisinha';
   public fps: number = 60;
   public sound: ISoundManager;
+  public juice: JuiceManager;
 
   private scenes: Map<SceneId, IScene> = new Map();
   private currentScene: IScene | null = null;
@@ -50,6 +52,7 @@ export class GameEngine implements IGameEngine {
     this.ctx = context;
     this.inputManager = new InputManager(this.canvas);
     this.sound = new SoundManager();
+    this.juice = new JuiceManager();
 
     this.registerScenes();
   }
@@ -64,7 +67,7 @@ export class GameEngine implements IGameEngine {
   }
 
   public start(): void {
-    this.switchScene('STUDIO');
+    this.switchSceneDirect('STUDIO');
     this.isRunning = true;
     this.lastTime = performance.now();
     requestAnimationFrame((time) => this.loop(time));
@@ -87,7 +90,7 @@ export class GameEngine implements IGameEngine {
     }
   }
 
-  public switchScene(sceneId: SceneId): void {
+  private switchSceneDirect(sceneId: SceneId): void {
     if (this.currentScene) {
       this.currentScene.destroy();
     }
@@ -111,8 +114,18 @@ export class GameEngine implements IGameEngine {
     }
   }
 
+  public switchScene(sceneId: SceneId): void {
+    // Efeito de transição folheada de cordel com som
+    this.sound.playCordelFolhear();
+    this.juice.transition.start(() => {
+      this.switchSceneDirect(sceneId);
+    });
+  }
+
   public unlockItem(item: MysticItemId): void {
     this.inventory[item] = true;
+    this.sound.playItemDescobrir();
+    this.juice.shake.addTrauma(0.4);
     if (this.onStateChange) {
       this.onStateChange(this);
     }
@@ -148,16 +161,33 @@ export class GameEngine implements IGameEngine {
     this.inputManager.update(dt);
     const input: InputState = this.inputManager.getState();
 
+    // Juice update (partículas, screenshake e transição)
+    this.juice.update(dt);
+
     // Update da cena ativa
     if (this.currentScene) {
       this.currentScene.update(dt, input, this);
     }
 
-    // Render da cena ativa
+    // Render da cena ativa com screen shake
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.ctx.save();
+    if (this.juice.shake.offsetX !== 0 || this.juice.shake.offsetY !== 0) {
+      this.ctx.translate(this.juice.shake.offsetX, this.juice.shake.offsetY);
+    }
+
     if (this.currentScene) {
       this.currentScene.render(this.ctx, this);
     }
+
+    // Partículas globais
+    this.juice.renderParticles(this.ctx);
+
+    this.ctx.restore();
+
+    // Transição visual de Cordel por cima
+    this.juice.renderTransition(this.ctx, this.canvas.width, this.canvas.height);
 
     requestAnimationFrame((time) => this.loop(time));
   }

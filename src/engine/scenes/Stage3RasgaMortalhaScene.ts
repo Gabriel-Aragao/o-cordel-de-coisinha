@@ -1,5 +1,6 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
 import { drawText } from '../../renderer/shapes';
+import { drawRasgaMortalha, drawMolduraCordel } from '../../renderer/xilogravura';
 
 interface HouseSlot {
   index: number;
@@ -24,8 +25,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
     id: 'owl',
     x: 100,
     y: 50,
-    width: 36,
-    height: 24,
+    width: 48,
+    height: 36,
     color: '#a855f7',
     label: '[RASGA-MORTALHA]',
     shape: 'triangle',
@@ -33,6 +34,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
   };
 
   private owlDirection: number = 1;
+  private animTime: number = 0;
 
   // As 5 Casas Sertanejas
   private houses: HouseSlot[] = [];
@@ -136,6 +138,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     this.selectedHouseIndex = 0;
     this.selectedRow = 0;
     this.currentStanza = 0;
+    this.animTime = 0;
 
     // Inicializa as 5 Casas com os valores de dedução
     this.houses = [
@@ -152,6 +155,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    this.animTime += dt;
+
     if (this.stateStatus !== 'PLAYING') {
       this.endTimer += dt;
       if (this.endTimer >= 2.5) {
@@ -169,6 +174,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     if (this.owlCantoTimer <= 0) {
       this.owlCantoTimer = 6.0 + Math.random() * 4.0;
       engine.sound.playRasgaCanto();
+      engine.juice.particles.emit('sparkle', this.owl.x, this.owl.y, { count: 6, speed: 30 });
     }
 
     // Navegação no Teclado
@@ -195,7 +201,6 @@ export class Stage3RasgaMortalhaScene implements IScene {
 
       // 1. Clique no Painel de Estrofes de Cordel (topo) ➔ Avança estrofe
       if (mx >= 40 && mx <= 920 && my >= 38 && my <= 140) {
-        // Checa clique nas setas ou no painel
         if (mx >= 40 && mx <= 120) {
           this.currentStanza = (this.currentStanza - 1 + this.stanzas.length) % this.stanzas.length;
         } else {
@@ -283,12 +288,14 @@ export class Stage3RasgaMortalhaScene implements IScene {
       engine.unlockItem('pena');
       this.message = '🎉 DEDUÇÃO EXATA! O Ferrador da Casa Verde entregou a 🪶 Pena Encantada!';
       engine.sound.playVictoryJingle();
+      engine.juice.particles.emit('sparkle', 480, 270, { count: 30, speed: 70 });
     } else {
       // FALHA!
       this.stateStatus = 'FAILED';
       this.message = '💀 O PIADO DA RASGA-MORTALHA ECOOU! A dedução está incorreta!';
       engine.sound.playRasgaCanto();
       engine.sound.playDefeatJingle();
+      engine.juice.shake.addTrauma(0.5);
     }
   }
 
@@ -297,25 +304,22 @@ export class Stage3RasgaMortalhaScene implements IScene {
     ctx.fillStyle = '#050814';
     ctx.fillRect(0, 0, 960, 540);
 
+    // Moldura de Cordel
+    drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+
     // Lua Cheia de Xilogravura
     ctx.fillStyle = '#fef08a';
     ctx.beginPath();
     ctx.arc(890, 50, 24, 0, Math.PI * 2);
     ctx.fill();
 
-    // Voo da Rasga-Mortalha
-    ctx.fillStyle = this.owl.color;
-    ctx.beginPath();
-    ctx.arc(this.owl.x, this.owl.y, 14, 0, Math.PI * 2);
-    ctx.fill();
-    drawText(ctx, '🦉 [RASGA-MORTALHA]', this.owl.x, this.owl.y - 18, {
-      font: 'bold 10px monospace',
-      color: '#d8b4fe',
-      align: 'center'
+    // Voo da Rasga-Mortalha (Xilogravura da Maya)
+    drawRasgaMortalha(ctx, this.owl.x, this.owl.y, this.owl.width, this.owl.height, {
+      time: this.animTime
     });
 
     // Cabeçalho
-    drawText(ctx, '🦉 FASE 3: A PENA DA RASGA-MORTALHA (ENIGMA DAS 5 CASAS)', 480, 18, {
+    drawText(ctx, '🦉 FASE 3: A PENA DA RASGA-MORTALHA (ENIGMA DAS 5 CASAS)', 480, 20, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
@@ -323,19 +327,18 @@ export class Stage3RasgaMortalhaScene implements IScene {
 
     // Painel Dinâmico de Estrofe por Estrofe (9 Estrofes ao Clique)
     ctx.fillStyle = '#111827';
-    ctx.fillRect(40, 40, 880, 102);
+    ctx.fillRect(40, 42, 880, 98);
     ctx.strokeStyle = '#eab308';
     ctx.lineWidth = 2;
-    ctx.strokeRect(40, 40, 880, 102);
+    ctx.strokeRect(40, 42, 880, 98);
 
     const s = this.stanzas[this.currentStanza];
 
-    // Cabeçalho da Estrofe com Botões de Navegação
     drawText(
       ctx,
       `📜 ${s.title.toUpperCase()} (${this.currentStanza + 1}/9) — [Clique no Painel ou aperte Espaço p/ Avançar]`,
       480,
-      48,
+      50,
       { font: 'bold 12px monospace', color: '#facc15', align: 'center' }
     );
 

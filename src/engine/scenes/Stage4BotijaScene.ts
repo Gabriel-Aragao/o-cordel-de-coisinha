@@ -1,5 +1,13 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
+import {
+  drawCoisinha,
+  drawCumadeFulozinha,
+  drawBeato,
+  drawItemBotija,
+  drawChaoTerraBatida,
+  drawMolduraCordel
+} from '../../renderer/xilogravura';
 
 type LotId = 'igreja' | '0' | '1a' | '1b' | '2a' | '2b' | '3a' | '3b';
 
@@ -28,8 +36,8 @@ export class Stage4BotijaScene implements IScene {
     id: 'hero',
     x: 480,
     y: 360,
-    width: 28,
-    height: 28,
+    width: 36,
+    height: 50,
     color: '#3b82f6',
     label: '[HEROI]',
     shape: 'rect',
@@ -40,8 +48,8 @@ export class Stage4BotijaScene implements IScene {
     id: 'fulo_furia',
     x: 480,
     y: 270,
-    width: 34,
-    height: 34,
+    width: 42,
+    height: 48,
     color: '#ef4444',
     label: '[FULÔ EM FÚRIA]',
     shape: 'circle',
@@ -68,7 +76,7 @@ export class Stage4BotijaScene implements IScene {
     x: 480,
     y: 180,
     width: 36,
-    height: 36,
+    height: 50,
     color: '#facc15',
     label: '[BEATO DA PARÓQUIA]',
     shape: 'rect'
@@ -95,6 +103,9 @@ export class Stage4BotijaScene implements IScene {
   private stepTimer: number = 0;
   private digSoundTimer: number = 0;
   private bellTimer: number = 0;
+  private animTime: number = 0;
+  private facing: 'left' | 'right' | 'up' | 'down' = 'down';
+  private isMoving: boolean = false;
 
   // Ciclo de patrulha da Fulô (exclui a Igreja)
   private lotSequence: LotId[] = ['0', '2a', '1a', '2b', '1b', '3b', '3a'];
@@ -179,6 +190,7 @@ export class Stage4BotijaScene implements IScene {
     this.stepTimer = 0;
     this.digSoundTimer = 0;
     this.bellTimer = 0;
+    this.animTime = 0;
 
     engine.sound.playSinoBadalo();
 
@@ -188,6 +200,8 @@ export class Stage4BotijaScene implements IScene {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    this.animTime += dt;
+
     if (this.stateStatus !== 'PLAYING') {
       this.endTimer += dt;
       if (this.endTimer >= 2.5) {
@@ -219,6 +233,7 @@ export class Stage4BotijaScene implements IScene {
 
       if (this.fuloCurrentLot === this.currentLot && !inSanctuary) {
         engine.sound.playCumadeAssobio(1.3);
+        engine.juice.shake.addTrauma(0.2);
       }
     }
 
@@ -235,6 +250,7 @@ export class Stage4BotijaScene implements IScene {
         this.message = '💀 VOCÊ FOI CAPTURADO PELA CUMADE FULOZINHA EM FÚRIA!';
         engine.sound.playChicote();
         engine.sound.playDefeatJingle();
+        engine.juice.shake.addTrauma(0.6);
         return;
       }
     }
@@ -243,27 +259,43 @@ export class Stage4BotijaScene implements IScene {
     let dx = 0;
     let dy = 0;
 
-    if (input.left) dx -= 1;
-    if (input.right) dx += 1;
-    if (input.up) dy -= 1;
-    if (input.down) dy += 1;
+    if (input.left) {
+      dx -= 1;
+      this.facing = 'left';
+    }
+    if (input.right) {
+      dx += 1;
+      this.facing = 'right';
+    }
+    if (input.up) {
+      dy -= 1;
+      this.facing = 'up';
+    }
+    if (input.down) {
+      dy += 1;
+      this.facing = 'down';
+    }
 
-    if (dx !== 0 && dy !== 0) {
+    this.isMoving = dx !== 0 || dy !== 0;
+
+    if (this.isMoving) {
       const len = Math.sqrt(dx * dx + dy * dy);
       dx /= len;
       dy /= len;
-    }
 
-    const currentSpeed = this.hasBotija ? 165 : 220;
-
-    if (dx !== 0 || dy !== 0) {
       this.stepTimer += dt;
       const stepInterval = this.hasBotija ? 0.45 : 0.32;
       if (this.stepTimer >= stepInterval) {
         this.stepTimer = 0;
         engine.sound.playPassos();
+        engine.juice.particles.emit('dust', this.player.x, this.player.y + 18, {
+          count: this.hasBotija ? 5 : 3,
+          speed: this.hasBotija ? 35 : 25
+        });
       }
     }
+
+    const currentSpeed = this.hasBotija ? 165 : 220;
     const lot = this.lots[this.currentLot];
     const halfW = this.player.width / 2;
     const halfH = this.player.height / 2;
@@ -305,12 +337,11 @@ export class Stage4BotijaScene implements IScene {
     }
 
     // 3. Porteiras de Borda (Transições entre Telas)
-    // Borda Direita (X > 940)
     if (this.player.x > 940) {
       if (this.currentLot === '1b') {
-        // Entra no Lote da Igreja
         this.currentLot = 'igreja';
         this.player.x = 40;
+        engine.sound.playSinoBadalo();
       } else if (this.currentLot === '0') {
         this.currentLot = '2a';
         this.player.x = 40;
@@ -320,12 +351,11 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Borda Esquerda (X < 20)
     if (this.player.x < 20) {
       if (this.currentLot === 'igreja') {
-        // Sai da Igreja para o Lote 1b
         this.currentLot = '1b';
         this.player.x = 920;
+        engine.sound.playSinoBadalo();
       } else if (this.currentLot === '2b') {
         this.currentLot = '2a';
         this.player.x = 920;
@@ -335,7 +365,6 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Borda Superior (Y < 20)
     if (this.player.y < 20) {
       if (this.currentLot === '0') {
         this.currentLot = '2a';
@@ -349,7 +378,6 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Borda Inferior (Y > 520)
     if (this.player.y > 520) {
       if (this.currentLot === '1a') {
         this.currentLot = '2a';
@@ -385,6 +413,7 @@ export class Stage4BotijaScene implements IScene {
           if (this.digSoundTimer >= 0.28) {
             this.digSoundTimer = 0;
             engine.sound.playEscavacao();
+            engine.juice.particles.emit('dust', this.pedraItem.x, this.pedraItem.y, { count: 4, speed: 30 });
           }
 
           if (this.digProgress >= 1) {
@@ -393,6 +422,8 @@ export class Stage4BotijaScene implements IScene {
             this.message = '🏺 BOTIJA DESENTERRADA! É muito pesada (-25% Vel). Fuja para a Igreja!';
             engine.sound.playPickup();
             engine.sound.playItemDescobrir();
+            engine.juice.shake.addTrauma(0.4);
+            engine.juice.particles.emit('sparkle', this.pedraItem.x, this.pedraItem.y, { count: 20, speed: 60 });
           }
         } else {
           this.isDigging = false;
@@ -409,6 +440,7 @@ export class Stage4BotijaScene implements IScene {
         this.message = '🎉 BÊNÇÃO CONCEDIDA: O Beato recebeu a botija no altar e entregou a 🖋️ Tinta Encantada!';
         engine.sound.playSinoBadalo();
         engine.sound.playVictoryJingle();
+        engine.juice.particles.emit('sparkle', this.beato.x, this.beato.y, { count: 30, speed: 65 });
       }
     }
   }
@@ -422,6 +454,9 @@ export class Stage4BotijaScene implements IScene {
       ctx.fillStyle = '#1e1b18';
       ctx.fillRect(0, 0, 960, 540);
 
+      // Moldura sagrada de cordel
+      drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+
       // Luz divina / velas
       ctx.save();
       const candleGrad = ctx.createRadialGradient(480, 180, 20, 480, 180, 320);
@@ -433,9 +468,30 @@ export class Stage4BotijaScene implements IScene {
       ctx.fill();
       ctx.restore();
 
-      // Altar e Beato
-      renderEntity(ctx, this.altar);
-      renderEntity(ctx, this.beato);
+      // Altar
+      ctx.fillStyle = '#78350f';
+      ctx.fillRect(
+        this.altar.x - this.altar.width / 2,
+        this.altar.y - this.altar.height / 2,
+        this.altar.width,
+        this.altar.height
+      );
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(
+        this.altar.x - this.altar.width / 2,
+        this.altar.y - this.altar.height / 2,
+        this.altar.width,
+        this.altar.height
+      );
+      drawText(ctx, '✝ [ALTAR SAGRADO]', this.altar.x, this.altar.y - 4, {
+        font: 'bold 11px monospace',
+        color: '#fef08a',
+        align: 'center'
+      });
+
+      // Beato (Xilogravura da Maya)
+      drawBeato(ctx, this.beato.x, this.beato.y, this.beato.width, this.beato.height);
 
       drawText(ctx, '🕊️ SANTUÁRIO SEGURO — A CUMADE FULÔ NÃO ENTRA AQUI!', 480, 65, {
         font: 'bold 12px monospace',
@@ -444,8 +500,8 @@ export class Stage4BotijaScene implements IScene {
       });
     } else {
       // Noite Escura dos Lotes da Caatinga
-      ctx.fillStyle = '#020408';
-      ctx.fillRect(0, 0, 960, 540);
+      drawChaoTerraBatida(ctx, 0, 0, 960, 540);
+      drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
     }
 
     // Paredes do Lote
@@ -453,13 +509,13 @@ export class Stage4BotijaScene implements IScene {
       ctx.fillStyle = lot.isSanctuary ? '#78350f' : '#1e293b';
       ctx.fillRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
       ctx.strokeStyle = lot.isSanctuary ? '#b45309' : '#334155';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
     }
 
     // Pedra da Botija (Lote 0)
     if (this.currentLot === '0' && !this.hasBotija) {
-      renderEntity(ctx, this.pedraItem);
+      drawItemBotija(ctx, this.pedraItem.x, this.pedraItem.y, 32);
 
       if (this.isDigging) {
         ctx.fillStyle = '#1e293b';
@@ -483,7 +539,9 @@ export class Stage4BotijaScene implements IScene {
       ctx.fill();
       ctx.restore();
 
-      renderEntity(ctx, this.fulozinha);
+      drawCumadeFulozinha(ctx, this.fulozinha.x, this.fulozinha.y, this.fulozinha.width, this.fulozinha.height, {
+        time: this.animTime
+      });
     }
 
     // Efeito de Iluminação Dinâmica do Candeeiro (fora da Igreja)
@@ -509,10 +567,16 @@ export class Stage4BotijaScene implements IScene {
       ctx.restore();
     }
 
-    // Jogador
-    renderEntity(ctx, this.player);
+    // Jogador Coisinha (Xilogravura da Maya)
+    drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
+      facing: this.facing,
+      isMoving: this.isMoving,
+      time: this.animTime
+    });
+
     if (this.hasBotija) {
-      drawText(ctx, '🏺 CARREGANDO BOTIJA (-25% Vel)', this.player.x, this.player.y - 32, {
+      drawItemBotija(ctx, this.player.x + 18, this.player.y - 10, 20);
+      drawText(ctx, '🏺 BOTIJA PESADA (-25% Vel)', this.player.x, this.player.y - 32, {
         font: 'bold 10px monospace',
         color: '#facc15',
         align: 'center'
@@ -520,13 +584,13 @@ export class Stage4BotijaScene implements IScene {
     }
 
     // HUD Superior
-    drawText(ctx, `🏺 FASE 4: ${lot.name}`, 480, 18, {
+    drawText(ctx, `🏺 FASE 4: ${lot.name}`, 480, 20, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
     });
 
-    drawText(ctx, this.message, 480, 510, {
+    drawText(ctx, this.message, 480, 505, {
       font: '12px monospace',
       align: 'center',
       color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'

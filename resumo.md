@@ -14,8 +14,10 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ## 🎭 Sistema Global de Diálogos & Interface Unificada
 
-### 1. Interface Gráfica Padronizada (Caixa de Diálogo & Notificações):
-* **Todas as mensagens de informação, toasts e dicas que aparecem na parte inferior da tela** utilizam **exatamente a mesma interface gráfica da caixa de diálogo** (moldura de cordel em madeira entalhada, fundo de papel kraft e tipografia xilográfica de alto contraste).
+### 1. Painel Dedicado Abaixo da Tela de Jogo (Sem Sobreposição):
+* **Área Exclusiva Abaixo do Canvas de Jogo:** Todas as mensagens de informação, diálogos de NPCs, toasts e dicas são exibidas em um **painel dedicado posicionado estritamente abaixo da tela de jogo**, evitando qualquer sobreposição com itens da sala, personagens ou elementos de gameplay.
+* **Fila Sequencial Sem Sobreposição:** As mensagens não se sobrepõem visualmente umas às outras; são enfileiradas e exibidas de forma clara e legível uma a uma.
+* **Estética de Xilogravura:** O painel inferior adota a moldura de madeira entalhada em cordel, fundo em textura de papel kraft e tipografia xilográfica de alto contraste com indicador de avanço `[E]`.
 
 ### 2. Diálogo Canônico de Censura (1ª Interação com NPCs):
 * A primeira vez que o jogador interage com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):

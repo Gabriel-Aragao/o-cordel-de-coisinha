@@ -356,9 +356,9 @@ export class Stage1ChupaCabraScene implements IScene {
       this.lastActionWasGrito = false;
     }
 
-    // 3. Interação com o Fazendeiro [E / Enter] (Diálogo Canônico de Censura)
+    // 3. Interação com o Fazendeiro [E no release / interactReleased] (Diálogo Canônico de Censura)
     const distToFazendeiro = Math.hypot(this.player.x - this.fazendeiro.x, this.player.y - this.fazendeiro.y);
-    if (distToFazendeiro < 140 && input.interact) {
+    if (distToFazendeiro < 140 && input.interactReleased) {
       const rescuedCount = this.goats.filter((g) => g.isRescued).length;
       this.dialogs.startDialog(
         'fazendeiro',
@@ -400,7 +400,7 @@ export class Stage1ChupaCabraScene implements IScene {
         this.triggerSoundWave(300, engine);
       }
 
-      if (distHeroBush < bush.radius + 30 && input.interact) {
+      if (distHeroBush < bush.radius + 35 && input.interactReleased) {
         if (!bush.isSearched) {
           bush.isSearched = true;
 
@@ -699,24 +699,24 @@ export class Stage1ChupaCabraScene implements IScene {
     // Fazendeiro
     drawFazendeiro(ctx, this.fazendeiro.x, this.fazendeiro.y, this.fazendeiro.width, this.fazendeiro.height);
 
-    // Moitas, Cactos e Frutas
+    // Moitas Homogêneas (Visualmente Idênticas até serem vasculhadas)
     for (const bush of this.bushes) {
-      if (bush.type === 'cacto') {
-        drawMoitaCactoEspinhos(ctx, bush.x, bush.y, bush.radius);
-      } else if (bush.type === 'fruta') {
-        drawMoitaFrutaRegional(ctx, bush.x, bush.y, bush.radius, { searched: bush.isSearched });
+      if (bush.isSearched) {
+        if (bush.type === 'cacto') {
+          drawMoitaCactoEspinhos(ctx, bush.x, bush.y, bush.radius);
+        } else if (bush.type === 'fruta') {
+          drawMoitaFrutaRegional(ctx, bush.x, bush.y, bush.radius, { searched: true });
+        } else {
+          drawMoita(ctx, bush.x, bush.y, bush.radius, {
+            hasItem: false,
+            searched: true
+          });
+        }
       } else {
+        // Moita clássica uniforme e misteriosa da xilogravura
         drawMoita(ctx, bush.x, bush.y, bush.radius, {
-          hasItem: (bush.type === 'corda' && !this.hasRope) || (bush.type === 'candeeiro' && !this.hasLantern),
-          searched: bush.isSearched
-        });
-      }
-
-      if (bush.hidingGoatId) {
-        drawText(ctx, '🌿 [RUGIDO]', bush.x, bush.y - 14, {
-          font: 'bold 10px monospace',
-          color: '#fef08a',
-          align: 'center'
+          hasItem: false,
+          searched: false
         });
       }
     }

@@ -71,7 +71,7 @@ export class NarrativeModalManager {
     this.animTimer += dt;
 
     if (this.isIntroActive) {
-      if (input.interact || input.mouse.clicked || input.action) {
+      if (input.interactReleased || (input.mouse.clicked && input.interactReleased) || input.action) {
         this.isIntroActive = false;
         engine.sound.playUIClick();
         if (this.onIntroDone) {
@@ -79,7 +79,7 @@ export class NarrativeModalManager {
         }
       }
     } else if (this.isOutroActive) {
-      if (input.interact || input.mouse.clicked || input.action) {
+      if (input.interactReleased || (input.mouse.clicked && input.interactReleased) || input.action) {
         this.isOutroActive = false;
         engine.sound.playUIClick();
         if (this.onOutroDone) {

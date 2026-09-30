@@ -37,7 +37,9 @@ export interface InputState {
   right: boolean;
   action: boolean; // Espaço / Aboio (curto) ou Grito (segurar)
   actionHeldTime: number; // Tempo em segundos segurando a ação
-  interact: boolean; // E / Enter
+  interact: boolean; // E / Enter (isDown)
+  interactReleased: boolean; // E / Enter disparado no release (keyUp)
+  interactJustPressed: boolean; // E / Enter disparado no primeiro frame de keydown
   mouse: MouseState;
 }
 

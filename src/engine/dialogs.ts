@@ -90,7 +90,8 @@ export class DialogSystem {
   public update(_dt: number, input: InputState, engine: IGameEngine): void {
     if (!this.isActive) return;
 
-    if (input.interact || input.mouse.clicked) {
+    // Avanço estritamente no release da tecla E / Enter ou clique
+    if (input.interactReleased) {
       this.advance(engine);
     }
   }

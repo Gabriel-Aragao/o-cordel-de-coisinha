@@ -520,10 +520,10 @@ export class Stage2FulozinhaScene implements IScene {
     this.player.x = Math.max(20, Math.min(940, this.player.x));
     this.player.y = Math.max(20, Math.min(520, this.player.y));
 
-    // 4. Vasculhar Moita do Lote 1b com [E / Enter]
+    // 4. Vasculhar Moita do Lote 1b com [E / Enter no release]
     if (this.currentLot === '1b' && lot.hasBush && lot.bushHasFumo && !this.hasFumo) {
       const distToBush = Math.hypot(this.player.x - (lot.bushX || 0), this.player.y - (lot.bushY || 0));
-      if (distToBush < 50 && input.interact) {
+      if (distToBush < 60 && input.interactReleased) {
         this.hasFumo = true;
         this.message = '🍂 FUMO DE ROLO ENCONTRADO NA MOITA! Leve a oferenda à Cumade no Lote 3b!';
         engine.sound.playPickup();

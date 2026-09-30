@@ -20,14 +20,15 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🎭 Sistema Canônico de Diálogos & Controles
 
-1. **Painel Dedicado Abaixo da Tela de Jogo:** Todas as mensagens, falas e toasts são exibidos em um painel inferior dedicado, localizado estritamente abaixo da área de gameplay, garantindo visibilidade 100% livre dos itens, cenários e personagens, com fila sequencial sem sobreposições.
-2. **Diálogo de Censura na 1ª Interação com NPCs:**
+1. **Painel Dedicado Abaixo da Tela de Jogo:** Todas as mensagens, falas e toasts são exibidos em um painel inferior dedicado, localizado estritamente abaixo da área de gameplay, garantindo visibilidade 100% livre dos itens, cenários e personagens, com fila sequencial sem sobreposições e sem blocos estáticos de citações na tela.
+2. **Ciclo de Vida e Desbloqueio dos Diálogos:** Ao terminar a última fala, o diálogo fecha imediatamente com a tecla `E`, consumindo o input e liberando a movimentação do personagem sem deixá-lo travado.
+3. **Diálogo de Censura na 1ª Interação com NPCs:**
    - Ao conversar pela primeira vez com qualquer NPC (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**), o NPC pergunta seu nome. O herói responde `"meu nome é @#$!*&%#!"` acompanhado de um som cômico de erro/censura. O NPC responde: `"Entendi foi nada!"`.
    - Nas próximas falas, os NPCs chamam-no exclusivamente de **"Coisinha"** e oferecem dicas contextuais para vencer cada fase.
    - **Avanço no Release (`keyUp`) da tecla `E`:** Cada mensagem avança estritamente ao soltar a tecla, sem autofire acelerado.
-3. **Obtenção da Corda & Candeeiro:** Encontrados exclusivamente vasculhando moitas na caatinga.
-4. **Telas de Abertura & Encerramento:** Cada fase possui tela introdutória com a narrativa do cordel e tela de vitória exibindo o **Item Místico** resgatado.
-5. **Controles Universais:** O comando de **Grito** (`Espaço`) e **Interação** (`E`) funcionam em todas as cenas do jogo.
+4. **Obtenção da Corda & Candeeiro:** Encontrados exclusivamente vasculhando moitas na caatinga.
+5. **Telas de Abertura & Encerramento:** Cada fase possui tela introdutória com a narrativa do cordel e tela de vitória exibindo o **Item Místico** resgatado.
+6. **Controles Universais:** O comando de **Grito** (`Espaço`) e **Interação** (`E`) funcionam em todas as cenas do jogo.
 
 ---
 

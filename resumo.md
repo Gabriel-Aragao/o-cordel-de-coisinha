@@ -17,17 +17,20 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 ### 1. Painel Dedicado Abaixo da Tela de Jogo (Sem Sobreposição):
 * **Área Exclusiva Abaixo do Canvas de Jogo:** Todas as mensagens de informação, diálogos de NPCs, toasts e dicas são exibidas em um **painel dedicado posicionado estritamente abaixo da tela de jogo**, evitando qualquer sobreposição com itens da sala, personagens ou elementos de gameplay.
 * **Fila Sequencial Sem Sobreposição:** As mensagens não se sobrepõem visualmente umas às outras; são enfileiradas e exibidas de forma clara e legível uma a uma.
+* **Sem Textos Estáticos de Citação Obstruindo a Tela:** Qualquer bloco estático de texto no painel ou na tela (como citações) é **completamente removido**, mantendo a visibilidade 100% limpa.
 * **Estética de Xilogravura:** O painel inferior adota a moldura de madeira entalhada em cordel, fundo em textura de papel kraft e tipografia xilográfica de alto contraste com indicador de avanço `[E]`.
 
-### 2. Diálogo Canônico de Censura (1ª Interação com NPCs):
-* A primeira vez que o jogador interage com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):
-  - **NPC:** *"Opa, forasteiro! Qual é o seu nome?"*
-  - **Jogador:** *"Meu nome é @#$!*&%#!"* *(com som cômico de erro/glitch/censura)*
-  - **NPC:** *"Entendi foi nada!"*
-* **Todas as falas subsequentes:** O NPC passa a chamar o personagem exclusivamente de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes não apareceram ainda..."*).
-* **Dicas de Gameplay:** Personagens-chave (dono do curral, padre, violeiros) fornecem dicas claras dos objetivos da fase.
-* **Avanço de Diálogos por Release da Tecla `E`:**
-  - As mensagens de diálogo **NÃO disparam em repetição contínua (autofire)**. Cada mensagem avança estritamente no evento de soltar (`keyUp` / release) da tecla `E` ou clique único.
+### 2. Ciclo de Vida e Desbloqueio dos Diálogos:
+* **Encerramento Fluido e Desbloqueio Imediato:** Ao atingir a última fala de um diálogo e soltar a tecla `E` / `Enter`, a caixa de diálogo **fecha imediatamente e desaparece**, liberando a movimentação e os controles do herói sem travamento.
+* **Consumo Atômico de Input e Cooldown de Interação:** O fechamento consome o evento de input e impede que o mesmo clique/release reabra instantaneamente a conversa com o mesmo NPC.
+* **Diálogo Canônico de Censura (1ª Interação com NPCs):**
+  - A primeira vez que o jogador interage com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):
+    - **NPC:** *"Opa, forasteiro! Qual é o seu nome?"*
+    - **Jogador:** *"Meu nome é @#$!*&%#!"* *(com som cômico de erro/glitch/censura)*
+    - **NPC:** *"Entendi foi nada!"*
+  - **Todas as falas subsequentes:** O NPC passa a chamar o personagem exclusivamente de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes não apareceram ainda..."*).
+  - **Dicas de Gameplay:** Personagens-chave (dono do curral, padre, violeiros) fornecem dicas claras dos objetivos da fase.
+  - **Avanço de Diálogos por Release da Tecla `E`:** Cada mensagem avança estritamente ao soltar (`keyUp` / release) a tecla `E` ou clique único.
 
 ### 2. Obtenção de Itens Especiais (Corda & Candeeiro):
 * O herói **inicia sem a Corda e sem o Candeeiro**.

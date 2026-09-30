@@ -80,9 +80,10 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * O sistema de **3 vidas (HP)**, **moitas de espinhos / cactos** (-1 HP + grito involuntário de dor) e **moitas de frutas regionais** (+1 HP) é **mantido e ativo nas Fases 2 e 4**.
 
 ### Topologia Rigorosa, Labirintos Densos & Corredor da Pedra:
+* **Spawn Desimpedido no Lote 0 (Fase 2):** O jogador inicia em área livre e limpa do Lote 0, sem sobreposição com muros ou colisores de labirinto.
 * Paredes de contorno sólidas ao redor de cada lote, com passagens abertas apenas nas conexões oficiais:
   * **Lote 0:** Conexão à direita com **Lote 2a**.
-    - **Pedra da Botija em Corredor Estreito:** A pedra fica posicionada obrigatoriamente no meio de um corredor estreito de passagem para o Lote 2a, fazendo o herói tropeçar nela na saída e na reentrada.
+    - **Pedra da Botija em Posição Idêntica (Fases 2 e 4):** A pedra fica posicionada **exatamente nas mesmas coordenadas** na saída do Lote 0 no meio do corredor estreito, fazendo o herói tropeçar na saída e na reentrada.
     - **Sem Legenda Textual na Pedra:** A pedra não possui texto/legenda fixa.
     - **Diálogos Cômicos de Tropeço:** Ao passar por cima e tropeçar na pedra, exibe uma das falas aleatórias:
       * *"Coisinha, tropeçou!"*
@@ -104,7 +105,7 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 [Lote 3a] ─────────────── [Lote 3b]
 ```
 
-* **Labirintos Mais Complexos:** Maior quantidade de paredes internas em cada lote, com mais passagens alternantes (portões dinâmicos que abrem e fecham com os assobios) e maior densidade de moitas.
+* **Estrutura de Labirinto Fechado (Fases 2 e 4):** Construção densa de paredes internas, corredores intrincados e passagens alternantes dinâmicas (portões que abrem e fecham com os assobios), conferindo sensação total de labirinto fechado.
 * **Física da Cumade Fulozinha:** A Fulô **NÃO atravessa paredes sólidas**. Ela se move exclusivamente por caminhos livres e passagens abertas.
 * **Fase 2:** Fumo de rolo na moita do Lote 1b; entregar à Cumade no Lote 3b ➔ **📄 Página Rasgada**.
 

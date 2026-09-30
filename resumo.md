@@ -76,9 +76,18 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ## 🌿 Fases 2 e 4: A Fazenda da Cumade Fulozinha & A Botija de Mané Monteiro
 
-### Topologia Rigorosa, Labirintos Complexos & Portões Alternantes:
+### Sistema de 3 Vidas, Moitas de Espinhos e Frutas:
+* O sistema de **3 vidas (HP)**, **moitas de espinhos / cactos** (-1 HP + grito involuntário de dor) e **moitas de frutas regionais** (+1 HP) é **mantido e ativo nas Fases 2 e 4**.
+
+### Topologia Rigorosa, Labirintos Densos & Corredor da Pedra:
 * Paredes de contorno sólidas ao redor de cada lote, com passagens abertas apenas nas conexões oficiais:
-  * **Lote 0:** Conexão à direita com **Lote 2a** (Pedra da botija na saída).
+  * **Lote 0:** Conexão à direita com **Lote 2a**.
+    - **Pedra da Botija em Corredor Estreito:** A pedra fica posicionada obrigatoriamente no meio de um corredor estreito de passagem para o Lote 2a, fazendo o herói tropeçar nela na saída e na reentrada.
+    - **Sem Legenda Textual na Pedra:** A pedra não possui texto/legenda fixa.
+    - **Diálogos Cômicos de Tropeço:** Ao passar por cima e tropeçar na pedra, exibe uma das falas aleatórias:
+      * *"Coisinha, tropeçou!"*
+      * *"Coisinha vai arrancar um dedo!"*
+      * *"Coisinha tá adivinhando butija!"*
   * **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
   * **Lote 1a:** Conexão à direita com **Lote 1b**.
   * **Lote 3a:** Conexão à direita com **Lote 3b**.
@@ -95,7 +104,7 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 [Lote 3a] ─────────────── [Lote 3b]
 ```
 
-* **Labirintos Mais Complexos:** Maior quantidade de paredes internas com passagens alternantes (portões dinâmicos que abrem e fecham com os assobios) e densidade de moitas.
+* **Labirintos Mais Complexos:** Maior quantidade de paredes internas em cada lote, com mais passagens alternantes (portões dinâmicos que abrem e fecham com os assobios) e maior densidade de moitas.
 * **Física da Cumade Fulozinha:** A Fulô **NÃO atravessa paredes sólidas**. Ela se move exclusivamente por caminhos livres e passagens abertas.
 * **Fase 2:** Fumo de rolo na moita do Lote 1b; entregar à Cumade no Lote 3b ➔ **📄 Página Rasgada**.
 

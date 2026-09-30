@@ -68,13 +68,13 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Derrota por Vidas (3 Vidas):** Se o HP zerar ➔ Retorno ao Estúdio (Falha).
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
-### 🦉 3. A Pena da Rasga-Mortalha (Espaço Amplo, Violeiros & Ciclo de Mesas)
-* **Objetivo:** Ouvir os 2 violeiros, empurrar moradores bêbados, transportar bebidas e fumos e conduzir os animais até as 5 casas em arco.
+### 🦉 3. A Pena da Rasga-Mortalha (Casas com Telas Interiores & Captura 'E')
+* **Objetivo:** Ouvir os 2 violeiros, capturar os elementos com `E`, entrar fisicamente nas 5 casas e depositar cada item, morador e animal no interior correto.
 * **Mecânicas Principais:**
-  - **2 Violeiros (Canto Inferior Esquerdo):** Violeiro 1 declama 4 estrofes; Violeiro 2 declama as 5 estrofes finais.
-  - **Mesas & Curral Ampliados:** Maior área para manobras do personagem.
-  - **Transporte de Bebidas/Fumos:** Ao pegar da mesa, o item some dela. Soltar fora da casa retorna o item à mesa; soltar dentro da casa fixa o item nela.
-  - **Fixação de Bêbados e Animais:** Parar de conduzir antes da casa retorna à mesa/curral; uma vez dentro da casa, não saem mais.
+  - **Captura Universal (`E`):** Bebidas, fumos, moradores e animais são capturados e soltos com a tecla `E`.
+  - **Telas Interiores das Casas:** Entrar pela porta transporta o herói para o interior daquela casa para depositar com `E`.
+  - **Remoção & Grito de Reset:** Capturar com `E` remove 1 item; Gritar (`Espaço`) dentro da casa expulsa todos os itens de volta para as mesas.
+  - **Soltar Fora:** Soltar fora de casas retorna os itens às mesas de origem.
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
 ### 🏺 4. A Botija de Mané Monteiro (Escuridão, Candeeiro & Santuário)

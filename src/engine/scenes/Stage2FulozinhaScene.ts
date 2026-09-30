@@ -60,8 +60,8 @@ export class Stage2FulozinhaScene implements IScene {
 
   private player: Entity = {
     id: 'hero',
-    x: 480,
-    y: 380,
+    x: 120,
+    y: 270,
     width: 36,
     height: 50,
     color: '#3b82f6',
@@ -122,20 +122,27 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
+        // Corredor Estreito da Pedra na Saída para Lote 2a (Idêntico na F2 e F4)
+        { x: 820, y: 190, w: 240, h: 24 },
+        { x: 820, y: 350, w: 240, h: 24 },
+        // Labirinto Interno Densificado
         { x: 260, y: 180, w: 24, h: 220 },
-        { x: 480, y: 350, w: 24, h: 200 },
-        { x: 700, y: 190, w: 24, h: 220 },
-        { x: 480, y: 150, w: 220, h: 24 }
+        { x: 260, y: 440, w: 24, h: 140 },
+        { x: 480, y: 360, w: 24, h: 220 },
+        { x: 640, y: 180, w: 24, h: 200 },
+        { x: 480, y: 150, w: 220, h: 24 },
+        { x: 400, y: 460, w: 140, h: 24 }
       ],
       gates: [
-        { x: 260, y: 340, w: 24, h: 80, isOpen: true },
-        { x: 700, y: 360, w: 24, h: 80, isOpen: false }
+        { x: 260, y: 320, w: 24, h: 80, isOpen: true },
+        { x: 640, y: 320, w: 24, h: 80, isOpen: false },
+        { x: 480, y: 240, w: 24, h: 60, isOpen: true }
       ],
       bushes: [
         { id: 'b_0_1', x: 160, y: 140, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_0_2', x: 380, y: 440, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_0_3', x: 600, y: 120, radius: 36, type: 'normal', isSearched: false }
+        { id: 'b_0_2', x: 360, y: 420, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_0_3', x: 550, y: 120, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_0_4', x: 740, y: 440, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '1a': {
@@ -149,19 +156,25 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
-        { x: 320, y: 220, w: 24, h: 240 },
-        { x: 550, y: 320, w: 24, h: 240 },
-        { x: 740, y: 200, w: 24, h: 220 }
+        // Labirinto Interno Densificado
+        { x: 300, y: 200, w: 24, h: 220 },
+        { x: 300, y: 440, w: 24, h: 140 },
+        { x: 520, y: 320, w: 24, h: 240 },
+        { x: 740, y: 190, w: 24, h: 200 },
+        { x: 740, y: 430, w: 24, h: 160 },
+        { x: 440, y: 180, w: 220, h: 24 },
+        { x: 600, y: 420, w: 180, h: 24 }
       ],
       gates: [
-        { x: 320, y: 380, w: 24, h: 80, isOpen: true },
-        { x: 550, y: 160, w: 24, h: 80, isOpen: false }
+        { x: 300, y: 330, w: 24, h: 70, isOpen: true },
+        { x: 520, y: 160, w: 24, h: 70, isOpen: false },
+        { x: 740, y: 310, w: 24, h: 70, isOpen: true }
       ],
       bushes: [
         { id: 'b_1a_1', x: 180, y: 380, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_1a_2', x: 440, y: 140, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_1a_3', x: 820, y: 350, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_1a_2', x: 420, y: 120, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1a_3', x: 820, y: 350, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_1a_4', x: 620, y: 260, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '1b': {
@@ -175,19 +188,24 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
-        // Labirinto Interno
-        { x: 300, y: 270, w: 24, h: 260 },
-        { x: 540, y: 180, w: 24, h: 200 },
-        { x: 740, y: 360, w: 24, h: 200 }
+        // Labirinto Interno Densificado
+        { x: 280, y: 240, w: 24, h: 240 },
+        { x: 480, y: 160, w: 24, h: 180 },
+        { x: 480, y: 400, w: 24, h: 180 },
+        { x: 700, y: 280, w: 24, h: 260 },
+        { x: 380, y: 320, w: 200, h: 24 },
+        { x: 600, y: 440, w: 180, h: 24 }
       ],
       gates: [
-        { x: 300, y: 180, w: 24, h: 84, isOpen: true },
-        { x: 540, y: 340, w: 24, h: 84, isOpen: false }
+        { x: 280, y: 380, w: 24, h: 80, isOpen: true },
+        { x: 700, y: 140, w: 24, h: 80, isOpen: false },
+        { x: 380, y: 320, w: 70, h: 24, isOpen: true }
       ],
       bushes: [
-        { id: 'b_1b_fumo', x: 780, y: 200, radius: 36, type: 'fumo', isSearched: false },
+        { id: 'b_1b_fumo', x: 820, y: 200, radius: 36, type: 'fumo', isSearched: false },
         { id: 'b_1b_1', x: 180, y: 160, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_1b_2', x: 420, y: 420, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_1b_2', x: 380, y: 440, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_1b_3', x: 580, y: 180, radius: 36, type: 'normal', isSearched: false }
       ]
     },
     '2a': {
@@ -203,19 +221,24 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
-        { x: 260, y: 270, w: 24, h: 240 },
-        { x: 500, y: 180, w: 260, h: 24 },
-        { x: 700, y: 340, w: 24, h: 200 }
+        // Labirinto Interno Densificado
+        { x: 260, y: 220, w: 24, h: 200 },
+        { x: 260, y: 440, w: 24, h: 140 },
+        { x: 500, y: 160, w: 260, h: 24 },
+        { x: 500, y: 380, w: 260, h: 24 },
+        { x: 720, y: 260, w: 24, h: 220 },
+        { x: 380, y: 300, w: 24, h: 180 }
       ],
       gates: [
-        { x: 500, y: 180, w: 80, h: 24, isOpen: true },
-        { x: 700, y: 200, w: 24, h: 80, isOpen: false }
+        { x: 500, y: 160, w: 80, h: 24, isOpen: true },
+        { x: 720, y: 400, w: 24, h: 70, isOpen: false },
+        { x: 260, y: 340, w: 24, h: 70, isOpen: true }
       ],
       bushes: [
         { id: 'b_2a_1', x: 160, y: 420, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_2a_2', x: 380, y: 140, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_2a_3', x: 800, y: 220, radius: 36, type: 'normal', isSearched: false }
+        { id: 'b_2a_2', x: 380, y: 120, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2a_3', x: 800, y: 220, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_2a_4', x: 600, y: 460, radius: 36, type: 'fruta', isSearched: false }
       ]
     },
     '2b': {
@@ -230,19 +253,24 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
-        { x: 340, y: 340, w: 24, h: 220 },
-        { x: 620, y: 200, w: 24, h: 240 },
-        { x: 480, y: 220, w: 180, h: 24 }
+        // Labirinto Interno Densificado
+        { x: 300, y: 200, w: 24, h: 220 },
+        { x: 300, y: 430, w: 24, h: 160 },
+        { x: 560, y: 180, w: 24, h: 200 },
+        { x: 560, y: 400, w: 24, h: 180 },
+        { x: 760, y: 270, w: 24, h: 260 },
+        { x: 440, y: 280, w: 200, h: 24 }
       ],
       gates: [
-        { x: 620, y: 360, w: 24, h: 80, isOpen: false },
-        { x: 340, y: 180, w: 24, h: 80, isOpen: true }
+        { x: 560, y: 300, w: 24, h: 70, isOpen: false },
+        { x: 300, y: 330, w: 24, h: 70, isOpen: true },
+        { x: 760, y: 420, w: 24, h: 70, isOpen: false }
       ],
       bushes: [
-        { id: 'b_2b_1', x: 200, y: 180, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_2b_2', x: 500, y: 420, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_2b_3', x: 780, y: 380, radius: 36, type: 'normal', isSearched: false }
+        { id: 'b_2b_1', x: 180, y: 180, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2b_2', x: 440, y: 420, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_2b_3', x: 680, y: 160, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_2b_4', x: 840, y: 440, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '3a': {
@@ -256,19 +284,25 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
-        { x: 300, y: 300, w: 24, h: 260 },
-        { x: 620, y: 220, w: 24, h: 240 },
-        { x: 460, y: 320, w: 200, h: 24 }
+        // Labirinto Interno Densificado
+        { x: 280, y: 220, w: 24, h: 220 },
+        { x: 280, y: 440, w: 24, h: 140 },
+        { x: 520, y: 200, w: 24, h: 200 },
+        { x: 520, y: 420, w: 24, h: 160 },
+        { x: 740, y: 260, w: 24, h: 260 },
+        { x: 400, y: 320, w: 200, h: 24 },
+        { x: 630, y: 180, w: 180, h: 24 }
       ],
       gates: [
-        { x: 460, y: 320, w: 84, h: 24, isOpen: true },
-        { x: 620, y: 380, w: 24, h: 80, isOpen: false }
+        { x: 400, y: 320, w: 70, h: 24, isOpen: true },
+        { x: 740, y: 410, w: 24, h: 70, isOpen: false },
+        { x: 280, y: 350, w: 24, h: 70, isOpen: true }
       ],
       bushes: [
         { id: 'b_3a_1', x: 160, y: 380, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b_3a_2', x: 460, y: 160, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_3a_3', x: 780, y: 320, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_3a_2', x: 420, y: 160, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3a_3', x: 780, y: 320, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3a_4', x: 620, y: 440, radius: 36, type: 'normal', isSearched: false }
       ]
     },
     '3b': {
@@ -282,26 +316,32 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
-        { x: 280, y: 270, w: 24, h: 280 },
-        { x: 620, y: 270, w: 24, h: 280 }
+        // Labirinto Interno Densificado
+        { x: 260, y: 220, w: 24, h: 220 },
+        { x: 260, y: 440, w: 24, h: 140 },
+        { x: 500, y: 160, w: 24, h: 180 },
+        { x: 500, y: 380, w: 24, h: 180 },
+        { x: 720, y: 260, w: 24, h: 260 },
+        { x: 380, y: 300, w: 220, h: 24 }
       ],
       gates: [
-        { x: 280, y: 180, w: 24, h: 84, isOpen: true },
-        { x: 620, y: 360, w: 24, h: 84, isOpen: false }
+        { x: 260, y: 350, w: 24, h: 70, isOpen: true },
+        { x: 720, y: 410, w: 24, h: 70, isOpen: false },
+        { x: 380, y: 300, w: 70, h: 24, isOpen: true }
       ],
       bushes: [
         { id: 'b_3b_1', x: 160, y: 200, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b_3b_2', x: 480, y: 140, radius: 36, type: 'normal', isSearched: false },
-        { id: 'b_3b_3', x: 780, y: 380, radius: 36, type: 'cacto', isSearched: false }
+        { id: 'b_3b_2', x: 420, y: 140, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_3b_3', x: 800, y: 380, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_3b_4', x: 620, y: 450, radius: 36, type: 'cacto', isSearched: false }
       ]
     }
   };
 
   public init(_engine: IGameEngine): void {
     this.currentLot = '0';
-    this.player.x = 480;
-    this.player.y = 380;
+    this.player.x = 120;
+    this.player.y = 270;
     this.heroHp = 3;
     this.hurtCooldown = 0;
     this.fulozinha.x = 750;

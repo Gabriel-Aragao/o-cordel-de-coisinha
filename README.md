@@ -59,12 +59,13 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Vida dos Bodes:** Morte de 1 bode ➔ **Falha**.
 * **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.
 
-### 🌿 2. A Fazenda da Cumade Fulozinha (Labirintos Complexos & Portões)
+### 🌿 2. A Fazenda da Cumade Fulozinha (Labirintos Densos, 3 Vidas & Tropeço)
 * **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**.
 * **Mecânicas Principais:**
-  - **Paredes Perimétricas Sólidas:** Conexões abertas estritamente nos trajetos canônicos.
-  - **Labirintos Internos com Portões Alternantes:** Portões dinâmicos bloqueiam rigidamente quando fechados e liberam passagem quando abertos.
-  - **Física da Cumade:** A Fulô **NÃO atravessa paredes**, movendo-se apenas por corredores livres e portões abertos.
+  - **3 Vidas & Moitas:** Sistema de 3 vidas, espinhos (-1 HP) e frutas (+1 HP) ativo.
+  - **Pedra da Botija em Corredor Estreito:** Posicionada em passagem obrigatória do Lote 0 sem legenda, disparando falas cômicas ao tropeçar (*"Coisinha, tropeçou!"*, *"Coisinha vai arrancar um dedo!"*, *"Coisinha tá adivinhando butija!"*).
+  - **Paredes Perimétricas & Portões Alternantes:** Mais paredes internas e passagens dinâmicas.
+  - **Física da Cumade:** Não atravessa paredes sólidas.
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
 ### 🦉 3. A Pena da Rasga-Mortalha (Espaço Amplo, Violeiros & Ciclo de Mesas)

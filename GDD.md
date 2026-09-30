@@ -1,118 +1,144 @@
-# 📜 Game Design Document (GDD) — O Labirinto do Salitre & A Botija do Coronel
+# 📜 Game Design Document (GDD) — O Cordel de Coisinha: O Herói do Sertão
 
-> **Projeto:** O Labirinto do Salitre & A Botija do Coronel  
+> **Projeto:** O Cordel de Coisinha: O Herói do Sertão  
 > **Tema:** O Velho Sertão (Tungão GameJam — IFPB Campus Monteiro)  
-> **Gênero:** 2D Top-Down Adventure / Dungeon Crawler RPG  
+> **Gênero:** 2D Top-Down Adventure / Escape Room / Puzzle & Action  
 > **Público-Alvo:** Web / Navegadores (HTML5 / WebGL)  
-> **Autores & Squad:** @domaragao (CTO/PO), @gunpei (PM), @ludens (Game Design), @draper (Direção Criativa), @maya (UI/UX), @alexey (Frontend), @carmack (Tech Lead), @gunther (Level Design), @koji (Áudio), @glitch (QA)
+> **Autores & Squad:** @domaragao (CTO/PO), @gunpei (PM), @ludens (Game Design), @draper (Direção Criativa), @cascudo (Folclorista), @maya (UI/UX), @alexey (Frontend), @carmack (Tech Lead), @gunther (Level Design), @koji (Áudio), @glitch (QA)
 
 ---
 
 ## 1. Visão Geral & Core Loop
 
 ### 1.1 Premissa Narrativa
-No coração do sertão da Paraíba, o temido **Coronel das Sete Almas** confiscou a lendária **Botija de Cachaça Benta** e o único rádio a pilha do vilarejo, trancando-os nas profundezas de sua mina de salitre abandonada e fortificada. O protagonista — **Zé do Pito**, um cabra da peste astuto e valente — decide invadir o labirinto subterrâneo de 5 alas para derrotar os capangas do coronel, desvendar enigmas antigos dos penitentes e recuperar o tesouro antes do meio-dia.
+Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao folhear um folheto encantado em branco chamado *"Os Contos..."*, sua própria imagem começa a ser desenhada no papel. O vendedor some, os braços de Coisinha desvanecem e ele é transportado para um **Estúdio de Xilogravura Místico** selado por uma porta ancestral: *"Só heróis têm a chave"*.
 
-### 1.2 Core Loop (Segundo a Segundo)
+Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
+
+### 1.2 Estrutura Macro do Jogo
 ```
-[Entrar na Sala] ➔ [Desafio Lógico / Puzzle] ➔ [Combate Tático de Inimigos] ➔ [Coleta de Loot / Upgrade] ➔ [Destrancar Portão para Próxima Sala]
+                    ┌───────────────────────────────┐
+                    │   HUB: ESTÚDIO DE XILOGRAVURA │
+                    │ (Varal de Cordéis Encantados) │
+                    └──────────────┬────────────────┘
+          ┌────────────────────────┼────────────────────────┐
+          │                        │                        │
+          ▼                        ▼                        ▼
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│ FASE 1           │     │ FASE 2           │     │ FASE 3           │     │ FASE 4           │
+│ O Ataque do      │     │ A Fazenda de     │     │ A Pena da        │     │ A Botija de      │
+│ Chupa-Cabra      │     │ Cumade Fulozinha │     │ Rasga-Mortalha   │     │ Mané Monteiro    │
+│ ➔ Carimbo Mágico │     │ ➔ Página Rasgada │     │ ➔ Pena Encantada │     │ ➔ Tinta Encantada│
+└──────────────────┘     └──────────────────┘     └──────────────────┘     └──────────────────┘
+                                   │
+                                   ▼
+                    ┌───────────────────────────────┐
+                    │   CLÍMAX: A PRENSA DO DESTINO │
+                    │ Impressão do Cordel c/ Nick   │
+                    └───────────────────────────────┘
 ```
 
 ---
 
-## 2. As 5 Salas / Cenários e Progressão
+## 2. Detalhamento das Fases & Mecânicas
+
+---
+
+### 🐐 FASE 1: O Ataque do Chupa-Cabra
+* **Ambiente:** Caatinga aberta ao entardecer com cercas de arame e curral central.
+* **Objetivo:** Encontrar 4 bodes dispersos e conduzi-los em segurança ao curral antes que o Chupa-Cabra os ataque.
+* **Entidades & Comportamentos:**
+  - **Coisinha (Jogador):** Movimentação 8 direções + Ação de Aboiar (segurar barra de espaço/botão).
+  - **Bodes (4):** Movimento autônomo errante. Ao ouvir o aboio sem corda, fogem na direção contrária. Com a corda, seguem o jogador em fila.
+  - **Chupa-Cabra:** Surge pelas bordas da tela em intervalos e persegue o bode mais próximo. Se o jogador aboiar próximo a ele, a criatura se assusta e recua para fora da tela.
+* **Itens:**
+  - 🪢 **Corda de Amarrar:** Permite prender e conduzir os bodes diretamente.
+  - 🏮 **Candeeiro:** Aumenta o raio de visão na penumbra.
+* **Condição de Vitória:** 4 bodes no curral ➔ Fazendeiro entrega o **Carimbo Mágico**.
+
+---
+
+### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
+* **Ambiente:** Labirinto de 7 lotes interconectados com vegetação fechada e porteiras de madeira.
+* **Topologia do Mapa (7 Lotes):**
+  ```
+  [1a]   [1b]
+    |      |
+  [2a] - [2b]
+    |
+  [Lote 0] (Início)
+    |
+  [3a] (Fumo) - [3b] - [3c] (Cumade Fulozinha)
+  ```
+* **Mecânicas Especiais:**
+  - **Assobios Mágicos:** Em intervalos rítmicos, um assobio ecoa pela mata. Assobios alternam paredes abertas/fechadas e invertem temporariamente os controles do jogador (cima ⇄ baixo ou esquerda ⇄ direita por 4 segundos).
+  - **A Pedra no Chão:** Pista secreta no Lote 0 onde o jogador tropeça em uma pedra grande (marcação da botija para a Fase 4).
+* **Itens:**
+  - 🍂 **Fumo de Rolo:** Localizado no Lote 3a.
+* **Condição de Vitória:** Entregar o fumo à Cumade Fulozinha no Lote 3c ➔ Ela entrega a **Página Rasgada**. (Se alcançá-la sem fumo: dano/expulsão).
+
+---
+
+### 🦉 FASE 3: A Pena da Rasga-Mortalha
+* **Ambiente:** Rua com 5 casas coloridas do vilarejo sertanejo (Azul, Amarela, Vermelha, Verde, Branca).
+* **Objetivo:** Descobrir em qual casa a Pena da Rasga-Mortalha caiu através de um **Enigma de Einstein no Sertão**.
+* **Matriz de Dedução (5 Atributos x 5 Casas):**
+  1. Cor da Casa (Azul, Amarela, Vermelha, Verde, Branca)
+  2. Ofício do Morador (Ferreiro, Beato, Vaqueiro, Sanfoneiro, Xilógrafo)
+  3. Bebida Típica (Garapa, Café, Cachaça, Água de Pote, Chá de Boldo)
+  4. Animal de Estimação (Galo de Campina, Bode, Calango, Cachorro, Tatu)
+  5. Tipo de Fumo (Fumo de Rolo, Cigarro de Palha, Cachimbo, Rapé, Desfiado)
+* **Mecânica de Jogo:**
+  - O jogador lê cartazes de cordel espalhados pela praça contendo as pistas lógicas.
+  - Interface interativa de dedução (tabela de marcação estilo puzzle).
+* **Condição de Vitória:** Selecionar a casa correta ➔ Recolher a **Pena Encantada**.
+
+---
+
+### 🏺 FASE 4: A Botija de Mané Monteiro
+* **Ambiente:** A mesma Fazenda da Cumade Fulozinha, porém em noite profunda e chuvosa.
+* **Objetivo:** Entrar pela porteira do Lote 1b, navegar no escuro até a pedra no Lote 0, cavar a botija e levá-la de volta à Paróquia.
+* **Mecânicas Especiais:**
+  - **Visão Limitada:** Escuridão severa. O Candeeiro (obtido na Fase 1) ilumina um círculo dinâmico de 120px ao redor do herói.
+  - **Cumade Furiosa (Stealth):** Sem o fumo, a Cumade Fulozinha patrulha o labirinto em alta velocidade. O jogador precisa esgueirar-se pelas sombras e evitar cruzar sua linha de visão.
+  - **Peso da Botija:** Carregar a botija reduz a velocidade de movimento em 25%.
+* **Condição de Vitória:** Entregar a botija ao Beato na Paróquia ➔ Receber o frasco de **Tinta Encantada**.
+
+---
+
+### 🏆 FASE FINAL: O Estúdio de Xilogravura & O Grande Encerramento
+1. O jogador retorna ao estúdio com os 4 cordéis e os 4 instrumentos.
+2. Posiciona os 4 cordéis no varal com os pregadores.
+3. Insere a Folha na prensa, derrama a Tinta, assina com a Pena e grava com o Carimbo.
+4. Caixa de texto interativa: o jogador digita seu **Nickname**.
+5. A prensa executa a animação de prensagem com efeito sonoro de impacto.
+6. A porta mágica se abre em um feixe de luz.
+7. **Tela Final de Vitória:** Capa de cordel personalizada em xilogravura:  
+   > **"O Cordel de [Nickname]: O Herói do Sertão"**
+
+---
+
+## 3. Diretrizes de Desenvolvimento do MVP (Fase 1 de Execução)
+
+Para garantir validação ágil e testes imediatos de jogabilidade:
 
 ```
-┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐      ┌─────────┐
-│ Sala 1  │ ───> │ Sala 2  │ ───> │ Sala 3  │ ───> │ Sala 4  │ ───> │ Sala 5  │
-│ Mina de │      │ Açude de│      │ Cristais│      │ Lajotas │      │ Chefe   │
-│ Salitre │      │ Pedra   │      │ Quartzo │      │ Malditas│      │ Final   │
-└─────────┘      └─────────┘      └─────────┘      └─────────┘      └─────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    MVP: FORMAS & LEGENDAS                   │
+├──────────────────────────┬──────────────────────────────────┤
+│ Coisinha (Jogador)       │ Quadrado Azul: `[HEROI]`         │
+│ Bodes                    │ Círculos Brancos: `[BODE]`       │
+│ Chupa-Cabra              │ Triângulo Vermelho: `[CHUPA]`    │
+│ Cumade Fulozinha         │ Círculo Amarelo: `[FULÔ]`        │
+│ Casas do Vilarejo        │ Retângulos Coloridos `[CASA 1..5]│
+│ Botija                   │ Quadrado Dourado `[BOTIJA]`      │
+│ Fumo de Rolo             │ Quadrado Marrom `[FUMO]`         │
+└──────────────────────────┴──────────────────────────────────┘
 ```
 
-### 📍 Sala 1: Entrada da Mina de Salitre (Tutorial & Fundação)
-* **Objetivo:** Ensinar movimentação, ataque corpo a corpo, caixas e placas de pressão.
-* **Puzzle Lógico:** Empurrar 2 caixotes de salitre sobre 2 placas de pressão de pedra para destravar a grade de ferro.
-* **Inimigos:** 4 Escorpiões e Calangos gigantes da caatinga (combate básico de peixeira e rolamento).
-* **Loot / Equipamento:**
-  - 🗡️ **Peixeira Básica** (Dano 1, golpe curto em arco).
-  - 📜 **Patuá de Couro** (Item passivo: +20% velocidade de movimento).
+* **Prioridade 1:** Montar o Game Loop reativo (movimentação, colisões e troca de cenas/fases).
+* **Prioridade 2:** Implementar as 4 lógicas de vitória de cada fase no estado global.
+* **Prioridade 3:** Validação com QA (@glitch) antes de aplicar sprites e áudio.
 
 ---
-
-### 📍 Sala 2: O Açude de Pedra (Lógica de Alavancas & Cobertura)
-* **Objetivo:** Introduzir combate à distância e quebra-cabeças de sequência lírica.
-* **Puzzle Lógico:** 3 Alavancas de comportas d'água. Uma estrofe de cordel na parede dá a dica da ordem correta: *Sol ➔ Seca ➔ Chuva*. Puxar na ordem certa drena a água da passagem.
-* **Inimigos:** 3 Soldados Fantasmas da Volante armados com fuzis (exige usar colunas de pedra para se proteger dos tiros).
-* **Loot / Equipamento:**
-  - 🤠 **Chapéu de Couro Estrela da Tarde** (+1 Coração de Vida Máxima).
-  - 💥 **Bacamarte de Pólvora** (Arma secundária com tiro cônico de dispersão).
-
----
-
-### 📍 Sala 3: Salão dos Cristais de Quartzo (Reflexo de Luz & Mini-Boss)
-* **Objetivo:** Puzzle de alinhamento óptico e mecânica de vulnerabilidade de chefes.
-* **Puzzle Lógico:** Rotacionar 2 estátuas com espelhos de cristal para refletir um feixe de sol do teto até queimar uma raiz de mandacaru gigante que bloqueia o centro.
-* **Inimigo (Mini-Boss):** **Corisco das Sombras** (inimigo espectral super veloz que só se torna tangível e toma dano quando atraído para debaixo do feixe de luz refletido).
-* **Loot / Equipamento:**
-  - ✝️ **Amuleto de Padre Cícero** (Passiva: regenera 1 coração de vida a cada 5 inimigos derrotados).
-  - ⚔️ **Peixeira de Prata** (Arma corpo a corpo aprimorada: Dano 2.5x contra almas e mortos-vivos).
-
----
-
-### 📍 Sala 4: Pátio das Lajotas Amaldiçoadas (Memória & Inimigos Blindados)
-* **Objetivo:** Teste de memória rápida, timing de esquiva e flanco tático.
-* **Puzzle Lógico:** Tabuleiro de lajotas 3x4 no piso. O caminho seguro pisca em verde por 3 segundos; pisar na lajota errada aciona estacas de espinho de mandacaru.
-* **Inimigos:** 2 Jagunços Blindados com escudo de couro cru (imunes a ataques frontais; o jogador precisa esquivar para as costas deles para golpear).
-* **Loot / Equipamento:**
-  - 🧪 **Garrafa de Cachaça da Peste** (Consumível: 6 segundos de invulnerabilidade e velocidade dobrada).
-  - 🔑 **Chave Dourada do Santuário**.
-
----
-
-### 📍 Sala 5: O Santuário do Coronel-Cão (Grande Batalha Final)
-* **Chefe Final:** **O Coronel das Sete Almas** (Montado em um Bode de Chifres Flamejantes).
-* **Fases do Combate:**
-  * **Fase 1 (Duelo de Balas):** O Coronel cavalga pela arena disparando rajadas de pólvora em leque e lançando dinamites.
-  * **Fase 2 (Fúria do Sertão - 50% de HP):** O Coronel ativa um escudo de chamas impenetrável. O jogador precisa ativar rapidamente duas placas de pressão nos cantos da sala sob fogo inimigo para quebrar o escudo e finalizar a batalha com a Peixeira de Prata.
-* **Vitória:** Abertura do cofre, recuperação da Botija Sagrada e exibição da tela de vitória em xilogravura com repente comemorativo gerado em áudio e texto.
-
----
-
-## 3. Sistema de Equipamentos & Atributos
-
-| Tipo | Nome do Item | Efeito Mecânico | Onde é Obtido |
-| :--- | :--- | :--- | :--- |
-| **Arma Melee 1** | Peixeira de Lata | Dano 1.0 / Alcance curto | Início (Sala 1) |
-| **Arma Melee 2** | Peixeira de Prata | Dano 2.5 / Efeito sagrado | Sala 3 (Mini-Boss) |
-| **Arma Ranged** | Bacamarte de Pederneira | Dano 2.0 em cone / Consome pólvora | Sala 2 |
-| **Acessório 1** | Patuá de Couro | +20% Velocidade de Movimento | Sala 1 (Loot) |
-| **Acessório 2** | Chapéu Estrela da Tarde | +1 Coração de Vida Máxima (de 3 para 4) | Sala 2 (Loot) |
-| **Acessório 3** | Amuleto de Padre Cícero | Cura 1 HP a cada 5 abates | Sala 3 (Loot) |
-| **Consumível** | Cachaça da Peste | 6s de Invencibilidade e Fúria | Sala 4 (Loot) |
-
----
-
-## 4. Easter Eggs Regionais & Interações Especiais
-
-1. 🏺 **Filtro de Barro São João:**
-   - Presente nas antessalas. Ao interagir: restaura 100% da vida com o som característico de água pingando e o texto *"Água fresca que desce benzendo as juntas."*
-2. 🐐 **O Bode Que Julga:**
-   - Um bode imóvel no canto das salas. Seus olhos seguem o jogador. Se o jogador errar uma alavanca ou pisar na lajota errada, ele solta um balido irônico.
-3. 📻 **Rádio Spica Secreto:**
-   - Escondido atrás de uma parede rachada na Sala 3 (quebrável com tiro de bacamarte). Toca *"Asa Branca"* em chiptune 8-bit.
-4. 🍾 **Diabinho na Garrafa (Menu de Ajuda):**
-   - NPC no menu de pausa que dá dicas cheias de ironia e sarcasmo.
-
----
-
-## 5. Diretrizes Técnicas de Desenvolvimento (60 FPS WebGL)
-
-* **Stack:** Vite + TypeScript + Phaser 3 (ou Canvas/PixiJS Reativo com React).
-* **Fixed Timestep:** Física e balística operando a 60Hz desacoplados da renderização.
-* **Spatial Hash Grid:** Particionamento espacial para detecção instantânea de colisões $O(1)$.
-* **Object Pooling:** Projéteis, partículas de poeira e números de dano sem alocação dinâmica (`new`) em tempo de execução para garantir Zero Garbage Collection Stutter.
-* **Formatos de Entrega:** Build Web SPA estática pronta para Vercel / GitHub Pages / Itch.io.
-
----
-*GDD Aprovado pela equipe XIUD para a Tungão GameJam 2024.*
+*GDD Aprovado por @gunpei e @domaragao para a Tungão GameJam 2024.*

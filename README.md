@@ -1,126 +1,97 @@
-# 🎮 Tungão GameJam — Documentação & Guia de Preparação
+# 📜 O Cordel de Coisinha: O Herói do Sertão
 
-> **Evento:** GameJam do X SEMIII — Instituto Federal da Paraíba (IFPB Campus Monteiro)  
-> **Data:** 29/09 a 01/10  
-> **Formato:** Equipe Híbrida (Pilotos Humanos no Lab + Squad de Agentes IA de Alta Performance)  
-> **Liderança:** @domaragao (CTO/PO) & @gunpei (Produtor Ágil & Game Jam PM)
-
----
-
-## 🏆 Visão Geral & Critérios de Avaliação
-
-O objetivo é entregar um **MVP jogável (Vertical Slice)** polido, divertido e sem bugs, maximizando a pontuação em todos os critérios oficiais do edital:
-
-| Critério | Peso / Foco | Estratégia da Equipe |
-| :--- | :--- | :--- |
-| **Adequação ao tema** | Relevância e criatividade | Brainstorm relâmpago pós-revelação do tema + narrativa/humor ácido integrado. |
-| **Gameplay e Jogabilidade** | Core Loop, controles e diversão | Foco no *Core Fun* nas primeiras 24h. Controles responsivos e curva de aprendizado intuitiva. |
-| **Arte e Design Visual** | Estilo visual e coerência de HUD | Estética 2D/Pixel Art coesa, paleta limitada, animações fluidas e UI limpa. |
-| **Áudio e Sonoplastia** | SFX dinâmicos e trilha imersiva | Geradores de SFX chiptune, trilhas em loop dinâmico e feedback sonoro para cada ação. |
-| **Estabilidade e Acabamento** | Ausência de bugs e polimento (*Juice*) | Build Web (HTML5) com 60 FPS cravados, zero erros de console e validação rigorosa de QA. |
+> **Projeto:** O Cordel de Coisinha: O Herói do Sertão  
+> **Evento:** Tungão GameJam — X SEMIII (IFPB Campus Monteiro)  
+> **Tema:** O Velho Sertão  
+> **Gênero:** 2D Top-Down Adventure / Escape Room / Puzzle & Action  
+> **Liderança:** @domaragao (CTO / Product Owner) & @gunpei (Produtor Ágil & PM)
 
 ---
 
-## 👥 Estrutura da Equipe Híbrida
+## 📖 Sinopse & Prólogo
 
-### 📍 Pilotos Humanos (No Laboratório do IFPB)
-- **@domaragao (CTO / Product Owner):** Direção geral, tomada de decisões, alinhamento de escopo e ponte com a organização.
-- **Colegas de Equipe (ADS / Suporte & Manutenção):** Testes de gameplay, validação de build em tempo real, feedback de jogabilidade e submissão.
+Ao visitar uma tradicional feira de cordéis no sertão paraibano, o protagonista **Coisinha** recebe de um vendedor misterioso um folheto encantado com páginas em branco intitulado *"Os Contos..."*. Subitamente, um desenho em xilogravura começa a se formar na folha: é o próprio Coisinha! O vendedor se desvanece no ar, os braços de Coisinha desaparecem e tudo escurece.
 
-### 🤖 Squad de Agentes de IA (Desenvolvimento Ágil em Tempo Real)
-- **@gunpei (PM & Produtor Ágil):** Gestão de escopo, timeboxing, controle de marcos e coordenação das entregas.
-- **@ludens (Game Designer):** Mecânicas centrais, regras, game loop e balanceamento.
-- **@draper (Diretor Criativo):** Conceito, narrativa, tom de voz provocativo, humor ácido e copy.
-- **@maya (UI/UX Designer):** Wireframes, telas, menus, HUD e design de experiência do jogador.
-- **@alexey (Game Frontend):** Motor de jogo reativo em React / Phaser, componentes e animações.
-- **@carmack (Game Tech Lead):** Algoritmos matemáticos, física, IA de inimigos e otimização.
-- **@koji (Sound Designer):** Composição chiptune, efeitos sonoros (SFX) e áudio dinâmico.
-- **@gunther (Level Designer):** Layout de fases, curva de dificuldade e economia do jogo.
-- **@glitch (QA & Build Engineer):** Validação de PRs, caça a bugs de colisão/estado e estabilidade da build final.
+Coisinha acorda dentro de um **Estúdio de Xilogravura Místico**. No local, há um varal com cordéis mágicos inacabados e uma pesada porta trancada com a inscrição: *"Só heróis têm a chave"*. 
+
+Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 histórias encantadas espalhadas pelo chão, enfrentar e desvendar os mistérios das entidades do folclore nordestino e coletar os **4 Elementos da Xilogravura** para estampar seu próprio cordel mestre!
 
 ---
 
-## 🚀 Instruções de Preparação Prévia (A Priori)
-
-### 1. Preparação dos Computadores (Lab e Pessoal)
-- [ ] Instalar o **Node.js (LTS)** e **Git**.
-- [ ] Instalar o **VS Code** com extensões: *Live Server*, *GitLens*, *Prettier*.
-- [ ] Garantir navegador atualizado com DevTools habilitado (Chrome / Firefox / Brave).
-- [ ] Testar acesso ao repositório GitHub e permissões de push/pull.
-
-### 2. Kit Pendrive de Emergência (Para o Laboratório)
-Caso haja instabilidade na internet ou restrições de download nos computadores do IFPB, mantenha em um pendrive:
-- Instaladores offline do Node.js LTS e Git.
-- Executável portátil do **Godot 4.x Standard** (~100 MB).
-- Executável do **LibreSprite** / **Audacity**.
-- Template base de projeto compactado (`.zip`).
-
-### 3. Padrões Operacionais Obrigatórios
-- **Commits:** Seguir o padrão de autoria (ex: `[gunpei] - mensagem descritiva`).
-- **Branches & PRs:** Toda feature/correção é desenvolvida em branch própria e submetida via Pull Request validado por QA.
-- **Formato de Entrega:** Build Web HTML5 pronta para rodar diretamente no navegador com 1 clique (Vercel / GitHub Pages / Itch.io).
-
----
-
-## 🌐 Plataformas Web & Recursos Recomendados (Acesso Rápido)
-
-### 🛠️ Engines & Frameworks (Code-First / Web-Ready)
-* [Phaser 3](https://phaser.io/) — Framework 2D para Canvas e WebGL em JavaScript/TypeScript.
-* [Kaplay (Kaboom.js)](https://kaplayjs.com/) — Biblioteca minimalista e ultra-rápida para jogos arcade 2D.
-* [PixiJS](https://pixijs.com/) — Renderizador 2D de altíssima performance para WebGL.
-* [Godot Engine](https://godotengine.org/) — Engine leve com exportação Web de 1 clique.
-
-### 🔊 Geradores de Efeitos Sonoros (SFX) & Música Web
-* [sfxr / jsfxr](https://sfxr.me/) — Gerador instantâneo de efeitos sonoros 8-bit no navegador (Pulos, Tiros, Explosões, Moedas).
-* [Bfxr](https://www.bfxr.net/) — Ferramenta avançada para síntese de efeitos sonoros de videogame.
-* [ChipTone](https://sfbgames.itch.io/chiptone) — Gerador de SFX com interface visual moderna e rica.
-* [BeepBox](https://www.beepbox.co/) — Estúdio chiptune no navegador para criação de trilhas em loop.
-* [JummBox](https://jummbus.bitbucket.io/) — Versão expandida do BeepBox com mais canais e instrumentos.
-* [Audacity](https://www.audacityteam.org/) — Editor e conversor de áudio gratuito (WAV, OGG, MP3).
-
-### 🎨 Arte 2D, Pixel Art & Paletas de Cores
-* [Piskel](https://www.piskelapp.com/) — Editor online de pixel art e animação de sprite sheets.
-* [LibreSprite](https://libresprite.github.io/) — Versão open-source e gratuita do Aseprite.
-* [Lospec](https://lospec.com/) — Coleção de paletas de cores consagradas (GameBoy, PICO-8, NES) e tutoriais de pixel art.
-* [Kenney.nl](https://kenney.nl/assets) — Maior acervo de assets 2D/UI sob licença livre (CC0 / Domínio Público).
-* [OpenGameArt.org](https://opengameart.org/) — Repositório comunitário de sprites, músicas e texturas livres.
-* [Itch.io Free Game Assets](https://itch.io/game-assets/free) — Assets e pacotes gráficos gratuitos para game jams.
-
-### 🗺️ Level Design & Prototipagem
-* [Tiled Map Editor](https://www.mapeditor.org/) — Editor de mapas tile-based flexível com export em JSON.
-* [LDtk (Level Designer Toolkit)](https://ldtk.io/) — Editor moderno de fases 2D voltado para game jams.
-* [Figma](https://www.figma.com/) — Prototipagem e wireframes de telas, menus e HUD.
-* [Excalidraw](https://excalidraw.com/) — Quadro branco colaborativo para brainstorms de mecânicas e fluxos.
-
-### 🚀 Hospedagem & Deploy Rápido (Play in Browser)
-* [Vercel](https://vercel.com/) — Deploy contínuo e instantâneo via GitHub para aplicações Web/Vite.
-* [GitHub Pages](https://pages.github.com/) — Hospedagem gratuita direta do branch do repositório.
-* [Itch.io](https://itch.io/) — Plataforma padrão da indústria para submissão e publicação de jogos de Jam.
-
----
-
-## ⏱️ Cronograma Tático de Jam (Timeboxing 48h)
+## 🎨 Os 4 Instrumentos da Xilogravura Mestre
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        CRONOGRAMA DE PRODUÇÃO                          │
-├────────────────────────────────┬───────────────────────────────────────┤
-│ 29/09 (Abertura & Dia 1)       │ • Revelação do Tema Surpresa          │
-│                                │ • Brainstorm Relâmpago (Máx 2h)       │
-│                                │ • Fechamento do Escopo do MVP         │
-│                                │ • Core Loop Jogável no Navegador      │
-├────────────────────────────────┼───────────────────────────────────────┤
-│ 30/09 (Produção Pesada Dia 2)  │ • Integração de Arte, HUD e Telas     │
-│                                │ • Injeção de SFX e Trilha Sonora      │
-│                                │ • Montagem de Fases & Dificuldade     │
-│                                │ • Testes de Gameplay e Balanceamento  │
-├────────────────────────────────┼───────────────────────────────────────┤
-│ 01/10 (Polimento & Submissão)  │ • Code Freeze (Trava de Novas Features│
-│                                │ • Caça a Bugs e Ajustes de Polish     │
-│                                │ • Geração de GIFs/Screenshots e Pitch │
-│                                │ • Submissão Final com 2h de Margem    │
-└────────────────────────────────┴───────────────────────────────────────┘
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│ 🪓 CARIMBO      │     │ 📄 FOLHA        │     │ 🪶 PENA         │     │ 🖋️ TINTA        │
+│ O Ataque do     │ ──> │ A Fazenda de    │ ──> │ A Pena da       │ ──> │ A Botija de     │
+│ Chupa-Cabra     │     │ Cumade Fulozinha│     │ Rasga-Mortalha  │     │ Mané Monteiro   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
 ---
-*Documento mantido por @gunpei (Game Jam PM) para a equipe XIUD na Tungão GameJam 2024.*
+
+## 🗺️ As 4 Fases & Mecânicas de Gameplay
+
+### 🐐 1. O Ataque do Chupa-Cabra (Ação, Pastoreio & Resgate)
+* **Objetivo:** Ajudar o fazendeiro a resgatar **4 bodes perdidos** na caatinga antes que o Chupa-Cabra os devore.
+* **Mecânicas Principais:**
+  - **Aboiar (Grito):** Segurar o botão de ação solta um grito potente que afasta o Chupa-Cabra, mas assusta os bodes soltos.
+  - **Itens:** Corda (para laçar e conduzir bodes) e Candeeiro (ilumina uma área ao redor do jogador).
+* **Recompensa:** 🪓 **Carimbo Mágico**.
+
+### 🌿 2. A Fazenda da Cumade Fulozinha (Labirinto Dinâmico & Inversão)
+* **Objetivo:** Navegar por um labirinto dinâmico de 7 lotes interconectados para encontrar o fumo de rolo no Lote 3a e entregá-lo como oferenda à Cumade Fulozinha no Lote 3c.
+* **Mecânicas Principais:**
+  - **Assobios Encantados:** Abrem/fecham passagens de paredes e invertem temporariamente os eixos de controle (cima ⇄ baixo / esquerda ⇄ direita).
+  - **Pista Oculta:** O jogador descobre uma pedra solta no chão (local secreto da botija).
+* **Recompensa:** 📄 **Página / Folha Rasgada**.
+
+### 🦉 3. A Pena da Rasga-Mortalha (Dedução Lógica / Enigma de Einstein)
+* **Objetivo:** Descobrir em qual das 5 casas de um vilarejo sertanejo caiu a pena mística da ave do agouro.
+* **Mecânicas Principais:**
+  - **Enigma das 5 Casas:** Pistas em sextilhas de cordel relacionando Cor da Casa, Ofício do Morador, Bebida Típica, Animal de Estimação e Tipo de Fumo.
+* **Recompensa:** 🪶 **Pena Encantada**.
+
+### 🏺 4. A Botija de Mané Monteiro (Stealth & Sobrevivência Noturna)
+* **Objetivo:** Infiltrar-se na fazenda à noite pelo Lote 1b, desenterrar a botija sob a pedra no Lote 0 e entregá-la ao beato na paróquia.
+* **Mecânicas Principais:**
+  - **Escuridão & Candeeiro:** Campo de visão limitado sem a luz do candeeiro.
+  - **Cumade Furiosa:** Sem oferenda de fumo, a entidade vaga velozmente pelo labirinto; o jogador deve desviar de seu raio de detecção.
+* **Recompensa:** 🖋️ **Tinta Encantada**.
+
+### 🏆 Encerramento & Vitória
+De volta ao estúdio, o jogador fixa os 4 cordéis no varal, une os 4 instrumentos, digita seu nome/nickname e imprime a capa do seu próprio cordel:  
+> **"O Cordel de [Nickname]: O Herói do Sertão"**
+
+---
+
+## 🚀 Diretriz de Desenvolvimento: Abordagem MVP First
+
+Para garantir validação ágil da jogabilidade e mecânicas nas primeiras horas da Jam:
+
+1. **Protótipo em Formas Geométricas com Legendas:**
+   - Jogador = Quadrado/Círculo azul `[HEROI]`.
+   - Bodes = Círculos brancos `[BODE]`.
+   - Chupa-Cabra = Triângulo vermelho `[CHUPA-CABRA]`.
+   - Lotes da Fazenda = Blocos retangulares em grade `[LOTE 0, 1a, 2a...]`.
+2. **Validação do Core Loop:**
+   - Teste de movimentação, condução de bodes e grito de aboio.
+   - Teste de inversão temporária de controles por assobios.
+   - Teste da máquina lógica de validação do enigma das 5 casas.
+   - Teste de iluminação por raio de candeeiro no escuro.
+3. **Segunda Onda de Polimento (Pós-MVP):**
+   - Inserção de sprites em estilo xilogravura 2D.
+   - Trilha sonora chiptune/baião e efeitos sonoros regionais (@koji).
+   - Telas de HUD ricas desenhadas pela @maya.
+
+---
+
+## 🌐 Hub de Ferramentas & Plataformas Web
+
+* **Framework Base:** Phaser 3 / HTML5 Canvas + Vite + TypeScript.
+* **Áudio & SFX:** [jsfxr](https://sfxr.me/) | [Bfxr](https://www.bfxr.net/) | [BeepBox](https://www.beepbox.co/).
+* **Arte & Pixel Art:** [Piskel](https://www.piskelapp.com/) | [LibreSprite](https://libresprite.github.io/) | [Lospec](https://lospec.com/).
+* **Deploy Web em 1 Clique:** [Vercel](https://vercel.com/) | [GitHub Pages](https://pages.github.com/).
+
+---
+*Documentação oficial mantida pela equipe XIUD para a Tungão GameJam 2024.*

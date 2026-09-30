@@ -1,5 +1,12 @@
 import { IScene, IGameEngine, InputState, SceneId, Entity } from '../types';
-import { drawText, renderEntity, drawChaoEstudioMadeira, drawMolduraCordel } from '../../renderer/shapes';
+import { drawText, renderEntity } from '../../renderer/shapes';
+import {
+  drawCoisinha,
+  drawPrensa,
+  drawVaral,
+  drawChaoEstudioMadeira,
+  drawMolduraCordel
+} from '../../renderer/xilogravura';
 
 interface CordelFloorTrigger {
   id: SceneId;
@@ -20,8 +27,8 @@ export class StudioScene implements IScene {
     id: 'hero',
     x: 480,
     y: 430,
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 48,
     color: '#3b82f6',
     label: '[HEROI]',
     shape: 'rect',
@@ -31,7 +38,7 @@ export class StudioScene implements IScene {
   private door: Entity = {
     id: 'door',
     x: 480,
-    y: 90,
+    y: 85,
     width: 200,
     height: 40,
     color: '#8b4513',
@@ -39,38 +46,19 @@ export class StudioScene implements IScene {
     shape: 'rect'
   };
 
-  private press: Entity = {
-    id: 'press',
-    x: 180,
-    y: 130,
-    width: 100,
-    height: 75,
-    color: '#475569',
-    label: '[PRENSA DO DESTINO]',
-    shape: 'rect'
-  };
-
-  private varal: Entity = {
-    id: 'varal',
-    x: 770,
-    y: 130,
-    width: 220,
-    height: 45,
-    color: '#ca8a04',
-    label: '[VARAL DE CORDÉIS]',
-    shape: 'rect'
-  };
-
   private triggers: CordelFloorTrigger[] = [];
   private infoMessage: string = 'Pise em um cordel no chão para entrar no conto!';
   private pulseGlow: number = 0;
-
+  private animTime: number = 0;
+  private facing: 'left' | 'right' | 'up' | 'down' = 'down';
+  private isMoving: boolean = false;
   private stepTimer: number = 0;
 
   public init(engine: IGameEngine): void {
     this.player.x = 480;
     this.player.y = 430;
     this.stepTimer = 0;
+    this.animTime = 0;
 
     this.triggers = [
       {
@@ -117,42 +105,56 @@ export class StudioScene implements IScene {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    this.animTime += dt;
     this.pulseGlow += dt * 4;
 
     // Movimento do Jogador
     let dx = 0;
     let dy = 0;
 
-    if (input.left) dx -= 1;
-    if (input.right) dx += 1;
-    if (input.up) dy -= 1;
-    if (input.down) dy += 1;
+    if (input.left) {
+      dx -= 1;
+      this.facing = 'left';
+    }
+    if (input.right) {
+      dx += 1;
+      this.facing = 'right';
+    }
+    if (input.up) {
+      dy -= 1;
+      this.facing = 'up';
+    }
+    if (input.down) {
+      dy += 1;
+      this.facing = 'down';
+    }
 
-    if (dx !== 0 && dy !== 0) {
+    this.isMoving = dx !== 0 || dy !== 0;
+
+    if (this.isMoving) {
       const len = Math.sqrt(dx * dx + dy * dy);
       dx /= len;
       dy /= len;
+
+      this.stepTimer += dt;
+      if (this.stepTimer >= 0.32) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+        engine.juice.particles.emit('dust', this.player.x, this.player.y + 18, { count: 3, speed: 25 });
+      }
+    } else {
+      this.stepTimer = 0.2;
     }
 
     const speed = this.player.speed || 230;
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
 
-    if (dx !== 0 || dy !== 0) {
-      this.stepTimer += dt;
-      if (this.stepTimer >= 0.35) {
-        this.stepTimer = 0;
-        engine.sound.playPassos();
-      }
-    } else {
-      this.stepTimer = 0.2;
-    }
-
     // Limites da tela
     const halfW = this.player.width / 2;
     const halfH = this.player.height / 2;
-    this.player.x = Math.max(halfW + 20, Math.min(960 - halfW - 20, this.player.x));
-    this.player.y = Math.max(halfH + 20, Math.min(540 - halfH - 20, this.player.y));
+    this.player.x = Math.max(halfW + 30, Math.min(960 - halfW - 30, this.player.x));
+    this.player.y = Math.max(halfH + 30, Math.min(540 - halfH - 30, this.player.y));
 
     // Atualiza status dos triggers
     this.triggers[0].isCompleted = engine.inventory.carimbo;
@@ -173,19 +175,19 @@ export class StudioScene implements IScene {
         Math.abs(this.player.y - t.y) < (this.player.height + t.height) / 2
       ) {
         this.infoMessage = `Entrando em: ${t.name}...`;
-        engine.sound.playCordelFolhear();
         engine.switchScene(t.id);
         return;
       }
     }
 
     // Interação com a Prensa do Destino
-    const distToPress = Math.hypot(this.player.x - this.press.x, this.player.y - this.press.y);
+    const distToPress = Math.hypot(this.player.x - 180, this.player.y - 130);
     if (distToPress < 75) {
       if (allCompleted) {
         this.infoMessage = '✨ 4 ITENS REUNIDOS! Aperte [E / Enter] para estampar seu cordel mestre!';
         if (input.interact) {
           engine.sound.playPrensaImpacto();
+          engine.juice.shake.addTrauma(0.6);
           engine.switchScene('VICTORY');
           return;
         }
@@ -224,9 +226,9 @@ export class StudioScene implements IScene {
     drawChaoEstudioMadeira(ctx, 0, 0, 960, 540);
 
     // 2. Moldura de Xilogravura do Estúdio
-    drawMolduraCordel(ctx, 12, 10, 936, 520, { borderWeight: 3 });
+    drawMolduraCordel(ctx, 10, 10, 940, 520, { borderWeight: 4 });
 
-    // Render dos 4 Cordéis no chão
+    // 3. Render dos 4 Cordéis no chão
     for (let i = 0; i < this.triggers.length; i++) {
       const t = this.triggers[i];
       ctx.save();
@@ -246,69 +248,29 @@ export class StudioScene implements IScene {
       ctx.restore();
     }
 
-    // Render das Estruturas
+    // 4. Porta Ancestral
     renderEntity(ctx, this.door);
 
-    // Efeito da Prensa
+    // 5. Prensa do Destino (Xilogravura da Maya)
     const allCompleted =
       engine.inventory.carimbo &&
       engine.inventory.folha &&
       engine.inventory.pena &&
       engine.inventory.tinta;
 
-    if (allCompleted) {
-      this.press.color = '#047857';
-      ctx.save();
-      const glow = (Math.sin(this.pulseGlow) + 1) / 2;
-      ctx.strokeStyle = `rgba(74, 222, 128, ${0.4 + glow * 0.6})`;
-      ctx.lineWidth = 6;
-      ctx.strokeRect(
-        this.press.x - this.press.width / 2 - 4,
-        this.press.y - this.press.height / 2 - 4,
-        this.press.width + 8,
-        this.press.height + 8
-      );
-      ctx.restore();
-    }
-    renderEntity(ctx, this.press);
+    drawPrensa(ctx, 180, 130, 120, 90, allCompleted);
 
-    // Render do Varal e seus 4 Pregadores
-    renderEntity(ctx, this.varal);
+    // 6. Varal de Cordéis com Pregadores (Xilogravura da Maya)
+    drawVaral(ctx, 770, 130, 240, 60, engine.inventory);
 
-    const completedItems = [
-      { name: 'Chupa-Cabra', ok: engine.inventory.carimbo, icon: '🪓' },
-      { name: 'Fulozinha', ok: engine.inventory.folha, icon: '📄' },
-      { name: 'Rasga-Mortalha', ok: engine.inventory.pena, icon: '🪶' },
-      { name: 'Botija', ok: engine.inventory.tinta, icon: '🖋️' }
-    ];
+    // 7. Herói Coisinha (Xilogravura da Maya com Animação de Passos)
+    drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
+      facing: this.facing,
+      isMoving: this.isMoving,
+      time: this.animTime
+    });
 
-    // Cordel pendurado no varal com pregadores
-    for (let i = 0; i < 4; i++) {
-      const item = completedItems[i];
-      const px = 685 + i * 45;
-      const py = 155;
-
-      // Corda do varal
-      ctx.fillStyle = item.ok ? '#22c55e' : '#64748b';
-      ctx.fillRect(px - 14, py, 28, 36);
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(px - 14, py, 28, 36);
-
-      // Pregador de madeira
-      ctx.fillStyle = '#b45309';
-      ctx.fillRect(px - 3, py - 6, 6, 10);
-
-      // Ícone do cordel pendurado
-      ctx.font = '12px monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(item.ok ? item.icon : '🔒', px, py + 22);
-    }
-
-    // Render do Jogador
-    renderEntity(ctx, this.player);
-
-    // Banner Superior
+    // 8. Cabeçalho e HUD
     drawText(ctx, '🏛️ ESTÚDIO DE XILOGRAVURA MÍSTICO', 480, 20, {
       font: 'bold 16px monospace',
       align: 'center',

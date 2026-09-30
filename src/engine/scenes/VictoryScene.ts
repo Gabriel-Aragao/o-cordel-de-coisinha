@@ -1,14 +1,14 @@
 import { IScene, IGameEngine, InputState, SceneId } from '../types';
+import { drawText } from '../../renderer/shapes';
 import {
-  drawText,
   drawMolduraCordel,
   drawCoisinha,
   drawItemCarimbo,
   drawItemFolha,
   drawItemPena,
   drawItemTinta,
-  XILO_COLORS,
-} from '../../renderer/shapes';
+  XILO_COLORS
+} from '../../renderer/xilogravura';
 
 export class VictoryScene implements IScene {
   public id: SceneId = 'VICTORY';
@@ -17,6 +17,7 @@ export class VictoryScene implements IScene {
   private isPrinted: boolean = false;
   private printProgress: number = 0;
   private animTimer: number = 0;
+  private sparkleTimer: number = 0;
 
   public init(engine: IGameEngine): void {
     if (!engine.playerName) {
@@ -25,6 +26,7 @@ export class VictoryScene implements IScene {
     this.isPrinted = false;
     this.printProgress = 0;
     this.animTimer = 0;
+    this.sparkleTimer = 0;
   }
 
   public update(dt: number, _input: InputState, engine: IGameEngine): void {
@@ -36,6 +38,17 @@ export class VictoryScene implements IScene {
         this.isPrinted = true;
         engine.sound.playPrensaImpacto();
         engine.sound.playVictoryJingle();
+        engine.juice.shake.addTrauma(0.6);
+        engine.juice.particles.emit('sparkle', 480, 240, { count: 35, speed: 80 });
+      }
+    } else {
+      this.sparkleTimer += dt;
+      if (this.sparkleTimer >= 0.4) {
+        this.sparkleTimer = 0;
+        engine.juice.particles.emit('sparkle', 200 + Math.random() * 560, 100 + Math.random() * 340, {
+          count: 2,
+          speed: 25
+        });
       }
     }
   }
@@ -90,7 +103,7 @@ export class VictoryScene implements IScene {
     // Herói Coisinha Ilustrado no Centro da Capa
     drawCoisinha(ctx, 480, 245, 50, 64, {
       time: this.animTimer,
-      isMoving: false,
+      isMoving: false
     });
 
     // Elementos Sertanejos Laterais (Cacto & Sol de Xilo)
@@ -105,7 +118,7 @@ export class VictoryScene implements IScene {
       { name: 'Carimbo Mágico', desc: 'Chupa-Cabra', draw: drawItemCarimbo, color: XILO_COLORS.goldAccent },
       { name: 'Página Rasgada', desc: 'Cumade Fulô', draw: drawItemFolha, color: XILO_COLORS.greenAccent },
       { name: 'Pena Encantada', desc: 'Rasga-Mortalha', draw: drawItemPena, color: XILO_COLORS.purpleAccent },
-      { name: 'Tinta Encantada', desc: 'Mané Monteiro', draw: drawItemTinta, color: XILO_COLORS.cyanAccent },
+      { name: 'Tinta Encantada', desc: 'Mané Monteiro', draw: drawItemTinta, color: XILO_COLORS.cyanAccent }
     ];
 
     for (let i = 0; i < items.length; i++) {
@@ -142,21 +155,18 @@ export class VictoryScene implements IScene {
       drawText(ctx, '✨ A GRANDE PORTA SE ABRIU! VOCÊ CONQUISTOU A CHAVE DO SERTÃO! ✨', 480, 460 + pulse, {
         font: 'bold 13px "Courier New", monospace',
         color: '#15803d',
-        align: 'center',
-        shadow: false,
+        align: 'center'
       });
       drawText(ctx, 'O seu cordel agora é eterno nas feiras e cantorias da Paraíba!', 480, 482, {
         font: '12px "Courier New", monospace',
         color: XILO_COLORS.black,
-        align: 'center',
-        shadow: false,
+        align: 'center'
       });
     } else {
       drawText(ctx, `Prensando matriz de xilogravura com os 4 elementos... ${Math.round(this.printProgress * 100)}%`, 480, 470, {
         font: 'bold 13px "Courier New", monospace',
         color: '#b45309',
-        align: 'center',
-        shadow: false,
+        align: 'center'
       });
     }
   }

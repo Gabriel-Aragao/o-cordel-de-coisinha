@@ -1,5 +1,12 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
 import { renderEntity, drawText } from '../../renderer/shapes';
+import {
+  drawCoisinha,
+  drawCumadeFulozinha,
+  drawMoita,
+  drawChaoTerraBatida,
+  drawMolduraCordel
+} from '../../renderer/xilogravura';
 
 type LotId = '0' | '1a' | '1b' | '2a' | '2b' | '3a' | '3b';
 
@@ -40,8 +47,8 @@ export class Stage2FulozinhaScene implements IScene {
     id: 'hero',
     x: 480,
     y: 380,
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 50,
     color: '#3b82f6',
     label: '[HEROI]',
     shape: 'rect',
@@ -52,8 +59,8 @@ export class Stage2FulozinhaScene implements IScene {
     id: 'fulozinha',
     x: 750,
     y: 270,
-    width: 36,
-    height: 36,
+    width: 42,
+    height: 48,
     color: '#eab308',
     label: '[CUMADE FULOZINHA]',
     shape: 'circle',
@@ -82,6 +89,9 @@ export class Stage2FulozinhaScene implements IScene {
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
   private stepTimer: number = 0;
+  private animTime: number = 0;
+  private facing: 'left' | 'right' | 'up' | 'down' = 'down';
+  private isMoving: boolean = false;
 
   // Definição dos 6 Lotes em Telas Individuais (sem 3c)
   private lots: Record<LotId, LotData> = {
@@ -195,6 +205,7 @@ export class Stage2FulozinhaScene implements IScene {
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
     this.stepTimer = 0;
+    this.animTime = 0;
 
     if (engine.inventory.folha) {
       this.message = '✓ Fase Concluída! Página Rasgada obtida com Cumade Fulozinha.';
@@ -202,6 +213,8 @@ export class Stage2FulozinhaScene implements IScene {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    this.animTime += dt;
+
     if (this.stateStatus !== 'PLAYING') {
       this.endTimer += dt;
       if (this.endTimer >= 2.5) {
@@ -224,6 +237,8 @@ export class Stage2FulozinhaScene implements IScene {
       this.whistleWaveRadius = 15;
       this.message = '🎶 ASSOBIO NA MATA! Os portões alternaram e os controles foram invertidos!';
       engine.sound.playCumadeAssobio(inFulozinhaLair ? 1.2 : 1.0);
+      engine.juice.shake.addTrauma(0.3);
+      engine.juice.particles.emit('note', 480, 200, { count: 8, speed: 45 });
 
       // Alterna portões internos em todos os lotes
       for (const lotKey in this.lots) {
@@ -252,22 +267,35 @@ export class Stage2FulozinhaScene implements IScene {
     const up = this.isControlsInverted ? input.down : input.up;
     const down = this.isControlsInverted ? input.up : input.down;
 
-    if (left) dx -= 1;
-    if (right) dx += 1;
-    if (up) dy -= 1;
-    if (down) dy += 1;
+    if (left) {
+      dx -= 1;
+      this.facing = 'left';
+    }
+    if (right) {
+      dx += 1;
+      this.facing = 'right';
+    }
+    if (up) {
+      dy -= 1;
+      this.facing = 'up';
+    }
+    if (down) {
+      dy += 1;
+      this.facing = 'down';
+    }
 
-    if (dx !== 0 && dy !== 0) {
+    this.isMoving = dx !== 0 || dy !== 0;
+
+    if (this.isMoving) {
       const len = Math.sqrt(dx * dx + dy * dy);
       dx /= len;
       dy /= len;
-    }
 
-    if (dx !== 0 || dy !== 0) {
       this.stepTimer += dt;
       if (this.stepTimer >= 0.32) {
         this.stepTimer = 0;
         engine.sound.playPassos();
+        engine.juice.particles.emit('dust', this.player.x, this.player.y + 18, { count: 3, speed: 25 });
       }
     }
 
@@ -345,7 +373,6 @@ export class Stage2FulozinhaScene implements IScene {
     }
 
     // 3. Porteiras de Borda (Transições entre Telas de Lotes)
-    // Borda Direita (X > 940)
     if (this.player.x > 940) {
       if (this.currentLot === '0') {
         this.currentLot = '2a';
@@ -356,7 +383,6 @@ export class Stage2FulozinhaScene implements IScene {
       }
     }
 
-    // Borda Esquerda (X < 20)
     if (this.player.x < 20) {
       if (this.currentLot === '2b') {
         this.currentLot = '2a';
@@ -367,7 +393,6 @@ export class Stage2FulozinhaScene implements IScene {
       }
     }
 
-    // Borda Superior (Y < 20)
     if (this.player.y < 20) {
       if (this.currentLot === '0') {
         this.currentLot = '2a';
@@ -381,7 +406,6 @@ export class Stage2FulozinhaScene implements IScene {
       }
     }
 
-    // Borda Inferior (Y > 520)
     if (this.player.y > 520) {
       if (this.currentLot === '1a') {
         this.currentLot = '2a';
@@ -412,6 +436,7 @@ export class Stage2FulozinhaScene implements IScene {
         this.message = '🍂 FUMO DE ROLO ENCONTRADO NA MOITA! Leve a oferenda à Cumade no Lote 3b!';
         engine.sound.playPickup();
         engine.sound.playItemDescobrir();
+        engine.juice.particles.emit('leaf', lot.bushX || 0, lot.bushY || 0, { count: 12, speed: 45 });
       }
     }
 
@@ -437,12 +462,14 @@ export class Stage2FulozinhaScene implements IScene {
           engine.unlockItem('folha');
           this.message = '🎉 CUMADE FULOZINHA ACEITOU O FUMO E ENTREGOU A 📄 PÁGINA RASGADA!';
           engine.sound.playVictoryJingle();
+          engine.juice.particles.emit('sparkle', this.fulozinha.x, this.fulozinha.y, { count: 20, speed: 60 });
         } else {
           // FALHA!
           this.stateStatus = 'FAILED';
           this.message = '💀 CHICOTADA DE CIPÓ! Você invadiu sem fumo e foi derrotado pela Fulô!';
           engine.sound.playChicote();
           engine.sound.playDefeatJingle();
+          engine.juice.shake.addTrauma(0.6);
         }
       }
     }
@@ -451,21 +478,18 @@ export class Stage2FulozinhaScene implements IScene {
   public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
     const lot = this.lots[this.currentLot];
 
-    // Fundo do Lote Atual
-    ctx.fillStyle = lot.color;
-    ctx.fillRect(0, 0, 960, 540);
+    // 1. Fundo do Terreno (Xilogravura da Maya)
+    drawChaoTerraBatida(ctx, 0, 0, 960, 540);
 
-    // Moldura do Lote
-    ctx.strokeStyle = '#475569';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(10, 10, 940, 520);
+    // 2. Moldura de Cordel
+    drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
 
     // Paredes Labirínticas Internas
     for (const w of lot.walls) {
       ctx.fillStyle = '#334155';
       ctx.fillRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
       ctx.strokeStyle = '#64748b';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
     }
 
@@ -477,24 +501,21 @@ export class Stage2FulozinhaScene implements IScene {
       ctx.lineWidth = 1.5;
       ctx.strokeRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
 
-      drawText(ctx, g.isOpen ? 'ABERTO (PASSAGEM)' : 'FECHADO (BLOQUEIO)', g.x, g.y - 14, {
+      drawText(ctx, g.isOpen ? 'ABERTO' : 'FECHADO', g.x, g.y - 14, {
         font: 'bold 9px monospace',
         color: g.isOpen ? '#4ade80' : '#f87171',
         align: 'center'
       });
     }
 
-    // Moita no Lote
+    // Moita no Lote (Xilogravura da Maya)
     if (lot.hasBush && lot.bushX && lot.bushY) {
-      ctx.fillStyle = '#15803d';
-      ctx.beginPath();
-      ctx.arc(lot.bushX, lot.bushY, 34, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = '#22c55e';
-      ctx.lineWidth = 2;
-      ctx.stroke();
+      drawMoita(ctx, lot.bushX, lot.bushY, 34, {
+        hasItem: lot.bushHasFumo && !this.hasFumo,
+        searched: this.hasFumo
+      });
 
-      drawText(ctx, lot.bushHasFumo && !this.hasFumo ? '🌿 [MOITA - FUMO]' : '🌿 [MOITA]', lot.bushX, lot.bushY - 6, {
+      drawText(ctx, lot.bushHasFumo && !this.hasFumo ? '🌿 [FUMO]' : '🌿', lot.bushX, lot.bushY - 12, {
         font: 'bold 10px monospace',
         color: '#fef08a',
         align: 'center'
@@ -506,9 +527,11 @@ export class Stage2FulozinhaScene implements IScene {
       renderEntity(ctx, this.pedraItem);
     }
 
-    // Cumade Fulozinha (apenas no Lote 3b)
+    // Cumade Fulozinha (Xilogravura da Maya no Lote 3b)
     if (this.currentLot === '3b') {
-      renderEntity(ctx, this.fulozinha);
+      drawCumadeFulozinha(ctx, this.fulozinha.x, this.fulozinha.y, this.fulozinha.width, this.fulozinha.height, {
+        time: this.animTime
+      });
 
       // Raio de Perseguição
       ctx.save();
@@ -532,17 +555,21 @@ export class Stage2FulozinhaScene implements IScene {
       });
     }
 
-    // Jogador
-    renderEntity(ctx, this.player);
+    // Herói Coisinha (Xilogravura da Maya)
+    drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
+      facing: this.facing,
+      isMoving: this.isMoving,
+      time: this.animTime
+    });
 
     // Topologia Minimapa / HUD Superior
-    drawText(ctx, `🌿 FASE 2: ${lot.name}`, 480, 18, {
+    drawText(ctx, `🌿 FASE 2: ${lot.name}`, 480, 20, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
     });
 
-    drawText(ctx, this.message, 480, 510, {
+    drawText(ctx, this.message, 480, 505, {
       font: '12px monospace',
       align: 'center',
       color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'

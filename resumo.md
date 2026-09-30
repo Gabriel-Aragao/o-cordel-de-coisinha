@@ -12,111 +12,108 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ---
 
+## 🎭 Sistema Global de Diálogos & Apresentação Narrativa
+
+### 1. Diálogo Canônico de Censura (1ª Interação com NPCs):
+* A primeira vez que o jogador interage com qualquer NPC falante do jogo (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):
+  - **NPC:** *"Opa, forasteiro! Qual é o seu nome?"*
+  - **Jogador:** *"Meu nome é @#$!*&%#!"* *(com som cômico de erro/glitch/censura)*
+  - **NPC:** *"Entendi foi nada!"*
+* **Todas as falas subsequentes:** O NPC passa a chamar o personagem exclusivamente de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes não apareceram ainda..."*).
+* **Dicas de Gameplay:** Personagens-chave (dono do curral, padre, violeiros) fornecem dicas claras dos objetivos da fase.
+
+### 2. Telas de Apresentação e Encerramento de Fase:
+* **Entrada na Fase:** Tela de introdução com a narrativa do conto em folheto de cordel.
+* **Conclusão da Fase:** Tela de encerramento celebrando o sucesso, apresentando a narrativa de desfecho e exibindo o **Item Místico** conquistado.
+
+### 3. Controles Universais:
+* Os comandos de **Grito** (`Espaço` / Segurar) e **Interação** (`E` / Clique) funcionam universalmente em **todas as telas e fases do jogo**.
+* O nome oficial do herói só é digitado e revelado na **Prensa do Destino** após a conquista dos 4 elementos.
+
+---
+
 ## 🚪 Regra Geral de Transição (Sem Portais)
 * **Nas fases NÃO existem portais manuais de volta ao estúdio.**
-* O jogador só retorna ao Estúdio de Xilogravura por dois caminhos:
-  1. **Vitória / Sucesso:** Ao cumprir o objetivo da fase, o jogador recebe o item místico correspondente e é transportado de volta comemorando o sucesso.
-  2. **Derrota / Falha:** Ao falhar na missão (ex: morte de um bode, ser pego desarmado/sem fumo pela criatura, errar o enigma), o jogador é expulso de volta ao estúdio sem o item para tentar novamente.
+* Retorno ocorre apenas por **Sucesso** (com item) ou por **Falha** (derrota/morte/erro).
 
 ---
 
 ## 🎨 Os 4 Elementos Místicos do Cordel Mestre
-Para completar o cordel do herói e destravar a prensa de saída do estúdio, Coisinha precisa coletar os 4 elementos fundamentais:
-
-* 🪓 **Carimbo Mágico:** Obtido na história *"O Ataque do Chupa-Cabra"*.
-* 📄 **Folha / Página Rasgada:** Obtida na história *"A Fazenda da Cumade Fulozinha"*.
-* 🪶 **Pena Encantada:** Obtida na história *"A Pena da Rasga-Mortalha"*.
-* 🖋️ **Tinta Encantada:** Obtida na história *"A Botija de Mané Monteiro"*.
+* 🪓 **Carimbo Mágico:** Obtido em *"O Ataque do Chupa-Cabra"*.
+* 📄 **Folha / Página Rasgada:** Obtida em *"A Fazenda da Cumade Fulozinha"*.
+* 🪶 **Pena Encantada:** Obtida em *"A Pena da Rasga-Mortalha"*.
+* 🖋️ **Tinta Encantada:** Obtida em *"A Botija de Mané Monteiro"*.
 
 ---
 
 ## 🐐 Fase 1: O Ataque do Chupa-Cabra
 
-### Contexto & Cenário
-* **Mapa Amplo com Câmera Dinâmica:** O cenário da caatinga é extenso e a câmera acompanha a movimentação do jogador pelo mapa.
-* **Moitas:** Existem várias moitas de vegetação espalhadas pelo cenário.
-  - Os bodes podem estar escondidos dentro das moitas.
-  - Ao interagir com uma moita, o jogador vasculha o arbusto à procura de itens (a **Corda** e o **Candeeiro** estão escondidos dentro de moitas).
-
-### Mecânicas de Aboio vs. Grito:
-* **Aboiar (Ação Rápida):** Se estiver perto ou dentro de uma moita, o aboio faz o bode sair da moita e o afasta apenas um pouco.
-* **Gritar (Segurar Ação):** O grito espanta o bode, forçando-o a sair em disparada à procura de uma nova moita para se esconder, além de assustar o Chupa-Cabra.
-
-### O Chupa-Cabra & Barra de Vida dos Bodes:
-* Um bode fora da moita chama imediatamente a atenção do **Chupa-Cabra**, que surge pelo mapa para atacá-lo e chupar seu sangue.
-* **Barra de Vida (HP) do Bode:** Cada um dos 4 bodes possui uma barra de vida individual visível. A vida drena continuamente enquanto o Chupa-Cabra estiver atacando o bode.
-* **Condição de Derrota (Falha):** Se qualquer um dos bodes morrer (HP zerar), a missão falha e o jogador retorna imediatamente ao estúdio.
-* **Condição de Vitória (Sucesso):** Resgatar e trancar em segurança os **4 bodes no curral central**. O fazendeiro presenteia o jogador com o **🪓 Carimbo Mágico** e ele retorna ao estúdio vitorioso.
+### Cenário Amplo, Moitas, Cactos e Frutas Regionais:
+* Mapa expandido com câmera suave (*camera lerp*).
+* **Vegetação Diversificada em Moitas:**
+  - **Moitas de Cactos (Espinhos):** Ao tocar ou vasculhar, o jogador perde 1 barra de vida (HP) e **solta um grito involuntário de dor**.
+  - **Moitas de Frutas Regionais (Umbu / Mandacaru):** Ao vasculhar, recuperam a barra de vida perdida.
+  - **Moitas com Itens:** Escondem a **Corda de Laçar** e o **Candeeiro**.
+  - **Moitas com Bodes:** Bodes escondidos.
+* **Comportamento Sonoro dos Bodes & Reação em Cadeia:**
+  - Ao serem atacados pelo Chupa-Cabra, os bodes **gritam de pavor**, espantando e afugentando outros bodes que estejam soltos ou escondidos em arbustos próximos.
+  - **Aboio:** Faz o bode sair da moita e se afastar levemente.
+  - **Grito:** Espanta o bode para procurar outra moita e afasta o Chupa-Cabra.
+* **Condição de Vitória:** Resgatar os 4 bodes no curral ➔ Ganha o **🪓 Carimbo Mágico**.
 
 ---
 
-## 🌿 Fase 2: A Fazenda da Cumade Fulozinha
+## 🌿 Fases 2 e 4: A Fazenda da Cumade Fulozinha & A Botija de Mané Monteiro
 
-### Estrutura do Mapa (6 Lotes em Telas Individuais — Sem Lote 3c):
-* Cada lote é uma tela individual com seu próprio labirinto interno.
-* **Portões Internos Dinâmicos:** Portões dentro do labirinto abrem e fecham com os assobios. Quando abertos, **permitem a passagem**; quando fechados, **bloqueiam rigidamente a passagem**.
-* **Porteiras de Fronteira:** As porteiras de transição entre lotes adjacentes estão **sempre abertas**.
-* **Moitas:** Todos os lotes possuem moitas espalhadas em seus labirintos.
-* **Topologia dos 6 Lotes:**
-  ```
-  [Lote 1a]                [Lote 1b] (Fumo na Moita)
-      |                        |
-  [Lote 2a] -------------- [Lote 2b]
-      |                        |
-  [Lote 0] (Início/Pedra)  [Lote 3b] (Cumade Fulozinha)
-      |
-  [Lote 3a]
-  ```
-* **Lote 0 (Início):** A tela exibe apenas o Lote 0. A **Pedra da Botija** fica posicionada **exclusivamente na saída do Lote 0** para o Lote 2a.
-* **Lote 1b:** O **Fumo de Rolo** da Cumade Fulozinha está escondido dentro de uma das moitas.
-* **Lote 3b:** Morada da **Cumade Fulozinha** (não existe Lote 3c).
+### Topologia Rigorosa de Lotes & Paredes Perimétricas:
+Cada lote possui **paredes de limite sólidas ao redor**, com passagens abertas **estritamente nas seguintes conexões**:
+* **Lote 0:** Apenas 1 conexão à direita com o **Lote 2a**. (Pedra da botija na saída).
+* **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
+* **Lote 1a:** Conexão à direita com **Lote 1b**.
+* **Lote 3a:** Conexão à direita com **Lote 3b**.
+* **Lote 2b:** Conexão acima com **Lote 1b**, abaixo com **Lote 3b**.
+* **Lote 1b:** Conexão à direita com o **Lote da Igreja** (**EXCLUSIVAMENTE na Fase 4**).
 
-### Mecânica de Caça & Assobios:
-* Ao entrar no Lote 3b, a Cumade Fulozinha começa a caçar o jogador pelo labirinto do lote, aumentando progressivamente a intensidade e frequência dos assobios (inversão temporária de controles: cima ⇄ baixo ou esquerda ⇄ direita).
-* **Condição de Colisão com a Cumade:**
-  - **Com o Fumo:** Ela aceita a oferenda, acalma a mata e entrega a **📄 Página / Folha Rasgada** ➔ Retorno ao estúdio com **Sucesso**!
-  - **Sem o Fumo:** Ela desfere uma chicotada de cipó e expulsa o invasor ➔ Retorno ao estúdio com **Falha**!
+```
+[Lote 1a] ─────────────── [Lote 1b] ── (Fase 4 apenas) ── [Lote Igreja] (Santuário)
+   │                           │
+[Lote 2a] ─────────────── [Lote 2b]
+   │                           │
+[Lote 0] (Início/Pedra)   [Lote 3b] (Cumade Fulozinha)
+   │
+[Lote 3a] ─────────────── [Lote 3b]
+```
+
+* **Labirintos Mais Complexos:** Mais paredes internas, portões que abrem/fecham com assobios (colisão rígida quando fechados) e maior densidade de moitas.
+* **Fase 2:** Fumo de rolo na moita do Lote 1b; entregar à Cumade no Lote 3b ➔ **📄 Página Rasgada**.
+* **Fase 4:** Início na Igreja (Santuário onde a Cumade não entra); desenterrar a botija no Lote 0 (-25% vel) e retornar à Igreja ➔ **🖋️ Tinta Encantada**.
 
 ---
 
-## 🦉 Fase 3: A Pena da Rasga-Mortalha
+## 🦉 Fase 3: A Pena da Rasga-Mortalha (Novo Espaço & Mecânicas Vivas)
 
-### O Enigma de Einstein no Sertão (Navegação Estrofe a Estrofe por Clique):
-* O vilarejo é composto por **5 casas enfileiradas** e itens soltos no cenário representando as características (Cores, Moradores, Bebidas, Animais e Fumantes).
-* **Paginação de Pistas em Cordel:** As **9 estrofes poéticas** são exibidas em formato de folheto de cordel, aparecendo **uma a uma na tela e mudando de acordo com o clique do jogador** (botão de Avançar / Voltar Estrofe).
-* **Mecânica de Montagem (Drag-and-Drop):** O jogador deve ler as estrofes e arrastar cada item solto para a sua casa correspondente na interface antes de poder investigar as casas.
+### 1. Os 2 Violeiros do Repente (Canto Inferior Esquerdo):
+* As estrofes poéticas do enigma **NÃO ficam no topo da tela**.
+* São declamadas pelos **2 Violeiros** ao interagir com eles:
+  - **Violeiro 1:** Declamador das **4 primeiras estrofes** do cordel.
+  - **Violeiro 2:** Declamador das **5 estrofes finais** do cordel.
 
-### Condições de Desfecho:
-* **Preenchimento com Algum Erro:** Ao confirmar com qualquer inconsistência ➔ O agouro se manifesta e o jogador retorna ao estúdio com **Falha**.
-* **Preenchimento 100% Correto:** A casa exata da ave é revelada (Casa 4 - Verde / Ferrador do Tatu), o jogador recolhe a **🪶 Pena Encantada** e retorna ao estúdio com **Sucesso**!
+### 2. As 5 Casas em Arco & 4 Mesas de Montagem:
+* **Casas:** Dispostas em **arco na parte superior** com a ave Rasga-Mortalha sobrevoando nos céus.
+* **4 Mesas Interativas na Parte Inferior:**
+  1. **Mesa dos Bêbados/Moradores:** Moradores embriagados ao redor da mesa. Ao interagir, o morador levanta e revela sua profissão. O jogador deve **empurrar fisicamente o bêbado** até a sua respectiva casa.
+  2. **Mesa das Bebidas:** 5 garrafas/cabaças que o jogador pega individualmente e transporta até a casa certa.
+  3. **Mesa dos Fumos:** 5 tipos de fumo/tabaco que o jogador pega e deposita na casa.
+  4. **Área/Mesa dos Animais:** 5 animais sertanejos.
+     - **Com Corda:** O jogador laça 1 animal por vez e o conduz amarrado até a casa.
+     - **Sem Corda:** O jogador precisa **tanger o animal** até a casa.
+     - **Regra de Saída do Animal:** Uma vez dentro da casa correta, o animal **só sai se o jogador der um grito**.
 
----
-
-## 🏺 Fase 4: A Botija de Mané Monteiro
-
-### Contexto & O Novo Lote da Igreja (Zona Segura):
-* A fase utiliza a estrutura da fazenda, com uma **NOVA ÁREA**: o **Lote da Igreja**, situado à direita do **Lote 1b**.
-* **Zona Sagrada / Santuário da Igreja:** A Cumade Fulozinha **NÃO CONSEGUE ENTRAR** no Lote da Igreja.
-* **Início da Missão:** O jogador **inicia dentro do Lote da Igreja** e só tem a porteira à sua esquerda para acessar o Lote 1b.
-
-### Caça Global da Cumade & Escuridão:
-* Nos demais lotes da fazenda, a Cumade Fulozinha **atravessa livremente entre todos os lotes** em perseguição global contínua.
-* **Sem Fumo:** Se a Cumade alcançar o personagem nos lotes da fazenda ➔ Retorno ao estúdio com **Falha**.
-* **Escuridão & Candeeiro:** Campo de visão restrito ao círculo de luz do Candeeiro.
-
-### Rota da Missão & Condição de Vitória:
-1. Iniciar no **Lote da Igreja** e cruzar a porteira para o **Lote 1b**.
-2. Navegar furtivamente pela fazenda até o **Lote 0**.
-3. Desenterrar a botija sob a pedra (velocidade de transporte reduzida em 25% pelo peso).
-4. Retornar por todo o trajeto até o **Lote da Igreja** e entregar a botija ao beato.
-5. O beato concede o frasco de **🖋️ Tinta Encantada** ➔ Retorno ao estúdio com **Sucesso**!
+### Desfecho da Fase 3:
+* Organização 100% correta das 5 casas ➔ A ave entrega a **🪶 Pena Encantada** ➔ **Sucesso**!
 
 ---
 
-## 🏆 Fase Final: A Prensa do Destino & Vitória
-
-1. **Condição de Interação:** O jogador só pode interagir com a mesa de prensagem após ter conquistado os **4 itens místicos** (Carimbo, Folha, Pena e Tinta) e pendurado os 4 cordéis no varal com seus pregadores.
-2. **Assinatura do Herói:** O jogador digita o seu **Nickname** no painel da prensa.
-3. **Prensagem:** A matriz xilográfica é estampada com som de impacto e a porta de saída do estúdio se abre com luz dourada.
-4. **Tela de Vitória:** Exibição da capa oficial do folheto em xilogravura com o título personalizado:
-   > **"O Cordel de [Nickname]: O Herói do Sertão"**
+## 🏆 Fase Final: A Prensa do Destino & Capa Oficial
+* Destravada com os 4 itens. O jogador insere seu **Nickname**, aciona a prensa e gera a capa:
+  > **"O Cordel de [Nickname]: O Herói do Sertão"**

@@ -127,12 +127,18 @@ window.addEventListener('DOMContentLoaded', () => {
   (window as any).gameEngine = engine;
 
   (window as any).setBottomMessage = (speaker: string, text: string, hint: string = '[ Solte E para Avançar ]') => {
+    const panel = document.getElementById('game-message-panel');
     const messageSpeaker = document.getElementById('message-speaker');
     const messageText = document.getElementById('message-text');
     const messageHint = document.getElementById('message-hint');
-    if (messageSpeaker) messageSpeaker.textContent = speaker ? speaker.toUpperCase() : '📜 NARRADOR';
-    if (messageText) messageText.textContent = text;
-    if (messageHint) messageHint.textContent = hint;
+    if (text) {
+      if (panel) panel.classList.add('active');
+      if (messageSpeaker) messageSpeaker.textContent = speaker ? speaker.toUpperCase() : '📜 NARRADOR';
+      if (messageText) messageText.textContent = text;
+      if (messageHint) messageHint.textContent = hint;
+    } else {
+      if (panel) panel.classList.remove('active');
+    }
   };
 
   console.log('🎮 O Cordel de Coisinha Game Engine iniciado com sucesso a 60 FPS.');

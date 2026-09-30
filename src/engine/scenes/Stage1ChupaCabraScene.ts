@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { drawText, drawUnifiedToast } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawBode,
@@ -10,7 +10,6 @@ import {
   drawMoitaCactoEspinhos,
   drawChaoTerraBatida
 } from '../../renderer/xilogravura';
-import { DialogSystem } from '../dialogs';
 import { NarrativeModalManager } from '../narrative';
 
 export type BushType = 'normal' | 'corda' | 'candeeiro' | 'bode' | 'cacto' | 'fruta';
@@ -121,8 +120,7 @@ export class Stage1ChupaCabraScene implements IScene {
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
 
-  // Sistemas Globais de Diálogo e Narrativa
-  private dialogs: DialogSystem = new DialogSystem();
+  // Sistema Narrativo de Cordel
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   public init(_engine: IGameEngine): void {
@@ -272,8 +270,7 @@ export class Stage1ChupaCabraScene implements IScene {
       return;
     }
 
-    if (this.dialogs.isActive) {
-      this.dialogs.update(dt, input, engine);
+    if (engine.messages.isDialogActive) {
       return;
     }
 
@@ -366,7 +363,7 @@ export class Stage1ChupaCabraScene implements IScene {
     const distToFazendeiro = Math.hypot(this.player.x - this.fazendeiro.x, this.player.y - this.fazendeiro.y);
     if (distToFazendeiro < 140 && input.interactReleased) {
       const rescuedCount = this.goats.filter((g) => g.isRescued).length;
-      this.dialogs.startDialog(
+      engine.messages.startDialog(
         'fazendeiro',
         'Fazendeiro Zé do Bode',
         '👨🌾',
@@ -734,7 +731,7 @@ export class Stage1ChupaCabraScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
     ctx.save();
     ctx.translate(-this.camera.x, -this.camera.y);
 
@@ -910,15 +907,14 @@ export class Stage1ChupaCabraScene implements IScene {
     }
     ctx.restore();
 
-    // Toast Unificado
-    drawUnifiedToast(ctx, this.message, 960, 540, {
+    // Notificar gerenciador global de mensagens na base
+    engine.messages.postMessage(this.message, {
       isError: this.stateStatus === 'FAILED',
       isSuccess: this.stateStatus === 'SUCCESS'
     });
 
-    // Diálogos & Modais Narrativos por Cima
-    this.dialogs.render(ctx, 960, 540);
-    this.narrative.render(ctx, 960, 540);
+    // Modais Narrativos de Apresentação e Conclusão
+    this.narrative.render(ctx, 960, 460);
   }
 
   public destroy(): void {}

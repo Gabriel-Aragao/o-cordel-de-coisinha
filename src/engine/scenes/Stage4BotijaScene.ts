@@ -429,8 +429,7 @@ export class Stage4BotijaScene implements IScene {
       return;
     }
 
-    if (this.dialogs.isActive) {
-      this.dialogs.update(dt, input, engine);
+    if (engine.messages.isDialogActive) {
       return;
     }
 

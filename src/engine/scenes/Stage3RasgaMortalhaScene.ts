@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { drawText, drawUnifiedToast } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawRasgaMortalha,
@@ -9,7 +9,6 @@ import {
   drawInteriorCasaXilo,
   drawBode
 } from '../../renderer/xilogravura';
-import { DialogSystem } from '../dialogs';
 import { NarrativeModalManager } from '../narrative';
 
 export interface HouseData {
@@ -84,7 +83,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private message: string = 'Ouça os Violeiros [E], pegue os itens com [E] e entre nas casas para organizá-las!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
 
-  private dialogs: DialogSystem = new DialogSystem();
+  // Sistema Narrativo de Cordel
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   public init(_engine: IGameEngine): void {
@@ -169,8 +168,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
       return;
     }
 
-    if (this.dialogs.isActive) {
-      this.dialogs.update(dt, input, engine);
+    if (engine.messages.isDialogActive) {
       return;
     }
 
@@ -337,7 +335,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
 
     if (input.interactReleased) {
       if (Math.hypot(this.player.x - 90, this.player.y - 460) < 70) {
-        this.dialogs.startDialog(
+        engine.messages.startDialog(
           'violeiro_1',
           'Mestre Cícero Violeiro',
           '🪕',
@@ -365,7 +363,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
 
       if (Math.hypot(this.player.x - 170, this.player.y - 460) < 70) {
-        this.dialogs.startDialog(
+        engine.messages.startDialog(
           'violeiro_2',
           'Severino Cantador',
           '🪕',
@@ -474,14 +472,14 @@ export class Stage3RasgaMortalhaScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
     // =========================================================================
     // 1. RENDER DO INTERIOR DA CASA
     // =========================================================================
     if (this.currentInteriorHouseIdx !== null) {
       const house = this.houses.find(h => h.index === this.currentInteriorHouseIdx)!;
 
-      drawInteriorCasaXilo(ctx, 960, 540, house, { time: this.animTime });
+      drawInteriorCasaXilo(ctx, 960, 460, house, { time: this.animTime });
 
       for (const it of this.allItems) {
         if (it.assignedHouseIdx === house.index && it.interiorX !== undefined && it.interiorY !== undefined) {
@@ -507,11 +505,11 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
 
       ctx.fillStyle = '#854d0e';
-      ctx.fillRect(430, 465, 100, 30);
+      ctx.fillRect(430, 425, 100, 30);
       ctx.strokeStyle = '#fef08a';
       ctx.lineWidth = 2;
-      ctx.strokeRect(430, 465, 100, 30);
-      drawText(ctx, 'SAÍDA ⬇', 480, 473, { font: 'bold 11px monospace', align: 'center', color: '#fef08a' });
+      ctx.strokeRect(430, 425, 100, 30);
+      drawText(ctx, 'SAÍDA ⬇', 480, 433, { font: 'bold 11px monospace', align: 'center', color: '#fef08a' });
 
       drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
         facing: this.facing,
@@ -527,7 +525,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
         ctx.restore();
       }
 
-      drawUnifiedToast(ctx, this.message, 960, 540);
+      // Notificar gerenciador global de mensagens na base
+      engine.messages.postMessage(this.message);
       return;
     }
 
@@ -536,8 +535,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
     // =========================================================================
 
     ctx.fillStyle = '#1e1b18';
-    ctx.fillRect(0, 0, 960, 540);
-    drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+    ctx.fillRect(0, 0, 960, 460);
+    drawMolduraCordel(ctx, 8, 8, 944, 444, { borderWeight: 3 });
 
     for (const h of this.houses) {
       ctx.fillStyle = '#292524';
@@ -637,10 +636,11 @@ export class Stage3RasgaMortalhaScene implements IScene {
       color: '#f7d070'
     });
 
-    drawUnifiedToast(ctx, this.message, 960, 540);
+    // Notificar gerenciador global de mensagens na base
+    engine.messages.postMessage(this.message);
 
-    this.dialogs.render(ctx, 960, 540);
-    this.narrative.render(ctx, 960, 540);
+    // Modais Narrativos
+    this.narrative.render(ctx, 960, 460);
   }
 
   public destroy(): void {}

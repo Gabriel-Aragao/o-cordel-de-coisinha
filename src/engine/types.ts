@@ -1,5 +1,6 @@
 import { ISoundManager } from '../audio/types';
 import { JuiceManager } from './juice';
+import type { MessageAndDialogManager } from './MessageAndDialogManager';
 
 export type SceneId =
   | 'STUDIO'
@@ -76,6 +77,7 @@ export interface IGameEngine {
   fps: number;
   sound: ISoundManager;
   juice: JuiceManager;
+  messages: MessageAndDialogManager;
   switchScene(sceneId: SceneId): void;
   unlockItem(item: MysticItemId): void;
   setPlayerName(name: string): void;

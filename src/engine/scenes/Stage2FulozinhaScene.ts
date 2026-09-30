@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText, drawUnifiedToast } from '../../renderer/shapes';
+import { renderEntity, drawText } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawCumadeFulozinha,
@@ -9,7 +9,6 @@ import {
   drawChaoTerraBatida,
   drawMolduraCordel
 } from '../../renderer/xilogravura';
-import { DialogSystem } from '../dialogs';
 import { NarrativeModalManager } from '../narrative';
 
 type LotId = '0' | '1a' | '1b' | '2a' | '2b' | '3a' | '3b';
@@ -107,7 +106,6 @@ export class Stage2FulozinhaScene implements IScene {
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
 
-  private dialogs: DialogSystem = new DialogSystem();
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   // Definição dos 6 Lotes com Paredes Perimétricas Sólidas, Barreiras Espaçosas, Portões Dinâmicos e Moitas
@@ -384,8 +382,7 @@ export class Stage2FulozinhaScene implements IScene {
       return;
     }
 
-    if (this.dialogs.isActive) {
-      this.dialogs.update(dt, input, engine);
+    if (engine.messages.isDialogActive) {
       return;
     }
 
@@ -768,7 +765,7 @@ export class Stage2FulozinhaScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
     const lot = this.lots[this.currentLot];
 
     // 1. Fundo do Terreno
@@ -881,15 +878,14 @@ export class Stage2FulozinhaScene implements IScene {
     }
     ctx.restore();
 
-    // Toast Unificado
-    drawUnifiedToast(ctx, this.message, 960, 540, {
+    // Notificar gerenciador global de mensagens na base
+    engine.messages.postMessage(this.message, {
       isError: this.stateStatus === 'FAILED',
       isSuccess: this.stateStatus === 'SUCCESS'
     });
 
-    // Modais e Diálogos
-    this.dialogs.render(ctx, 960, 540);
-    this.narrative.render(ctx, 960, 540);
+    // Modais Narrativos de Apresentação e Conclusão
+    this.narrative.render(ctx, 960, 460);
   }
 
   public destroy(): void {}

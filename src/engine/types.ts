@@ -20,13 +20,22 @@ export interface Vector2 {
   y: number;
 }
 
+export interface MouseState {
+  x: number;
+  y: number;
+  isDown: boolean;
+  clicked: boolean;
+}
+
 export interface InputState {
   up: boolean;
   down: boolean;
   left: boolean;
   right: boolean;
-  action: boolean; // Espaço / Aboio
+  action: boolean; // Espaço / Aboio (curto) ou Grito (segurar)
+  actionHeldTime: number; // Tempo em segundos segurando a ação
   interact: boolean; // E / Enter
+  mouse: MouseState;
 }
 
 export interface Entity {

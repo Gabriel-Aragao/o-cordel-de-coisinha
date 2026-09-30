@@ -62,10 +62,14 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
   - **Moitas de Frutas Regionais (Umbu / Mandacaru):** Recuperam 1 barra de vida.
   - **Moitas com Itens:** Escondem a **Corda de Laçar** ou o **Candeeiro**.
   - **Moitas com Bodes:** Escondem os bodes do rebanho.
-* **Comportamento Sonoro dos Bodes & Reação em Cadeia:**
-  - Ao serem atacados pelo Chupa-Cabra, os bodes **gritam de pavor**, espantando e afugentando outros bodes soltos ou em arbustos próximos.
-  - **Aboio:** Faz o bode sair da moita e se afastar levemente.
-  - **Grito:** Espanta o bode para procurar outra moita e afasta o Chupa-Cabra.
+### Comportamento Sonoro dos Bodes & Reações Acústicas:
+* **Reação dos Bodes:**
+  - **Aboio:** Faz o bode andar um pouco (deslocamento suave, saindo da moita ou se afastando levemente).
+  - **Grito:** Faz o bode correr em disparada e procurar ativamente outra moita para se esconder.
+  - **Bode Atacado:** Ao ser atacado pelo Chupa-Cabra, o bode grita de pavor, assustando e espantando outros bodes soltos ou escondidos em arbustos próximos.
+* **Reação do Chupa-Cabra ao Som:**
+  - **Aboio:** NÃO afeta o Chupa-Cabra (o predador ignora o aboio).
+  - **Grito:** Afugenta o Chupa-Cabra, fazendo-o fugir e se afastar o máximo que seu deslocamento permitir por **3 segundos**. Após esse tempo, ele retoma a caça aos bodes indefesos.
 * **Condição de Vitória:** Resgatar os 4 bodes no curral ➔ Ganha o **🪓 Carimbo Mágico**.
 
 ---

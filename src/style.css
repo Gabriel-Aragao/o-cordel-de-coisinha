@@ -59,6 +59,40 @@ body {
   text-transform: uppercase;
 }
 
+.nickname-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #382c21;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #735031;
+}
+
+.nickname-box label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f7d070;
+}
+
+.nickname-box input {
+  background: #1c150e;
+  border: 1px solid #8b5a2b;
+  color: #fef08a;
+  font-size: 0.85rem;
+  font-family: monospace;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: 110px;
+  outline: none;
+}
+
+.nickname-box input:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 6px rgba(250, 204, 21, 0.4);
+}
+
 .header-right {
   display: flex;
   gap: 16px;
@@ -145,6 +179,7 @@ body {
   gap: 8px;
   border-top: 1px solid #423020;
   padding-top: 8px;
+  flex-wrap: wrap;
 }
 
 .debug-label {
@@ -175,4 +210,16 @@ body {
   border-color: #f7d070;
   color: #fff;
   font-weight: 700;
+}
+
+.btn-action {
+  background: #065f46;
+  border-color: #10b981;
+  color: #d1fae5;
+  font-weight: 600;
+}
+
+.btn-action:hover {
+  background: #047857;
+  border-color: #34d399;
 }

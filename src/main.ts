@@ -15,8 +15,28 @@ window.addEventListener('DOMContentLoaded', () => {
   const itemFolha = document.getElementById('item-folha');
   const itemPena = document.getElementById('item-pena');
   const itemTinta = document.getElementById('item-tinta');
+  const nicknameInput = document.getElementById('player-nickname') as HTMLInputElement;
+  const btnUnlockAll = document.getElementById('btn-unlock-all');
 
   const engine = new GameEngine(canvas);
+
+  // Listener para o Nickname
+  if (nicknameInput) {
+    nicknameInput.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      engine.setPlayerName(target.value);
+    });
+  }
+
+  // Listener para desbloqueio rápido de todos os itens no modo Debug
+  if (btnUnlockAll) {
+    btnUnlockAll.addEventListener('click', () => {
+      engine.unlockItem('carimbo');
+      engine.unlockItem('folha');
+      engine.unlockItem('pena');
+      engine.unlockItem('tinta');
+    });
+  }
 
   const sceneLabels: Record<SceneId, string> = {
     STUDIO: '🏠 Estúdio de Xilogravura',

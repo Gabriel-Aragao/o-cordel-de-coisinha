@@ -8,6 +8,8 @@ import {
   drawChaoTerraBatida,
   drawMolduraCordel
 } from '../../renderer/xilogravura';
+import { DialogSystem } from '../dialogs';
+import { NarrativeModalManager } from '../narrative';
 
 type LotId = 'igreja' | '0' | '1a' | '1b' | '2a' | '2b' | '3a' | '3b';
 
@@ -29,7 +31,7 @@ export class Stage4BotijaScene implements IScene {
   public id: SceneId = 'STAGE_4_BOTIJA';
   public name = 'Fase 4: A Botija de Mané Monteiro';
 
-  // O jogador inicia no Lote da Igreja (Santuário Seguro)
+  // Início no Santuário da Igreja
   private currentLot: LotId = 'igreja';
 
   private player: Entity = {
@@ -99,13 +101,15 @@ export class Stage4BotijaScene implements IScene {
 
   private message: string = 'Saia da Igreja pela esquerda, desenterre a Botija no Lote 0 e retorne ao Santuário!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
-  private endTimer: number = 0;
   private stepTimer: number = 0;
   private digSoundTimer: number = 0;
   private bellTimer: number = 0;
   private animTime: number = 0;
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
+
+  private dialogs: DialogSystem = new DialogSystem();
+  private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   // Ciclo de patrulha da Fulô (exclui a Igreja)
   private lotSequence: LotId[] = ['0', '2a', '1a', '2b', '1b', '3b', '3a'];
@@ -116,6 +120,13 @@ export class Stage4BotijaScene implements IScene {
       name: 'LOTE DA IGREJA — SANTUÁRIO SEGURO (BEATO)',
       isSanctuary: true,
       walls: [
+        // Perimétricas: Topo, Fundo, Direita Sólidos. Esquerda Aberta para 1b (210 a 330)
+        { x: 480, y: 12, w: 960, h: 24 },
+        { x: 480, y: 528, w: 960, h: 24 },
+        { x: 948, y: 270, w: 24, h: 540 },
+        { x: 12, y: 105, w: 24, h: 210 },
+        { x: 12, y: 435, w: 24, h: 210 },
+        // Altar e Pilares Internos
         { x: 480, y: 120, w: 180, h: 40 },
         { x: 260, y: 270, w: 20, h: 260 },
         { x: 700, y: 270, w: 20, h: 260 }
@@ -125,6 +136,13 @@ export class Stage4BotijaScene implements IScene {
       id: '0',
       name: 'LOTE 0 — A PEDRA ANCESTRAL DA BOTIJA',
       walls: [
+        // Abertura apenas à direita para 2a
+        { x: 480, y: 12, w: 960, h: 24 },
+        { x: 480, y: 528, w: 960, h: 24 },
+        { x: 12, y: 270, w: 24, h: 540 },
+        { x: 948, y: 105, w: 24, h: 210 },
+        { x: 948, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 280, y: 150, w: 20, h: 220 },
         { x: 680, y: 350, w: 20, h: 200 }
       ]
@@ -133,6 +151,14 @@ export class Stage4BotijaScene implements IScene {
       id: '1a',
       name: 'LOTE 1a — TRILHA NORTE DA CAATINGA',
       walls: [
+        // Abertura Baixo (2a) e Direita (1b)
+        { x: 480, y: 12, w: 960, h: 24 },
+        { x: 12, y: 270, w: 24, h: 540 },
+        { x: 210, y: 528, w: 420, h: 24 },
+        { x: 750, y: 528, w: 420, h: 24 },
+        { x: 948, y: 105, w: 24, h: 210 },
+        { x: 948, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 480, y: 220, w: 340, h: 20 }
       ]
     },
@@ -140,6 +166,15 @@ export class Stage4BotijaScene implements IScene {
       id: '1b',
       name: 'LOTE 1b — PORTEIRA DA IGREJA',
       walls: [
+        // Aberturas: Esquerda (1a), Baixo (2b) e Direita (Igreja Santuário)
+        { x: 480, y: 12, w: 960, h: 24 },
+        { x: 12, y: 105, w: 24, h: 210 },
+        { x: 12, y: 435, w: 24, h: 210 },
+        { x: 948, y: 105, w: 24, h: 210 },
+        { x: 948, y: 435, w: 24, h: 210 },
+        { x: 210, y: 528, w: 420, h: 24 },
+        { x: 750, y: 528, w: 420, h: 24 },
+        // Internas
         { x: 380, y: 270, w: 20, h: 280 }
       ]
     },
@@ -147,6 +182,16 @@ export class Stage4BotijaScene implements IScene {
       id: '2a',
       name: 'LOTE 2a — ENCRUZILHADA CENTRAL OESTE',
       walls: [
+        // 4 Aberturas: Topo (1a), Baixo (3a), Esquerda (0), Direita (2b)
+        { x: 210, y: 12, w: 420, h: 24 },
+        { x: 750, y: 12, w: 420, h: 24 },
+        { x: 210, y: 528, w: 420, h: 24 },
+        { x: 750, y: 528, w: 420, h: 24 },
+        { x: 12, y: 105, w: 24, h: 210 },
+        { x: 12, y: 435, w: 24, h: 210 },
+        { x: 948, y: 105, w: 24, h: 210 },
+        { x: 948, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 220, y: 270, w: 20, h: 240 },
         { x: 520, y: 180, w: 260, h: 20 }
       ]
@@ -155,6 +200,15 @@ export class Stage4BotijaScene implements IScene {
       id: '2b',
       name: 'LOTE 2b — ENCRUZILHADA CENTRAL LESTE',
       walls: [
+        // Aberturas: Topo (1b), Baixo (3b), Esquerda (2a). Direita Sólida.
+        { x: 948, y: 270, w: 24, h: 540 },
+        { x: 210, y: 12, w: 420, h: 24 },
+        { x: 750, y: 12, w: 420, h: 24 },
+        { x: 210, y: 528, w: 420, h: 24 },
+        { x: 750, y: 528, w: 420, h: 24 },
+        { x: 12, y: 105, w: 24, h: 210 },
+        { x: 12, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 420, y: 350, w: 20, h: 200 },
         { x: 700, y: 220, w: 20, h: 220 }
       ]
@@ -163,6 +217,14 @@ export class Stage4BotijaScene implements IScene {
       id: '3a',
       name: 'LOTE 3a — BOSQUE ESCURO',
       walls: [
+        // Aberturas: Topo (2a), Direita (3b). Fundo e Esquerda Sólidos.
+        { x: 480, y: 528, w: 960, h: 24 },
+        { x: 12, y: 270, w: 24, h: 540 },
+        { x: 210, y: 12, w: 420, h: 24 },
+        { x: 750, y: 12, w: 420, h: 24 },
+        { x: 948, y: 105, w: 24, h: 210 },
+        { x: 948, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 480, y: 300, w: 340, h: 20 }
       ]
     },
@@ -170,6 +232,14 @@ export class Stage4BotijaScene implements IScene {
       id: '3b',
       name: 'LOTE 3b — CLAREIRA DOS CIPÓS',
       walls: [
+        // Aberturas: Topo (2b), Esquerda (3a). Fundo e Direita Sólidos.
+        { x: 480, y: 528, w: 960, h: 24 },
+        { x: 948, y: 270, w: 24, h: 540 },
+        { x: 210, y: 12, w: 420, h: 24 },
+        { x: 750, y: 12, w: 420, h: 24 },
+        { x: 12, y: 105, w: 24, h: 210 },
+        { x: 12, y: 435, w: 24, h: 210 },
+        // Internas
         { x: 300, y: 270, w: 20, h: 280 },
         { x: 620, y: 270, w: 20, h: 280 }
       ]
@@ -186,7 +256,6 @@ export class Stage4BotijaScene implements IScene {
     this.digProgress = 0;
     this.isDigging = false;
     this.stateStatus = 'PLAYING';
-    this.endTimer = 0;
     this.stepTimer = 0;
     this.digSoundTimer = 0;
     this.bellTimer = 0;
@@ -194,26 +263,46 @@ export class Stage4BotijaScene implements IScene {
 
     engine.sound.playSinoBadalo();
 
-    if (engine.inventory.tinta) {
-      this.message = '✓ Fase Concluída! O Beato entregou a 🖋️ Tinta Encantada.';
-    }
+    // Apresentação da Fase (Folheto de Cordel)
+    this.narrative.showIntro({
+      phaseNumber: 4,
+      title: 'A Botija de Mané Monteiro',
+      subtitle: 'O tesouro encantado, a fuga nas trevas e a bênção da Igreja',
+      verses: [
+        'No templo sagrado da paróquia o Beato faz oração,',
+        'A Cumade Furiosa não entra no santuário de bênção e perdão;',
+        'Vá ao Lote 0 desenterrar o ouro de Mané Monteiro com bravura,',
+        'E volte com a botija nos braços para selar a escritura!'
+      ],
+      objective: 'Saia pela esquerda, escave a botija no Lote 0 e retorne à Igreja!',
+      itemReward: {
+        id: 'tinta',
+        name: 'Tinta Encantada',
+        icon: '🖋️'
+      }
+    });
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
 
+    if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
+      this.narrative.update(dt, input, engine);
+      return;
+    }
+
+    if (this.dialogs.isActive) {
+      this.dialogs.update(dt, input, engine);
+      return;
+    }
+
     if (this.stateStatus !== 'PLAYING') {
-      this.endTimer += dt;
-      if (this.endTimer >= 2.5) {
-        engine.switchScene('STUDIO');
-      }
       return;
     }
 
     const inSanctuary = this.currentLot === 'igreja';
     engine.sound.setBGMState({ tension: inSanctuary ? 0.1 : 0.8 });
 
-    // Badalo suave periódico na Igreja
     if (inSanctuary) {
       this.bellTimer += dt;
       if (this.bellTimer >= 10.0) {
@@ -222,7 +311,7 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 1. Patrulha Global da Cumade Fulozinha (Exclusivamente fora da Igreja)
+    // 1. Patrulha da Fulô (exclusivamente fora da Igreja)
     this.fuloLotChangeTimer -= dt;
     if (this.fuloLotChangeTimer <= 0) {
       this.fuloLotChangeTimer = 4.5;
@@ -237,13 +326,11 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Se a Fulô estiver no mesmo lote que o herói (e o herói NÃO estiver na Igreja), persegue!
     if (this.currentLot !== 'igreja' && this.fuloCurrentLot === this.currentLot) {
       const angle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
       this.fulozinha.x += Math.cos(angle) * (this.fulozinha.speed || 160) * dt;
       this.fulozinha.y += Math.sin(angle) * (this.fulozinha.speed || 160) * dt;
 
-      // Colisão com a Fulô Furiosa ➔ FALHA!
       const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
       if (distToHero < 34) {
         this.stateStatus = 'FAILED';
@@ -251,11 +338,70 @@ export class Stage4BotijaScene implements IScene {
         engine.sound.playChicote();
         engine.sound.playDefeatJingle();
         engine.juice.shake.addTrauma(0.6);
+        setTimeout(() => engine.switchScene('STUDIO'), 2500);
         return;
       }
     }
 
-    // 2. Movimento do Jogador com Penalidade de Peso (-25% com a botija)
+    // 2. Interação com o Beato da Paróquia [E / Enter] (Diálogo Canônico de Censura)
+    if (this.currentLot === 'igreja') {
+      const distToBeato = Math.hypot(this.player.x - this.beato.x, this.player.y - this.beato.y);
+      if (distToBeato < 75 && input.interact) {
+        if (!this.hasBotija) {
+          this.dialogs.startDialog(
+            'beato',
+            'Beato Frei Damião',
+            '📿',
+            [
+              {
+                speaker: 'Beato',
+                avatarIcon: '📿',
+                text: 'Então, Coisinha! A Cumade Fulô guarda a fazenda, mas aqui dentro ela não tem poder.'
+              },
+              {
+                speaker: 'Beato',
+                avatarIcon: '📿',
+                text: 'Vá até o Lote 0, desenterre a Botija de ouro sob a pedra ancestral e traga para consagração no altar!'
+              }
+            ],
+            undefined,
+            engine
+          );
+          return;
+        } else {
+          // Entrega da Botija -> Vitória!
+          this.stateStatus = 'SUCCESS';
+          engine.unlockItem('tinta');
+          engine.sound.playSinoBadalo();
+          engine.sound.playVictoryJingle();
+          engine.juice.particles.emit('sparkle', this.beato.x, this.beato.y, { count: 35, speed: 70 });
+
+          this.narrative.showOutro(
+            {
+              phaseNumber: 4,
+              title: 'A Botija de Mané Monteiro',
+              verses: [
+                'O ouro ancestral foi depositado com fé no altar,',
+                'E das mãos do bom Beato a bênção veio brilhar;',
+                'Com os quatro elementos reunidos com louvor e glória:',
+                'A Tinta Encantada fecha o ciclo da vitória!'
+              ],
+              itemReward: {
+                id: 'tinta',
+                name: 'Tinta Encantada',
+                icon: '🖋️'
+              }
+            },
+            () => {
+              engine.switchScene('STUDIO');
+            }
+          );
+          return;
+        }
+      }
+    }
+
+    // 3. Movimento do Jogador
     let dx = 0;
     let dy = 0;
 
@@ -336,8 +482,8 @@ export class Stage4BotijaScene implements IScene {
       this.player.y = targetY;
     }
 
-    // 3. Porteiras de Borda (Transições entre Telas)
-    if (this.player.x > 940) {
+    // 4. Transições entre Telas pelas Conexões Oficiais
+    if (this.player.x > 936) {
       if (this.currentLot === '1b') {
         this.currentLot = 'igreja';
         this.player.x = 40;
@@ -348,10 +494,16 @@ export class Stage4BotijaScene implements IScene {
       } else if (this.currentLot === '2a') {
         this.currentLot = '2b';
         this.player.x = 40;
+      } else if (this.currentLot === '1a') {
+        this.currentLot = '1b';
+        this.player.x = 40;
+      } else if (this.currentLot === '3a') {
+        this.currentLot = '3b';
+        this.player.x = 40;
       }
     }
 
-    if (this.player.x < 20) {
+    if (this.player.x < 24) {
       if (this.currentLot === 'igreja') {
         this.currentLot = '1b';
         this.player.x = 920;
@@ -362,37 +514,43 @@ export class Stage4BotijaScene implements IScene {
       } else if (this.currentLot === '2a') {
         this.currentLot = '0';
         this.player.x = 920;
+      } else if (this.currentLot === '1b') {
+        this.currentLot = '1a';
+        this.player.x = 920;
+      } else if (this.currentLot === '3b') {
+        this.currentLot = '3a';
+        this.player.x = 920;
       }
     }
 
-    if (this.player.y < 20) {
-      if (this.currentLot === '0') {
-        this.currentLot = '2a';
-        this.player.y = 500;
-      } else if (this.currentLot === '2a') {
+    if (this.player.y < 24) {
+      if (this.currentLot === '2a') {
         this.currentLot = '1a';
         this.player.y = 500;
       } else if (this.currentLot === '2b') {
         this.currentLot = '1b';
         this.player.y = 500;
+      } else if (this.currentLot === '3a') {
+        this.currentLot = '2a';
+        this.player.y = 500;
+      } else if (this.currentLot === '3b') {
+        this.currentLot = '2b';
+        this.player.y = 500;
       }
     }
 
-    if (this.player.y > 520) {
+    if (this.player.y > 516) {
       if (this.currentLot === '1a') {
         this.currentLot = '2a';
         this.player.y = 40;
       } else if (this.currentLot === '1b') {
         this.currentLot = '2b';
         this.player.y = 40;
-      } else if (this.currentLot === '2b') {
-        this.currentLot = '3b';
-        this.player.y = 40;
-      } else if (this.currentLot === '0') {
+      } else if (this.currentLot === '2a') {
         this.currentLot = '3a';
         this.player.y = 40;
-      } else if (this.currentLot === '2a') {
-        this.currentLot = '0';
+      } else if (this.currentLot === '2b') {
+        this.currentLot = '3b';
         this.player.y = 40;
       }
     }
@@ -400,7 +558,7 @@ export class Stage4BotijaScene implements IScene {
     this.player.x = Math.max(20, Math.min(940, this.player.x));
     this.player.y = Math.max(20, Math.min(520, this.player.y));
 
-    // 4. Mecânica de Escavação da Botija no Lote 0
+    // 5. Escavação da Botija no Lote 0
     if (this.currentLot === '0' && !this.hasBotija) {
       const distToPedra = Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y);
       if (distToPedra < 55) {
@@ -430,19 +588,6 @@ export class Stage4BotijaScene implements IScene {
         }
       }
     }
-
-    // 5. Entrega da Botija ao Beato no Santuário da Igreja
-    if (this.currentLot === 'igreja' && this.hasBotija) {
-      const distToBeato = Math.hypot(this.player.x - this.beato.x, this.player.y - this.beato.y);
-      if (distToBeato < 80) {
-        this.stateStatus = 'SUCCESS';
-        engine.unlockItem('tinta');
-        this.message = '🎉 BÊNÇÃO CONCEDIDA: O Beato recebeu a botija no altar e entregou a 🖋️ Tinta Encantada!';
-        engine.sound.playSinoBadalo();
-        engine.sound.playVictoryJingle();
-        engine.juice.particles.emit('sparkle', this.beato.x, this.beato.y, { count: 30, speed: 65 });
-      }
-    }
   }
 
   public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
@@ -450,11 +595,9 @@ export class Stage4BotijaScene implements IScene {
 
     // Fundo
     if (lot.isSanctuary) {
-      // Fundo acolhedor e seguro da Igreja
       ctx.fillStyle = '#1e1b18';
       ctx.fillRect(0, 0, 960, 540);
 
-      // Moldura sagrada de cordel
       drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
 
       // Luz divina / velas
@@ -490,7 +633,7 @@ export class Stage4BotijaScene implements IScene {
         align: 'center'
       });
 
-      // Beato (Xilogravura da Maya)
+      // Beato
       drawBeato(ctx, this.beato.x, this.beato.y, this.beato.width, this.beato.height);
 
       drawText(ctx, '🕊️ SANTUÁRIO SEGURO — A CUMADE FULÔ NÃO ENTRA AQUI!', 480, 65, {
@@ -499,7 +642,6 @@ export class Stage4BotijaScene implements IScene {
         align: 'center'
       });
     } else {
-      // Noite Escura dos Lotes da Caatinga
       drawChaoTerraBatida(ctx, 0, 0, 960, 540);
       drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
     }
@@ -527,7 +669,7 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Fulô Furiosa (se estiver no lote atual e o lote NÃO for a Igreja)
+    // Fulô Furiosa (fora da Igreja)
     if (!lot.isSanctuary && this.fuloCurrentLot === this.currentLot) {
       ctx.save();
       ctx.beginPath();
@@ -544,7 +686,7 @@ export class Stage4BotijaScene implements IScene {
       });
     }
 
-    // Efeito de Iluminação Dinâmica do Candeeiro (fora da Igreja)
+    // Efeito de Iluminação do Candeeiro (fora da Igreja)
     if (!lot.isSanctuary) {
       ctx.save();
       const lightRadius = 145;
@@ -567,7 +709,7 @@ export class Stage4BotijaScene implements IScene {
       ctx.restore();
     }
 
-    // Jogador Coisinha (Xilogravura da Maya)
+    // Jogador Coisinha
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
@@ -596,40 +738,9 @@ export class Stage4BotijaScene implements IScene {
       color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'
     });
 
-    // Banner de Sucesso ou Falha
-    if (this.stateStatus === 'SUCCESS') {
-      ctx.fillStyle = 'rgba(22, 101, 52, 0.94)';
-      ctx.fillRect(240, 200, 480, 100);
-      ctx.strokeStyle = '#4ade80';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(240, 200, 480, 100);
-      drawText(ctx, '🎉 SUCESSO! 🖋️ TINTA ENCANTADA CONQUISTADA!', 480, 225, {
-        font: 'bold 16px monospace',
-        color: '#bbf7d0',
-        align: 'center'
-      });
-      drawText(ctx, 'Retornando vitorioso ao Estúdio de Xilogravura...', 480, 255, {
-        font: '12px monospace',
-        color: '#f0fdf4',
-        align: 'center'
-      });
-    } else if (this.stateStatus === 'FAILED') {
-      ctx.fillStyle = 'rgba(127, 29, 29, 0.95)';
-      ctx.fillRect(240, 200, 480, 100);
-      ctx.strokeStyle = '#f87171';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(240, 200, 480, 100);
-      drawText(ctx, '💀 DERROTA: CAPTURADO NAS TREVAS!', 480, 225, {
-        font: 'bold 16px monospace',
-        color: '#fecaca',
-        align: 'center'
-      });
-      drawText(ctx, 'Retornando ao Estúdio para nova tentativa...', 480, 255, {
-        font: '12px monospace',
-        color: '#fff',
-        align: 'center'
-      });
-    }
+    // Modais e Diálogos
+    this.dialogs.render(ctx, 960, 540);
+    this.narrative.render(ctx, 960, 540);
   }
 
   public destroy(): void {}

@@ -765,4 +765,34 @@ export class SFXSynth {
       osc.stop(noteTime + duration);
     });
   }
+
+  // 21. BERRO DE PAVOR DO BODE
+  public playBerroPavorBode(): void {
+    this.playBerroBode(true);
+  }
+
+  // 22. VIOLA DO REPENTE / DEDILHADO
+  public playViolaRepente(): void {
+    const t = this.ctx.currentTime;
+    const chords = [220.0, 277.18, 329.63, 440.0]; // A Maior de Viola
+    chords.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const strumTime = t + idx * 0.035;
+      const duration = 0.45;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, strumTime);
+
+      gain.gain.setValueAtTime(0.001, strumTime);
+      gain.gain.linearRampToValueAtTime(0.25, strumTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, strumTime + duration);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(strumTime);
+      osc.stop(strumTime + duration);
+    });
+  }
 }

@@ -352,4 +352,14 @@ export class SoundManager implements ISoundManager {
     this.resume();
     this.sfxSynth?.playFruitEat();
   }
+
+  public playBerroPavorBode(): void {
+    this.resume();
+    this.sfxSynth?.playBerroPavorBode();
+  }
+
+  public playViolaRepente(): void {
+    this.resume();
+    this.sfxSynth?.playViolaRepente();
+  }
 }

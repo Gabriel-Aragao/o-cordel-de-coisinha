@@ -16,7 +16,7 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
 ### 1.2 Sistema Global de Diálogos, Layout & Controles
-* **Painel de Diálogos Estritamente Sob Demanda:** Caixas de diálogo e notificações são renderizadas apenas quando houver mensagens ativas. Em estado ocioso (idle), **o bloco inteiro é completamente ocultado**, deixando 100% da tela visível para exploração dos itens e cenários.
+* **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Caixas de diálogo, falas de NPCs e mensagens de gameplay são exibidas fora do canvas de jogo, em um painel inferior dedicado. Nada é desenhado sobre a área do canvas, deixando 100% da tela do jogo visível para navegação e exploração dos itens e cenários.
 * **Ciclo de Fechamento de Diálogo:** Conclusão da última fala libera instantaneamente o movimento do herói sem travamento ou loop infinito de interação.
 * **Diálogo de Censura na 1ª Interação com NPCs:**
   - Primeira conversa com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**):

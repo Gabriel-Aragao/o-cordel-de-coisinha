@@ -14,11 +14,12 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ## 🎭 Sistema Global de Diálogos & Interface Unificada
 
-### 1. Painel de Diálogo Sob Demanda (Zero Bloco Idle / Sem Obstrução):
-* **Renderização Estritamente Sob Demanda:** O painel/caixa de diálogo é renderizado **apenas quando houver um diálogo ou toast ativo**. Quando em estado ocioso (idle), **o bloco inteiro do painel é completamente ocultado**, permitindo visibilidade 100% desobstruída de todo o mapa, itens, cenários e personagens.
-* **Fila Sequencial Sem Sobreposição:** Quando ativo, as mensagens não se sobrepõem visualmente umas às outras; são exibidas sequencialmente de forma limpa no painel.
-* **Sem Blocos ou Caixas Estáticas:** Nenhum retângulo, faixa ou moldura vazia permanece na tela durante o gameplay ocioso.
-* **Estética de Xilogravura:** Ao aparecer, adota a moldura de madeira entalhada em cordel, fundo em textura de papel kraft e tipografia xilográfica de alto contraste com indicador de avanço `[E]`.
+### 1. Painel de Diálogo Fora e Abaixo da Tela de Jogo (Zero Sobreposição):
+* **Renderização Fora do Canvas de Jogo:** Todas as mensagens de informação, diálogos de NPCs, toasts e orientações são exibidas em um **painel dedicado posicionado estritamente FORA e ABAIXO do canvas de jogo** (na estrutura de interface externa ao jogo).
+* **Zero Sobreposição no Canvas:** **Nenhuma caixa de diálogo, texto ou notificação é desenhada por cima do canvas de jogo**, garantindo que 100% do mapa, itens, salas interiores e personagens fiquem totalmente visíveis e desobstruídos em todas as fases.
+* **Renderização Estritamente Sob Demanda:** Em estado ocioso (idle), o painel inferior externo permanece recolhido/oculto, abrindo-se apenas no momento em que uma conversa for iniciada ou um toast for disparado.
+* **Fila Sequencial Sem Conflito:** Mensagens são enfileiradas e exibidas uma a uma de forma limpa.
+* **Estética de Xilogravura:** O painel conta com moldura e tipografia xilográfica, distintivo do locutor com cores temáticas e indicador de avanço `[Solte E para Avançar]`.
 
 ### 2. Ciclo de Vida e Desbloqueio dos Diálogos:
 * **Encerramento Fluido e Desbloqueio Imediato:** Ao atingir a última fala de um diálogo e soltar a tecla `E` / `Enter`, a caixa de diálogo **fecha imediatamente e desaparece**, liberando a movimentação e os controles do herói sem travamento.

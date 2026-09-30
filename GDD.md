@@ -57,16 +57,19 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ---
 
 ### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
-* **Spawn Desimpedido:** Posição inicial no Lote 0 em área livre de muros e colisores.
+* **Passagens Espaçosas & Vãos Livres:** Corredores e vãos entre paredes desenhados com largura suficiente para travessia desimpedida.
+* **Sistema de 3 Vidas & Quedas:**
+  - **Tropeço na Pedra:** Ao pisar na pedra no Lote 0, o herói **cai e perde 1 vida (-1 HP)** com diálogo cômico.
+  - **Cadarços Amarrados pela Fulô:** Ao colidir com a Fulô, o herói **cai e perde 1 vida (-1 HP)** (*"A Cumade amarrou seus cadarços!"*), ganhando invulnerabilidade temporária.
+  - **Perda de Vidas:** Ao zerar as 3 vidas (HP = 0) ➔ Retorno ao Estúdio (Falha).
 * **Topologia Fechada de Lotes & Paredes Perimétricas:**
   - Paredes sólidas de limite ao redor de cada lote, abertas apenas nas conexões oficiais:
-    * **Lote 0:** Conexão à direita com **Lote 2a**.
-      - **Pedra da Botija (Posição Idêntica F2 e F4):** No corredor estreito sem legenda; tropeçar exibe diálogos cômicos (*"Coisinha, tropeçou!"*, *"Coisinha vai arrancar um dedo!"*, *"Coisinha tá adivinhando butija!"*).
+    * **Lote 0:** Conexão à direita com **Lote 2a** (Pedra da botija na saída no mesmo local da F4).
     * **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
     * **Lote 1a:** Conexão à direita com **Lote 1b**.
     * **Lote 3a:** Conexão à direita com **Lote 3b**.
     * **Lote 2b:** Conexão acima com **Lote 1b**, abaixo com **Lote 3b**.
-  - **Labirintos Densos:** Múltiplas paredes internas e passagens alternantes dinâmicas conferindo sensação de labirinto autêntico.
+  - **Labirintos Densos & Espaçosos:** Múltiplas paredes internas e passagens dinâmicas que equilibram desafio de labirinto com trânsito livre.
   - **Física da Cumade:** A Fulô **NÃO atravessa paredes sólidas**, movendo-se apenas por caminhos livres e portões abertos.
 * **Objetivo:** Fumo de rolo na moita do Lote 1b; entregar à Cumade no Lote 3b ➔ **📄 Página Rasgada**.
 

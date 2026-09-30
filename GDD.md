@@ -75,14 +75,16 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ---
 
-### 🦉 FASE 3: A Pena da Rasga-Mortalha (Layout Amplo & Ciclo de Mesas)
-* **2 Violeiros no Canto Inferior Esquerdo:** Violeiro 1 declama 4 estrofes; Violeiro 2 declama 5 estrofes sob interação (`E` release).
-* **5 Casas em Arco:** Posicionadas na parte superior sob o voo da ave.
-* **Mesas & Curral Ampliados:**
-  1. **Mesa dos Moradores:** Moradores bêbados dizem sua profissão ao levantar e devem ser **empurrados** até suas casas. Parar antes da casa retorna o bêbado à mesa; dentro da casa, não sai mais.
-  2. **Mesa das Bebidas & Fumos:** Pegar da mesa faz o item sumir dela. Soltar fora da casa retorna à mesa; soltar na casa fixa o item nela.
-  3. **Área dos Animais:** Laçar com Corda ou tanger até a casa. Parar antes da casa retorna o animal ao curral; dentro da casa, não sai mais.
-* **Vitória:** Organização correta da vila ➔ **🪶 Pena Encantada**.
+### 🦉 FASE 3: A Pena da Rasga-Mortalha (Casas Interiores & Captura 'E')
+* **Captura Universal (`E`):** Bebidas, fumos, moradores bêbados e animais são capturados e soltos com a tecla `E` (1 elemento carregado por vez).
+* **Telas Interiores das Casas:** Cruzar a porta de qualquer casa transporta o jogador para a tela do interior daquela casa.
+* **Depósito & Remoção:**
+  - Apertar `E` dentro da casa deposita o elemento carregado.
+  - Apertar `E` próximo a um elemento já depositado o recaptura.
+  - **Grito de Limpeza (`Espaço`):** Gritar dentro de uma casa expulsa todos os elementos dela de volta para suas respectivas mesas.
+* **Soltura Externa:** Soltar qualquer elemento fora de casas faz com que retorne automaticamente à mesa/curral de origem.
+* **2 Violeiros:** Declamam as 9 sextilhas de cordel (Violeiro 1: 4 estrofes; Violeiro 2: 5 estrofes).
+* **Vitória:** 5 casas com todos os 4 atributos corretos em seus interiores ➔ **🪶 Pena Encantada**.
 
 ---
 

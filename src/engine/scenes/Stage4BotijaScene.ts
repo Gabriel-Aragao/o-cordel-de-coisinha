@@ -20,10 +20,19 @@ interface Wall {
   h: number;
 }
 
+interface InternalGate {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  isOpen: boolean;
+}
+
 interface LotData {
   id: LotId;
   name: string;
   walls: Wall[];
+  gates: InternalGate[];
   isSanctuary?: boolean;
 }
 
@@ -61,6 +70,7 @@ export class Stage4BotijaScene implements IScene {
   // A Fulô NUNCA entra na Igreja
   private fuloCurrentLot: LotId = '2b';
   private fuloLotChangeTimer: number = 4.0;
+  private whistleTimer: number = 6.0;
 
   private pedraItem: Entity = {
     id: 'pedra',
@@ -96,6 +106,7 @@ export class Stage4BotijaScene implements IScene {
   };
 
   private hasBotija: boolean = false;
+  private hasLantern: boolean = false;
   private digProgress: number = 0;
   private isDigging: boolean = false;
 
@@ -114,59 +125,63 @@ export class Stage4BotijaScene implements IScene {
   // Ciclo de patrulha da Fulô (exclui a Igreja)
   private lotSequence: LotId[] = ['0', '2a', '1a', '2b', '1b', '3b', '3a'];
 
+  // Definição dos 8 Lotes com Paredes Perimétricas Sólidas, Barreiras Internas e Portões Alternantes
   private lots: Record<LotId, LotData> = {
     'igreja': {
       id: 'igreja',
       name: 'LOTE DA IGREJA — SANTUÁRIO SEGURO (BEATO)',
       isSanctuary: true,
       walls: [
-        // Perimétricas: Topo, Fundo, Direita Sólidos. Esquerda Aberta para 1b (210 a 330)
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Altar e Pilares Internos
         { x: 480, y: 120, w: 180, h: 40 },
         { x: 260, y: 270, w: 20, h: 260 },
         { x: 700, y: 270, w: 20, h: 260 }
-      ]
+      ],
+      gates: []
     },
     '0': {
       id: '0',
       name: 'LOTE 0 — A PEDRA ANCESTRAL DA BOTIJA',
       walls: [
-        // Abertura apenas à direita para 2a
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 280, y: 150, w: 20, h: 220 },
-        { x: 680, y: 350, w: 20, h: 200 }
+        // Labirinto Interno Complexo
+        { x: 250, y: 180, w: 24, h: 220 },
+        { x: 480, y: 380, w: 24, h: 200 },
+        { x: 700, y: 200, w: 24, h: 220 }
+      ],
+      gates: [
+        { x: 250, y: 340, w: 24, h: 80, isOpen: true },
+        { x: 700, y: 360, w: 24, h: 80, isOpen: false }
       ]
     },
     '1a': {
       id: '1a',
       name: 'LOTE 1a — TRILHA NORTE DA CAATINGA',
       walls: [
-        // Abertura Baixo (2a) e Direita (1b)
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 480, y: 220, w: 340, h: 20 }
-      ]
+        // Labirinto Interno
+        { x: 340, y: 220, w: 24, h: 240 },
+        { x: 620, y: 320, w: 24, h: 240 }
+      ],
+      gates: [{ x: 480, y: 200, w: 100, h: 24, isOpen: false }]
     },
     '1b': {
       id: '1b',
       name: 'LOTE 1b — PORTEIRA DA IGREJA',
       walls: [
-        // Aberturas: Esquerda (1a), Baixo (2b) e Direita (Igreja Santuário)
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
@@ -174,15 +189,16 @@ export class Stage4BotijaScene implements IScene {
         { x: 948, y: 435, w: 24, h: 210 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
-        // Internas
-        { x: 380, y: 270, w: 20, h: 280 }
-      ]
+        // Labirinto Interno
+        { x: 360, y: 270, w: 24, h: 260 },
+        { x: 620, y: 220, w: 24, h: 220 }
+      ],
+      gates: [{ x: 360, y: 180, w: 24, h: 80, isOpen: true }]
     },
     '2a': {
       id: '2a',
       name: 'LOTE 2a — ENCRUZILHADA CENTRAL OESTE',
       walls: [
-        // 4 Aberturas: Topo (1a), Baixo (3a), Esquerda (0), Direita (2b)
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 210, y: 528, w: 420, h: 24 },
@@ -191,16 +207,17 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 220, y: 270, w: 20, h: 240 },
-        { x: 520, y: 180, w: 260, h: 20 }
-      ]
+        // Labirinto Interno
+        { x: 260, y: 270, w: 24, h: 220 },
+        { x: 500, y: 220, w: 240, h: 24 },
+        { x: 720, y: 350, w: 24, h: 200 }
+      ],
+      gates: [{ x: 500, y: 220, w: 80, h: 24, isOpen: true }]
     },
     '2b': {
       id: '2b',
       name: 'LOTE 2b — ENCRUZILHADA CENTRAL LESTE',
       walls: [
-        // Aberturas: Topo (1b), Baixo (3b), Esquerda (2a). Direita Sólida.
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
@@ -208,40 +225,45 @@ export class Stage4BotijaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 420, y: 350, w: 20, h: 200 },
-        { x: 700, y: 220, w: 20, h: 220 }
-      ]
+        // Labirinto Interno
+        { x: 380, y: 340, w: 24, h: 220 },
+        { x: 650, y: 200, w: 24, h: 240 }
+      ],
+      gates: [{ x: 650, y: 360, w: 24, h: 80, isOpen: false }]
     },
     '3a': {
       id: '3a',
       name: 'LOTE 3a — BOSQUE ESCURO',
       walls: [
-        // Aberturas: Topo (2a), Direita (3b). Fundo e Esquerda Sólidos.
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 480, y: 300, w: 340, h: 20 }
-      ]
+        // Labirinto Interno
+        { x: 320, y: 300, w: 24, h: 260 },
+        { x: 640, y: 220, w: 24, h: 240 }
+      ],
+      gates: [{ x: 480, y: 300, w: 100, h: 24, isOpen: true }]
     },
     '3b': {
       id: '3b',
       name: 'LOTE 3b — CLAREIRA DOS CIPÓS',
       walls: [
-        // Aberturas: Topo (2b), Esquerda (3a). Fundo e Direita Sólidos.
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 300, y: 270, w: 20, h: 280 },
-        { x: 620, y: 270, w: 20, h: 280 }
+        // Labirinto Interno
+        { x: 280, y: 270, w: 24, h: 280 },
+        { x: 620, y: 270, w: 24, h: 280 }
+      ],
+      gates: [
+        { x: 280, y: 180, w: 24, h: 80, isOpen: true },
+        { x: 620, y: 360, w: 24, h: 80, isOpen: false }
       ]
     }
   };
@@ -252,7 +274,9 @@ export class Stage4BotijaScene implements IScene {
     this.player.y = 360;
     this.fuloCurrentLot = '2b';
     this.fuloLotChangeTimer = 4.0;
+    this.whistleTimer = 6.0;
     this.hasBotija = false;
+    this.hasLantern = false;
     this.digProgress = 0;
     this.isDigging = false;
     this.stateStatus = 'PLAYING';
@@ -311,7 +335,21 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 1. Patrulha da Fulô (exclusivamente fora da Igreja)
+    // 1. Assobios e Alternância de Portões Internos
+    this.whistleTimer -= dt;
+    if (this.whistleTimer <= 0) {
+      this.whistleTimer = 5.5;
+      engine.sound.playCumadeAssobio(1.1);
+      engine.juice.shake.addTrauma(0.2);
+
+      for (const lotKey in this.lots) {
+        for (const g of this.lots[lotKey as LotId].gates) {
+          g.isOpen = !g.isOpen;
+        }
+      }
+    }
+
+    // 2. Patrulha da Fulô (exclusivamente fora da Igreja)
     this.fuloLotChangeTimer -= dt;
     if (this.fuloLotChangeTimer <= 0) {
       this.fuloLotChangeTimer = 4.5;
@@ -322,15 +360,81 @@ export class Stage4BotijaScene implements IScene {
 
       if (this.fuloCurrentLot === this.currentLot && !inSanctuary) {
         engine.sound.playCumadeAssobio(1.3);
-        engine.juice.shake.addTrauma(0.2);
+        engine.juice.shake.addTrauma(0.25);
       }
     }
 
+    // Física e Perseguição da Fulô em Fúria: NÃO ATRAVESSA PAREDES!
     if (this.currentLot !== 'igreja' && this.fuloCurrentLot === this.currentLot) {
       const angle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-      this.fulozinha.x += Math.cos(angle) * (this.fulozinha.speed || 160) * dt;
-      this.fulozinha.y += Math.sin(angle) * (this.fulozinha.speed || 160) * dt;
+      const fuloSpeed = this.fulozinha.speed || 160;
+      const fuloHalfW = this.fulozinha.width / 2;
+      const fuloHalfH = this.fulozinha.height / 2;
+      const currentLotData = this.lots[this.currentLot];
 
+      // Teste de Colisão da Fulô no eixo X
+      const fuloTargetX = this.fulozinha.x + Math.cos(angle) * fuloSpeed * dt;
+      let fuloBlockedX = false;
+      for (const w of currentLotData.walls) {
+        if (
+          fuloTargetX + fuloHalfW > w.x - w.w / 2 &&
+          fuloTargetX - fuloHalfW < w.x + w.w / 2 &&
+          this.fulozinha.y + fuloHalfH > w.y - w.h / 2 &&
+          this.fulozinha.y - fuloHalfH < w.y + w.h / 2
+        ) {
+          fuloBlockedX = true;
+          break;
+        }
+      }
+      for (const g of currentLotData.gates) {
+        if (!g.isOpen) {
+          if (
+            fuloTargetX + fuloHalfW > g.x - g.w / 2 &&
+            fuloTargetX - fuloHalfW < g.x + g.w / 2 &&
+            this.fulozinha.y + fuloHalfH > g.y - g.h / 2 &&
+            this.fulozinha.y - fuloHalfH < g.y + g.h / 2
+          ) {
+            fuloBlockedX = true;
+            break;
+          }
+        }
+      }
+      if (!fuloBlockedX) {
+        this.fulozinha.x = fuloTargetX;
+      }
+
+      // Teste de Colisão da Fulô no eixo Y
+      const fuloTargetY = this.fulozinha.y + Math.sin(angle) * fuloSpeed * dt;
+      let fuloBlockedY = false;
+      for (const w of currentLotData.walls) {
+        if (
+          this.fulozinha.x + fuloHalfW > w.x - w.w / 2 &&
+          this.fulozinha.x - fuloHalfW < w.x + w.w / 2 &&
+          fuloTargetY + fuloHalfH > w.y - w.h / 2 &&
+          fuloTargetY - fuloHalfH < w.y + w.h / 2
+        ) {
+          fuloBlockedY = true;
+          break;
+        }
+      }
+      for (const g of currentLotData.gates) {
+        if (!g.isOpen) {
+          if (
+            this.fulozinha.x + fuloHalfW > g.x - g.w / 2 &&
+            this.fulozinha.x - fuloHalfW < g.x + g.w / 2 &&
+            fuloTargetY + fuloHalfH > g.y - g.h / 2 &&
+            fuloTargetY - fuloHalfH < g.y + g.h / 2
+          ) {
+            fuloBlockedY = true;
+            break;
+          }
+        }
+      }
+      if (!fuloBlockedY) {
+        this.fulozinha.y = fuloTargetY;
+      }
+
+      // Colisão com o herói
       const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
       if (distToHero < 34) {
         this.stateStatus = 'FAILED';
@@ -343,10 +447,10 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 2. Interação com o Beato da Paróquia [E / Enter] (Diálogo Canônico de Censura)
+    // 3. Interação com o Beato da Paróquia [E no release / interactReleased]
     if (this.currentLot === 'igreja') {
       const distToBeato = Math.hypot(this.player.x - this.beato.x, this.player.y - this.beato.y);
-      if (distToBeato < 75 && input.interact) {
+      if (distToBeato < 80 && input.interactReleased) {
         if (!this.hasBotija) {
           this.dialogs.startDialog(
             'beato',
@@ -401,7 +505,7 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 3. Movimento do Jogador
+    // 4. Movimento do Jogador com Colisão Rígida
     let dx = 0;
     let dy = 0;
 
@@ -460,6 +564,19 @@ export class Stage4BotijaScene implements IScene {
         break;
       }
     }
+    for (const g of lot.gates) {
+      if (!g.isOpen) {
+        if (
+          targetX + halfW > g.x - g.w / 2 &&
+          targetX - halfW < g.x + g.w / 2 &&
+          this.player.y + halfH > g.y - g.h / 2 &&
+          this.player.y - halfH < g.y + g.h / 2
+        ) {
+          blockedX = true;
+          break;
+        }
+      }
+    }
     if (!blockedX) {
       this.player.x = targetX;
     }
@@ -478,11 +595,24 @@ export class Stage4BotijaScene implements IScene {
         break;
       }
     }
+    for (const g of lot.gates) {
+      if (!g.isOpen) {
+        if (
+          this.player.x + halfW > g.x - g.w / 2 &&
+          this.player.x - halfW < g.x + g.w / 2 &&
+          targetY + halfH > g.y - g.h / 2 &&
+          targetY - halfH < g.y + g.h / 2
+        ) {
+          blockedY = true;
+          break;
+        }
+      }
+    }
     if (!blockedY) {
       this.player.y = targetY;
     }
 
-    // 4. Transições entre Telas pelas Conexões Oficiais
+    // 5. Transições entre Telas pelas Conexões Oficiais
     if (this.player.x > 936) {
       if (this.currentLot === '1b') {
         this.currentLot = 'igreja';
@@ -558,7 +688,7 @@ export class Stage4BotijaScene implements IScene {
     this.player.x = Math.max(20, Math.min(940, this.player.x));
     this.player.y = Math.max(20, Math.min(520, this.player.y));
 
-    // 5. Escavação da Botija no Lote 0
+    // 6. Escavação da Botija no Lote 0
     if (this.currentLot === '0' && !this.hasBotija) {
       const distToPedra = Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y);
       if (distToPedra < 55) {
@@ -642,6 +772,7 @@ export class Stage4BotijaScene implements IScene {
         align: 'center'
       });
     } else {
+      // Escuridão Profunda da Noite Sertaneja
       drawChaoTerraBatida(ctx, 0, 0, 960, 540);
       drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
     }
@@ -653,6 +784,15 @@ export class Stage4BotijaScene implements IScene {
       ctx.strokeStyle = lot.isSanctuary ? '#b45309' : '#334155';
       ctx.lineWidth = 1.5;
       ctx.strokeRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
+    }
+
+    // Portões Internos Dinâmicos
+    for (const g of lot.gates) {
+      ctx.fillStyle = g.isOpen ? '#16a34a' : '#dc2626';
+      ctx.fillRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
     }
 
     // Pedra da Botija (Lote 0)
@@ -686,26 +826,41 @@ export class Stage4BotijaScene implements IScene {
       });
     }
 
-    // Efeito de Iluminação do Candeeiro (fora da Igreja)
+    // Escuridão Total / Visão Restrita (fora da Igreja)
     if (!lot.isSanctuary) {
       ctx.save();
-      const lightRadius = 145;
-      const gradient = ctx.createRadialGradient(
-        this.player.x,
-        this.player.y,
-        30,
-        this.player.x,
-        this.player.y,
-        lightRadius
-      );
-      gradient.addColorStop(0, 'rgba(254, 240, 138, 0.4)');
-      gradient.addColorStop(0.7, 'rgba(254, 240, 138, 0.1)');
-      gradient.addColorStop(1, 'rgba(2, 4, 8, 0)');
+      const lightRadius = this.hasLantern ? 240 : 85;
 
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(this.player.x, this.player.y, lightRadius, 0, Math.PI * 2);
-      ctx.fill();
+      // Máscara de Escuridão
+      const darkCanvas = document.createElement('canvas');
+      darkCanvas.width = 960;
+      darkCanvas.height = 540;
+      const dCtx = darkCanvas.getContext('2d');
+      if (dCtx) {
+        dCtx.fillStyle = 'rgba(3, 4, 8, 0.94)';
+        dCtx.fillRect(0, 0, 960, 540);
+
+        // Abre o buraco de visão
+        dCtx.globalCompositeOperation = 'destination-out';
+        const grad = dCtx.createRadialGradient(
+          this.player.x,
+          this.player.y,
+          lightRadius * 0.3,
+          this.player.x,
+          this.player.y,
+          lightRadius
+        );
+        grad.addColorStop(0, 'rgba(0,0,0,1)');
+        grad.addColorStop(0.7, 'rgba(0,0,0,0.85)');
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+        dCtx.fillStyle = grad;
+        dCtx.beginPath();
+        dCtx.arc(this.player.x, this.player.y, lightRadius, 0, Math.PI * 2);
+        dCtx.fill();
+
+        ctx.drawImage(darkCanvas, 0, 0);
+      }
       ctx.restore();
     }
 

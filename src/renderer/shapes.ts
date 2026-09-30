@@ -23,6 +23,8 @@ import {
   drawMolduraCordel,
   drawTelaApresentacaoCordel,
   drawTelaEncerramentoCordel,
+  drawMascaraEscuridaoCandeeiro,
+  drawMesaMontagemXilo,
 } from './xilogravura';
 
 export * from './xilogravura';
@@ -186,4 +188,10 @@ export function drawText(
   ctx.restore();
 }
 
-export { drawMolduraCordel, drawTelaApresentacaoCordel, drawTelaEncerramentoCordel };
+export {
+  drawMolduraCordel,
+  drawTelaApresentacaoCordel,
+  drawTelaEncerramentoCordel,
+  drawMascaraEscuridaoCandeeiro,
+  drawMesaMontagemXilo,
+};

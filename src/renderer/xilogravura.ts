@@ -1821,3 +1821,100 @@ export function drawTelaEncerramentoCordel(
 
   ctx.restore();
 }
+
+/**
+ * 🕯️ MÁSCARA DE ESCURIDÃO & FOCO DE CANDEEIRO (FASE 4 - NOTURNO)
+ */
+export function drawMascaraEscuridaoCandeeiro(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  playerX: number,
+  playerY: number,
+  hasLantern: boolean,
+  time: number = 0
+): void {
+  ctx.save();
+
+  // Raio de iluminação
+  const flicker = Math.sin(time * 12) * 4;
+  const innerRadius = hasLantern ? 50 : 25;
+  const outerRadius = hasLantern ? 280 + flicker : 115 + flicker;
+
+  // Gradiente radial de luz da lamparina
+  const grad = ctx.createRadialGradient(
+    playerX,
+    playerY,
+    innerRadius,
+    playerX,
+    playerY,
+    outerRadius
+  );
+
+  grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  grad.addColorStop(0.65, hasLantern ? 'rgba(217, 119, 6, 0.15)' : 'rgba(10, 8, 6, 0.55)');
+  grad.addColorStop(0.85, 'rgba(10, 8, 6, 0.88)');
+  grad.addColorStop(1, 'rgba(10, 8, 6, 0.98)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
+
+  // Aura sutil dourada ao redor da lamparina quando equipada
+  if (hasLantern) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(254, 240, 138, 0.08)';
+    ctx.beginPath();
+    ctx.arc(playerX, playerY, outerRadius * 0.7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * 🪵 MESA DE MONTAGEM & ÁREA AMPLA DE XILOGRAVURA (FASE 3)
+ */
+export function drawMesaMontagemXilo(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  label: string,
+  icon: string,
+  options: { isHovered?: boolean; colorAccent?: string } = {}
+): void {
+  ctx.save();
+
+  // Sombra no chão
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.fillRect(x - w / 2 + 4, y - h / 2 + 6, w, h);
+
+  // Tampo de Madeira Rústica
+  ctx.fillStyle = options.colorAccent || '#3b2615';
+  ctx.fillRect(x - w / 2, y - h / 2, w, h);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 2.5;
+  ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+
+  // Moldura interna de entalhe
+  ctx.strokeStyle = options.isHovered ? XILO_COLORS.goldAccent : XILO_COLORS.kraftDark;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - w / 2 + 4, y - h / 2 + 4, w - 8, h - 8);
+
+  // Placa / Rótulo de Xilogravura
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(x - w / 2 + 6, y - h / 2 - 16, w - 12, 18);
+  ctx.strokeStyle = XILO_COLORS.goldAccent;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x - w / 2 + 6, y - h / 2 - 16, w - 12, 18);
+
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 10px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`${icon} ${label}`, x, y - h / 2 - 7);
+
+  ctx.restore();
+}

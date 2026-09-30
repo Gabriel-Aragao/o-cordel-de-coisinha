@@ -2,6 +2,9 @@ import { InputState, MouseState } from './types';
 
 export class InputManager {
   private keys: Record<string, boolean> = {};
+  private keysReleased: Record<string, boolean> = {};
+  private keysJustPressed: Record<string, boolean> = {};
+
   private actionHeldTime: number = 0;
   private mouseState: MouseState = {
     x: 0,
@@ -27,6 +30,10 @@ export class InputManager {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    if (!this.keys[e.code] && !this.keys[e.key]) {
+      this.keysJustPressed[e.code] = true;
+      this.keysJustPressed[e.key] = true;
+    }
     this.keys[e.code] = true;
     this.keys[e.key] = true;
 
@@ -38,6 +45,8 @@ export class InputManager {
   private onKeyUp(e: KeyboardEvent): void {
     this.keys[e.code] = false;
     this.keys[e.key] = false;
+    this.keysReleased[e.code] = true;
+    this.keysReleased[e.key] = true;
   }
 
   private updateMousePos(clientX: number, clientY: number): void {
@@ -58,6 +67,7 @@ export class InputManager {
   private onMouseUp(e: MouseEvent): void {
     this.updateMousePos(e.clientX, e.clientY);
     this.mouseState.isDown = false;
+    this.keysReleased['MouseClick'] = true;
   }
 
   private onMouseMove(e: MouseEvent): void {
@@ -74,6 +84,7 @@ export class InputManager {
 
   private onTouchEnd(_e: TouchEvent): void {
     this.mouseState.isDown = false;
+    this.keysReleased['MouseClick'] = true;
   }
 
   private onTouchMove(e: TouchEvent): void {
@@ -99,6 +110,24 @@ export class InputManager {
     const action = !!(this.keys['Space'] || this.keys['KeyJ']);
     const interact = !!(this.keys['KeyE'] || this.keys['Enter'] || this.keys['KeyK']);
 
+    const interactReleased = !!(
+      this.keysReleased['KeyE'] ||
+      this.keysReleased['e'] ||
+      this.keysReleased['E'] ||
+      this.keysReleased['Enter'] ||
+      this.keysReleased['KeyK'] ||
+      this.keysReleased['MouseClick']
+    );
+
+    const interactJustPressed = !!(
+      this.keysJustPressed['KeyE'] ||
+      this.keysJustPressed['e'] ||
+      this.keysJustPressed['E'] ||
+      this.keysJustPressed['Enter'] ||
+      this.keysJustPressed['KeyK'] ||
+      this.mouseState.clicked
+    );
+
     const state: InputState = {
       up,
       down,
@@ -107,10 +136,14 @@ export class InputManager {
       action,
       actionHeldTime: this.actionHeldTime,
       interact,
+      interactReleased,
+      interactJustPressed,
       mouse: { ...this.mouseState }
     };
 
-    // Reseta flag de click pontual após leitura
+    // Limpa os buffers pontuais de release e click após consumo no frame
+    this.keysReleased = {};
+    this.keysJustPressed = {};
     this.mouseState.clicked = false;
 
     return state;

@@ -81,6 +81,7 @@ export class Stage2FulozinhaScene implements IScene {
 
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
+  private stepTimer: number = 0;
 
   // Definição dos 6 Lotes em Telas Individuais (sem 3c)
   private lots: Record<LotId, LotData> = {
@@ -193,6 +194,7 @@ export class Stage2FulozinhaScene implements IScene {
     this.whistleWaveRadius = 0;
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
+    this.stepTimer = 0;
 
     if (engine.inventory.folha) {
       this.message = '✓ Fase Concluída! Página Rasgada obtida com Cumade Fulozinha.';
@@ -212,6 +214,8 @@ export class Stage2FulozinhaScene implements IScene {
     const inFulozinhaLair = this.currentLot === '3b';
     const timerInterval = inFulozinhaLair ? 4.5 : 7.0;
 
+    engine.sound.setBGMState({ tension: inFulozinhaLair ? 0.75 : 0.2 });
+
     this.whistleTimer -= dt;
     if (this.whistleTimer <= 0) {
       this.whistleTimer = timerInterval;
@@ -219,6 +223,7 @@ export class Stage2FulozinhaScene implements IScene {
       this.whistleDuration = inFulozinhaLair ? 4.0 : 3.2;
       this.whistleWaveRadius = 15;
       this.message = '🎶 ASSOBIO NA MATA! Os portões alternaram e os controles foram invertidos!';
+      engine.sound.playCumadeAssobio(inFulozinhaLair ? 1.2 : 1.0);
 
       // Alterna portões internos em todos os lotes
       for (const lotKey in this.lots) {
@@ -256,6 +261,14 @@ export class Stage2FulozinhaScene implements IScene {
       const len = Math.sqrt(dx * dx + dy * dy);
       dx /= len;
       dy /= len;
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      this.stepTimer += dt;
+      if (this.stepTimer >= 0.32) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+      }
     }
 
     const speed = this.player.speed || 230;
@@ -397,6 +410,8 @@ export class Stage2FulozinhaScene implements IScene {
       if (distToBush < 50 && input.interact) {
         this.hasFumo = true;
         this.message = '🍂 FUMO DE ROLO ENCONTRADO NA MOITA! Leve a oferenda à Cumade no Lote 3b!';
+        engine.sound.playPickup();
+        engine.sound.playItemDescobrir();
       }
     }
 
@@ -421,10 +436,13 @@ export class Stage2FulozinhaScene implements IScene {
           this.stateStatus = 'SUCCESS';
           engine.unlockItem('folha');
           this.message = '🎉 CUMADE FULOZINHA ACEITOU O FUMO E ENTREGOU A 📄 PÁGINA RASGADA!';
+          engine.sound.playVictoryJingle();
         } else {
           // FALHA!
           this.stateStatus = 'FAILED';
           this.message = '💀 CHICOTADA DE CIPÓ! Você invadiu sem fumo e foi derrotado pela Fulô!';
+          engine.sound.playChicote();
+          engine.sound.playDefeatJingle();
         }
       }
     }

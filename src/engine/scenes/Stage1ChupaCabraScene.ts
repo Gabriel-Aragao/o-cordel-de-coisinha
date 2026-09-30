@@ -92,6 +92,11 @@ export class Stage1ChupaCabraScene implements IScene {
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
 
+  private stepTimer: number = 0;
+  private rosnadoTimer: number = 0;
+  private actionSoundTriggered: boolean = false;
+  private lastActionWasGrito: boolean = false;
+
   public init(engine: IGameEngine): void {
     this.player.x = 960;
     this.player.y = 650;
@@ -102,6 +107,10 @@ export class Stage1ChupaCabraScene implements IScene {
     this.soundWaveRadius = 0;
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
+    this.stepTimer = 0;
+    this.rosnadoTimer = 0;
+    this.actionSoundTriggered = false;
+    this.lastActionWasGrito = false;
 
     // Moitas espalhadas pelo mapa amplo
     this.bushes = [
@@ -224,6 +233,14 @@ export class Stage1ChupaCabraScene implements IScene {
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
 
+    if (dx !== 0 || dy !== 0) {
+      this.stepTimer += dt;
+      if (this.stepTimer >= 0.32) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+      }
+    }
+
     this.player.x = Math.max(30, Math.min(this.mapWidth - 30, this.player.x));
     this.player.y = Math.max(30, Math.min(this.mapHeight - 30, this.player.y));
 
@@ -238,16 +255,26 @@ export class Stage1ChupaCabraScene implements IScene {
         this.isGritoActive = true;
         this.isAboioActive = false;
         this.soundWaveRadius = Math.min(320, this.soundWaveRadius + 500 * dt);
+        if (!this.lastActionWasGrito) {
+          this.lastActionWasGrito = true;
+          engine.sound.playGrito();
+        }
       } else {
         // Aboio Suave
         this.isAboioActive = true;
         this.isGritoActive = false;
         this.soundWaveRadius = Math.min(140, this.soundWaveRadius + 300 * dt);
+        if (!this.actionSoundTriggered) {
+          this.actionSoundTriggered = true;
+          engine.sound.playAboio(1.2);
+        }
       }
     } else {
       this.isAboioActive = false;
       this.isGritoActive = false;
       this.soundWaveRadius = 0;
+      this.actionSoundTriggered = false;
+      this.lastActionWasGrito = false;
     }
 
     // 3. Vasculhar Moitas com [E / Enter]
@@ -259,9 +286,11 @@ export class Stage1ChupaCabraScene implements IScene {
             if (bush.hasItem === 'corda' && !this.hasRope) {
               this.hasRope = true;
               this.message = '🪢 CORDA ENCONTRADA NA MOITA! Agora você pode laçar os bodes!';
+              engine.sound.playPickup();
             } else if (bush.hasItem === 'candeeiro' && !this.hasLantern) {
               this.hasLantern = true;
               this.message = '🏮 CANDEEIRO ENCONTRADO NA MOITA! Iluminação expandida na caatinga!';
+              engine.sound.playPickup();
             }
           }
 
@@ -274,6 +303,8 @@ export class Stage1ChupaCabraScene implements IScene {
               goat.y = bush.y + 20;
               bush.hidingGoatId = undefined;
               this.message = '🐐 Você descobriu um bode escondido na moita!';
+              engine.sound.playBerroBode(false);
+              engine.sound.playItemDescobrir();
             }
           }
         }
@@ -291,6 +322,7 @@ export class Stage1ChupaCabraScene implements IScene {
               goat.x = bush.x + (Math.random() - 0.5) * 40;
               goat.y = bush.y + (Math.random() - 0.5) * 40;
               bush.hidingGoatId = undefined;
+              engine.sound.playBerroBode(this.isGritoActive);
             }
           }
         }
@@ -298,6 +330,7 @@ export class Stage1ChupaCabraScene implements IScene {
     }
 
     // 4. IA do Chupa-Cabra & Ataque com Drenagem de HP
+    let isAttackingGoat = false;
     if (this.chupaCabra.active) {
       const distHeroChupa = Math.hypot(this.player.x - this.chupaCabra.x, this.player.y - this.chupaCabra.y);
 
@@ -328,14 +361,23 @@ export class Stage1ChupaCabraScene implements IScene {
 
           // Se estiver encostado no bode, drena HP!
           if (minDist < 30) {
+            isAttackingGoat = true;
             targetGoat.hp -= 25 * dt;
             this.message = `🩸 O CHUPA-CABRA ESTÁ ATACANDO O ${targetGoat.label}! GRITE PARA ESPANTAR!`;
+
+            this.rosnadoTimer += dt;
+            if (this.rosnadoTimer >= 0.75) {
+              this.rosnadoTimer = 0;
+              engine.sound.playChupaCabraRosnado();
+              engine.sound.playBerroBode(true);
+            }
 
             // Verificação de Morte do Bode ➔ FALHA!
             if (targetGoat.hp <= 0) {
               targetGoat.hp = 0;
               this.stateStatus = 'FAILED';
               this.message = '💀 UM BODE MORREU! Missão Falhou. Retornando ao Estúdio...';
+              engine.sound.playDefeatJingle();
               return;
             }
           }
@@ -347,6 +389,8 @@ export class Stage1ChupaCabraScene implements IScene {
       this.chupaCabra.x = Math.max(30, Math.min(this.mapWidth - 30, this.chupaCabra.x));
       this.chupaCabra.y = Math.max(30, Math.min(this.mapHeight - 30, this.chupaCabra.y));
     }
+
+    engine.sound.setBGMState({ tension: isAttackingGoat ? 0.9 : 0.2 });
 
     // 5. Comportamento e Condução dos Bodes
     let leashedIdx = 1;
@@ -362,11 +406,15 @@ export class Stage1ChupaCabraScene implements IScene {
       ) {
         g.isRescued = true;
         g.isLeashed = false;
+        engine.sound.playPickup();
         continue;
       }
 
       // Laçar com a corda
       if (this.hasRope && distToHero < 70) {
+        if (!g.isLeashed) {
+          engine.sound.playBerroBode(false);
+        }
         g.isLeashed = true;
       }
 
@@ -429,6 +477,7 @@ export class Stage1ChupaCabraScene implements IScene {
       this.stateStatus = 'SUCCESS';
       engine.unlockItem('carimbo');
       this.message = '🎉 TODOS OS 4 BODES SALVOS! O Fazendeiro entregou o 🪓 Carimbo Mágico!';
+      engine.sound.playVictoryJingle();
     }
   }
 

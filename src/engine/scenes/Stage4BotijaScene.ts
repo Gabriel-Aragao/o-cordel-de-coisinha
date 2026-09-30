@@ -92,6 +92,9 @@ export class Stage4BotijaScene implements IScene {
   private message: string = 'Saia da Igreja pela esquerda, desenterre a Botija no Lote 0 e retorne ao Santuário!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
+  private stepTimer: number = 0;
+  private digSoundTimer: number = 0;
+  private bellTimer: number = 0;
 
   // Ciclo de patrulha da Fulô (exclui a Igreja)
   private lotSequence: LotId[] = ['0', '2a', '1a', '2b', '1b', '3b', '3a'];
@@ -173,6 +176,11 @@ export class Stage4BotijaScene implements IScene {
     this.isDigging = false;
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
+    this.stepTimer = 0;
+    this.digSoundTimer = 0;
+    this.bellTimer = 0;
+
+    engine.sound.playSinoBadalo();
 
     if (engine.inventory.tinta) {
       this.message = '✓ Fase Concluída! O Beato entregou a 🖋️ Tinta Encantada.';
@@ -188,6 +196,18 @@ export class Stage4BotijaScene implements IScene {
       return;
     }
 
+    const inSanctuary = this.currentLot === 'igreja';
+    engine.sound.setBGMState({ tension: inSanctuary ? 0.1 : 0.8 });
+
+    // Badalo suave periódico na Igreja
+    if (inSanctuary) {
+      this.bellTimer += dt;
+      if (this.bellTimer >= 10.0) {
+        this.bellTimer = 0;
+        engine.sound.playSinoBadalo();
+      }
+    }
+
     // 1. Patrulha Global da Cumade Fulozinha (Exclusivamente fora da Igreja)
     this.fuloLotChangeTimer -= dt;
     if (this.fuloLotChangeTimer <= 0) {
@@ -196,6 +216,10 @@ export class Stage4BotijaScene implements IScene {
       this.fuloCurrentLot = this.lotSequence[nextIdx];
       this.fulozinha.x = 100 + Math.random() * 760;
       this.fulozinha.y = 100 + Math.random() * 340;
+
+      if (this.fuloCurrentLot === this.currentLot && !inSanctuary) {
+        engine.sound.playCumadeAssobio(1.3);
+      }
     }
 
     // Se a Fulô estiver no mesmo lote que o herói (e o herói NÃO estiver na Igreja), persegue!
@@ -209,6 +233,8 @@ export class Stage4BotijaScene implements IScene {
       if (distToHero < 34) {
         this.stateStatus = 'FAILED';
         this.message = '💀 VOCÊ FOI CAPTURADO PELA CUMADE FULOZINHA EM FÚRIA!';
+        engine.sound.playChicote();
+        engine.sound.playDefeatJingle();
         return;
       }
     }
@@ -229,6 +255,15 @@ export class Stage4BotijaScene implements IScene {
     }
 
     const currentSpeed = this.hasBotija ? 165 : 220;
+
+    if (dx !== 0 || dy !== 0) {
+      this.stepTimer += dt;
+      const stepInterval = this.hasBotija ? 0.45 : 0.32;
+      if (this.stepTimer >= stepInterval) {
+        this.stepTimer = 0;
+        engine.sound.playPassos();
+      }
+    }
     const lot = this.lots[this.currentLot];
     const halfW = this.player.width / 2;
     const halfH = this.player.height / 2;
@@ -346,10 +381,18 @@ export class Stage4BotijaScene implements IScene {
           this.digProgress += dt * 0.45;
           this.message = `⛏️ Desenterrando a botija de ouro... ${Math.round(this.digProgress * 100)}%`;
 
+          this.digSoundTimer += dt;
+          if (this.digSoundTimer >= 0.28) {
+            this.digSoundTimer = 0;
+            engine.sound.playEscavacao();
+          }
+
           if (this.digProgress >= 1) {
             this.digProgress = 1;
             this.hasBotija = true;
             this.message = '🏺 BOTIJA DESENTERRADA! É muito pesada (-25% Vel). Fuja para a Igreja!';
+            engine.sound.playPickup();
+            engine.sound.playItemDescobrir();
           }
         } else {
           this.isDigging = false;
@@ -364,6 +407,8 @@ export class Stage4BotijaScene implements IScene {
         this.stateStatus = 'SUCCESS';
         engine.unlockItem('tinta');
         this.message = '🎉 BÊNÇÃO CONCEDIDA: O Beato recebeu a botija no altar e entregou a 🖋️ Tinta Encantada!';
+        engine.sound.playSinoBadalo();
+        engine.sound.playVictoryJingle();
       }
     }
   }

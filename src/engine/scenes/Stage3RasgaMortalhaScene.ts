@@ -127,10 +127,12 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private message: string = 'Clique no painel superior para ler as 9 estrofes, deduza os dados das 5 casas e valide a solução!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
+  private owlCantoTimer: number = 4.0;
 
   public init(engine: IGameEngine): void {
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
+    this.owlCantoTimer = 4.0;
     this.selectedHouseIndex = 0;
     this.selectedRow = 0;
     this.currentStanza = 0;
@@ -163,17 +165,27 @@ export class Stage3RasgaMortalhaScene implements IScene {
     if (this.owl.x > 880) this.owlDirection = -1;
     if (this.owl.x < 80) this.owlDirection = 1;
 
+    this.owlCantoTimer -= dt;
+    if (this.owlCantoTimer <= 0) {
+      this.owlCantoTimer = 6.0 + Math.random() * 4.0;
+      engine.sound.playRasgaCanto();
+    }
+
     // Navegação no Teclado
     if (input.left) {
       this.selectedHouseIndex = Math.max(0, this.selectedHouseIndex - 1);
+      engine.sound.playUIHover();
     } else if (input.right) {
       this.selectedHouseIndex = Math.min(4, this.selectedHouseIndex + 1);
+      engine.sound.playUIHover();
     }
 
     if (input.up) {
       this.selectedRow = Math.max(0, this.selectedRow - 1);
+      engine.sound.playUIHover();
     } else if (input.down) {
       this.selectedRow = Math.min(3, this.selectedRow + 1);
+      engine.sound.playUIHover();
     }
 
     // Suporte ao Clique / Mouse
@@ -189,6 +201,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
         } else {
           this.currentStanza = (this.currentStanza + 1) % this.stanzas.length;
         }
+        engine.sound.playCordelFolhear();
       }
 
       // 2. Clique nas Casas Sertanejas
@@ -203,16 +216,16 @@ export class Stage3RasgaMortalhaScene implements IScene {
           const relativeY = my - hy;
           if (relativeY >= 40 && relativeY < 85) {
             this.selectedRow = 0;
-            this.cycleAttribute(i, 0);
+            this.cycleAttribute(i, 0, engine);
           } else if (relativeY >= 85 && relativeY < 130) {
             this.selectedRow = 1;
-            this.cycleAttribute(i, 1);
+            this.cycleAttribute(i, 1, engine);
           } else if (relativeY >= 130 && relativeY < 175) {
             this.selectedRow = 2;
-            this.cycleAttribute(i, 2);
+            this.cycleAttribute(i, 2, engine);
           } else if (relativeY >= 175) {
             this.selectedRow = 3;
-            this.cycleAttribute(i, 3);
+            this.cycleAttribute(i, 3, engine);
           }
         }
       }
@@ -226,13 +239,15 @@ export class Stage3RasgaMortalhaScene implements IScene {
     // Ação com Teclado (Espaço para avançar estrofe ou alternar atributo)
     if (input.action) {
       this.currentStanza = (this.currentStanza + 1) % this.stanzas.length;
+      engine.sound.playCordelFolhear();
     } else if (input.interact) {
-      this.cycleAttribute(this.selectedHouseIndex, this.selectedRow);
+      this.cycleAttribute(this.selectedHouseIndex, this.selectedRow, engine);
     }
   }
 
-  private cycleAttribute(houseIdx: number, row: number): void {
+  private cycleAttribute(houseIdx: number, row: number, engine: IGameEngine): void {
     const house = this.houses[houseIdx];
+    engine.sound.playUIClick();
     if (row === 0) {
       const idx = this.moradores.indexOf(house.morador);
       house.morador = this.moradores[(idx + 1) % this.moradores.length];
@@ -267,10 +282,13 @@ export class Stage3RasgaMortalhaScene implements IScene {
       this.stateStatus = 'SUCCESS';
       engine.unlockItem('pena');
       this.message = '🎉 DEDUÇÃO EXATA! O Ferrador da Casa Verde entregou a 🪶 Pena Encantada!';
+      engine.sound.playVictoryJingle();
     } else {
       // FALHA!
       this.stateStatus = 'FAILED';
       this.message = '💀 O PIADO DA RASGA-MORTALHA ECOOU! A dedução está incorreta!';
+      engine.sound.playRasgaCanto();
+      engine.sound.playDefeatJingle();
     }
   }
 

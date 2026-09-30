@@ -1918,3 +1918,252 @@ export function drawMesaMontagemXilo(
 
   ctx.restore();
 }
+
+/**
+ * 🏠 INTERIOR DA CASA DE CORDEL (FASE 3 — 4 NICHOS / SLOTS DE XILOGRAVURA)
+ */
+export interface InteriorHouseData {
+  index: number;
+  corName: string;
+  colorHex: string;
+  morador?: string;
+  bebida?: string;
+  fumo?: string;
+  animal?: string;
+  clue?: string;
+}
+
+export function drawInteriorCasaXilo(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  house: InteriorHouseData,
+  options: { time?: number; activeSlot?: string } = {}
+): void {
+  ctx.save();
+
+  // 1. Fundo Rústico de Taipa / Piso de Barro Batido
+  ctx.fillStyle = '#20150e';
+  ctx.fillRect(0, 0, w, h);
+
+  // Vigas e Paredes de Pau-a-Pique de Xilogravura
+  ctx.strokeStyle = '#120b07';
+  ctx.lineWidth = 2;
+  for (let px = 40; px < w; px += 60) {
+    ctx.beginPath();
+    ctx.moveTo(px, 0);
+    ctx.lineTo(px, h);
+    ctx.stroke();
+  }
+
+  // Moldura Externa de Xilogravura
+  drawMolduraCordel(ctx, 16, 14, w - 32, h - 28, { borderWeight: 4 });
+
+  // 2. Cabeçalho da Casa
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w / 2 - 260, 24, 520, 56);
+  ctx.fillStyle = XILO_COLORS.kraftLight;
+  ctx.fillRect(w / 2 - 256, 28, 512, 48);
+  ctx.strokeStyle = house.colorHex;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(w / 2 - 256, 28, 512, 48);
+
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 18px "Courier New", Courier, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`🏠 INTERIOR DA CASA ${house.index} — COR ${house.corName.toUpperCase()}`, w / 2, 50);
+
+  ctx.font = '11px monospace';
+  ctx.fillStyle = '#475569';
+  ctx.fillText(house.clue || 'Deposite os 4 elementos sagrados correspondentes a esta moradia.', w / 2, 66);
+
+  // 3. Os 4 Nichos / Slots de Encaixe de Xilogravura
+  const slots = [
+    { type: 'morador', label: 'MORADOR', icon: '👤', val: house.morador, color: '#f59e0b', x: w * 0.22, y: h * 0.40 },
+    { type: 'bebida', label: 'BEBIDA', icon: '🍶', val: house.bebida, color: '#38bdf8', x: w * 0.41, y: h * 0.40 },
+    { type: 'fumo', label: 'FUMO', icon: '🍂', val: house.fumo, color: '#f97316', x: w * 0.59, y: h * 0.40 },
+    { type: 'animal', label: 'ANIMAL', icon: '🐾', val: house.animal, color: '#4ade80', x: w * 0.78, y: h * 0.40 },
+  ];
+
+  const slotW = 145;
+  const slotH = 175;
+
+  for (const s of slots) {
+    const isHover = options.activeSlot === s.type;
+
+    // Sombra do Nicho
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.fillRect(s.x - slotW / 2 + 4, s.y - slotH / 2 + 6, slotW, slotH);
+
+    // Corpo do Nicho (Madeira Talhada)
+    ctx.fillStyle = s.val ? '#2a1a10' : '#170f09';
+    ctx.fillRect(s.x - slotW / 2, s.y - slotH / 2, slotW, slotH);
+    ctx.strokeStyle = isHover ? XILO_COLORS.goldAccent : XILO_COLORS.black;
+    ctx.lineWidth = isHover ? 3 : 2;
+    ctx.strokeRect(s.x - slotW / 2, s.y - slotH / 2, slotW, slotH);
+
+    // Borda interna estilizada
+    ctx.strokeStyle = s.val ? s.color : '#3f3f46';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(s.x - slotW / 2 + 5, s.y - slotH / 2 + 5, slotW - 10, slotH - 10);
+
+    // Placa do Slot
+    ctx.fillStyle = XILO_COLORS.black;
+    ctx.fillRect(s.x - slotW / 2 + 8, s.y - slotH / 2 + 8, slotW - 16, 24);
+    ctx.fillStyle = s.color;
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${s.icon} ${s.label}`, s.x, s.y - slotH / 2 + 24);
+
+    // Conteúdo / Estado do Slot
+    if (s.val) {
+      // Slot Preenchido
+      ctx.fillStyle = XILO_COLORS.kraftPaper;
+      ctx.fillRect(s.x - slotW / 2 + 12, s.y - 20, slotW - 24, 70);
+      ctx.strokeStyle = XILO_COLORS.black;
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(s.x - slotW / 2 + 12, s.y - 20, slotW - 24, 70);
+
+      // Ícone Grande
+      ctx.font = '26px sans-serif';
+      ctx.fillText(s.icon, s.x, s.y + 12);
+
+      // Nome do Item
+      ctx.fillStyle = XILO_COLORS.black;
+      ctx.font = 'bold 12px monospace';
+      ctx.fillText(s.val.toUpperCase(), s.x, s.y + 36);
+
+      // Status
+      ctx.fillStyle = '#15803d';
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('✓ ALOCADO', s.x, s.y - slotH / 2 + slotH - 14);
+    } else {
+      // Slot Vazio
+      ctx.fillStyle = '#52525b';
+      ctx.font = '28px sans-serif';
+      ctx.fillText('🕳️', s.x, s.y + 10);
+
+      ctx.fillStyle = '#a1a1aa';
+      ctx.font = '11px monospace';
+      ctx.fillText('[ VAZIO ]', s.x, s.y + 38);
+
+      ctx.fillStyle = '#71717a';
+      ctx.font = '9px monospace';
+      ctx.fillText('Aperte [E] p/ Soltar', s.x, s.y - slotH / 2 + slotH - 14);
+    }
+  }
+
+  // 4. Porta de Saída & Dicas de Controles no Rodapé
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w / 2 - 200, h - 85, 400, 48);
+  ctx.fillStyle = '#78350f';
+  ctx.fillRect(w / 2 - 196, h - 81, 392, 40);
+  ctx.strokeStyle = XILO_COLORS.goldAccent;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(w / 2 - 196, h - 81, 392, 40);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 12px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('🚪 SAÍDA DA CASA — Pressione [E / Porta] para Voltar à Vila', w / 2, h - 62);
+  ctx.font = '10px monospace';
+  ctx.fillStyle = '#fde047';
+  ctx.fillText('⚡ Dica: Dê um Grito [Espaço] para resetar todos os itens desta casa', w / 2, h - 48);
+
+  ctx.restore();
+}
+
+/**
+ * 📜 CAIXA DE DIÁLOGO & TOAST UNIFICADO EM XILOGRAVURA
+ */
+export function drawCaixaDialogoXilo(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  speaker: string,
+  text: string,
+  options: {
+    prompt?: string;
+    speakerColor?: string;
+    isToast?: boolean;
+    borderWeight?: number;
+  } = {}
+): void {
+  ctx.save();
+
+  // Sombra profunda
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(x + 4, y + 6, w, h);
+
+  // Fundo Pergaminho / Kraft Escuro
+  ctx.fillStyle = '#1e140d';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = options.borderWeight || 3;
+  ctx.strokeRect(x, y, w, h);
+
+  // Moldura interna de xilogravura
+  ctx.strokeStyle = XILO_COLORS.goldAccent;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x + 5, y + 5, w - 10, h - 10);
+
+  // Cantoneiras ornamentais
+  const cs = 10;
+  ctx.fillStyle = XILO_COLORS.goldAccent;
+  ctx.fillRect(x + 5, y + 5, cs, cs);
+  ctx.fillRect(x + w - 5 - cs, y + 5, cs, cs);
+  ctx.fillRect(x + 5, y + h - 5 - cs, cs, cs);
+  ctx.fillRect(x + w - 5 - cs, y + h - 5 - cs, cs, cs);
+
+  // Placa do Locutor / Título
+  if (speaker) {
+    ctx.fillStyle = XILO_COLORS.black;
+    ctx.fillRect(x + 18, y - 12, speaker.length * 10 + 24, 22);
+    ctx.strokeStyle = options.speakerColor || XILO_COLORS.goldAccent;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x + 18, y - 12, speaker.length * 10 + 24, 22);
+
+    ctx.fillStyle = options.speakerColor || '#fef08a';
+    ctx.font = 'bold 12px monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(speaker.toUpperCase(), x + 28, y - 1);
+  }
+
+  // Texto da Fala / Notificação
+  ctx.fillStyle = '#f4ebd9';
+  ctx.font = '14px "Courier New", Courier, monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  // Quebra de linha inteligente
+  const words = text.split(' ');
+  let line = '';
+  let curY = y + 18;
+  const maxLineW = w - 40;
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxLineW && i > 0) {
+      ctx.fillText(line, x + 20, curY);
+      line = words[i] + ' ';
+      curY += 20;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x + 20, curY);
+
+  // Prompt de ação / avanço
+  const prompt = options.prompt || '[ Solte E para Avançar ]';
+  ctx.fillStyle = '#a1a1aa';
+  ctx.font = '10px monospace';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(prompt, x + w - 16, y + h - 10);
+
+  ctx.restore();
+}

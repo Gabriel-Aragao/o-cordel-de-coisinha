@@ -25,6 +25,8 @@ import {
   drawTelaEncerramentoCordel,
   drawMascaraEscuridaoCandeeiro,
   drawMesaMontagemXilo,
+  drawInteriorCasaXilo,
+  drawCaixaDialogoXilo,
 } from './xilogravura';
 
 export * from './xilogravura';
@@ -194,4 +196,36 @@ export {
   drawTelaEncerramentoCordel,
   drawMascaraEscuridaoCandeeiro,
   drawMesaMontagemXilo,
+  drawInteriorCasaXilo,
+  drawCaixaDialogoXilo,
 };
+
+export function drawUnifiedToast(
+  ctx: CanvasRenderingContext2D,
+  message: string,
+  width: number = 960,
+  height: number = 540,
+  options: {
+    isError?: boolean;
+    isSuccess?: boolean;
+    icon?: string;
+  } = {}
+): void {
+  if (!message) return;
+
+  const boxW = Math.min(840, Math.max(480, message.length * 9.5 + 80));
+  const boxH = 50;
+  const boxX = (width - boxW) / 2;
+  const boxY = height - 62;
+
+  const defaultIcon = options.isError ? '💀' : options.isSuccess ? '✨' : '📜';
+  const icon = options.icon || defaultIcon;
+  const speakerColor = options.isError ? '#ef4444' : options.isSuccess ? '#22c55e' : '#f59e0b';
+
+  drawCaixaDialogoXilo(ctx, boxX, boxY, boxW, boxH, icon, message, {
+    isToast: true,
+    speakerColor,
+    prompt: '',
+    borderWeight: 2,
+  });
+}

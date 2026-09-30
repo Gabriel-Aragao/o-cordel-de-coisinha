@@ -1,16 +1,18 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { drawText } from '../../renderer/shapes';
+import { drawText, drawUnifiedToast } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawRasgaMortalha,
   drawVioleiro,
   drawMoradorBebado,
-  drawMolduraCordel
+  drawMolduraCordel,
+  drawInteriorCasaXilo,
+  drawBode
 } from '../../renderer/xilogravura';
 import { DialogSystem } from '../dialogs';
 import { NarrativeModalManager } from '../narrative';
 
-interface HouseSlot {
+export interface HouseData {
   index: number;
   corName: string;
   colorHex: string;
@@ -24,51 +26,31 @@ interface HouseSlot {
   animal?: string;
 }
 
-interface DrunkVillager {
+export interface VillageEntityItem {
   id: string;
+  type: 'morador' | 'bebida' | 'fumo' | 'animal';
   name: string;
-  x: number;
-  y: number;
-  originX: number;
-  originY: number;
-  assignedHouseIdx?: number;
-  isPushed: boolean;
+  icon: string;
   color: string;
-}
-
-interface ItemResource {
-  id: string;
-  type: 'bebida' | 'fumo';
-  name: string;
-  icon: string;
   x: number;
   y: number;
   originX: number;
   originY: number;
   assignedHouseIdx?: number;
-}
-
-interface VillageAnimal {
-  id: string;
-  name: string;
-  icon: string;
-  x: number;
-  y: number;
-  originX: number;
-  originY: number;
-  assignedHouseIdx?: number;
-  isLeashed: boolean;
-  speed: number;
+  interiorX?: number;
+  interiorY?: number;
 }
 
 export class Stage3RasgaMortalhaScene implements IScene {
   public id: SceneId = 'STAGE_3_RASGAMORTALHA';
   public name = 'Fase 3: A Pena da Rasga-Mortalha';
 
+  private currentInteriorHouseIdx: number | null = null;
+
   private player: Entity = {
     id: 'hero',
     x: 480,
-    y: 290,
+    y: 310,
     width: 36,
     height: 50,
     color: '#3b82f6',
@@ -95,33 +77,25 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
 
-  // As 5 Casas em Arco no Topo
-  private houses: HouseSlot[] = [];
+  private houses: HouseData[] = [];
+  private allItems: VillageEntityItem[] = [];
+  private carriedItem?: VillageEntityItem;
 
-  // 4 Mesas / Áreas Interativas Ampliadas
-  private villagers: DrunkVillager[] = [];
-  private beverages: ItemResource[] = [];
-  private tobaccos: ItemResource[] = [];
-  private animals: VillageAnimal[] = [];
-
-  // Item Carregado pelo Herói
-  private carriedItem?: { type: 'bebida' | 'fumo'; name: string; icon: string; id: string };
-
-  private message: string = 'Ouça os Violeiros [E], organize as 5 casas com os Bêbados, Bebidas, Fumos e Animais!';
+  private message: string = 'Ouça os Violeiros [E], pegue os itens com [E] e entre nas casas para organizá-las!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
 
   private dialogs: DialogSystem = new DialogSystem();
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   public init(_engine: IGameEngine): void {
+    this.currentInteriorHouseIdx = null;
     this.player.x = 480;
-    this.player.y = 290;
+    this.player.y = 310;
     this.carriedItem = undefined;
     this.stateStatus = 'PLAYING';
     this.animTime = 0;
     this.stepTimer = 0;
 
-    // 1. As 5 Casas Dispostas em Arco no Topo
     const arcPositions = [
       { x: 130, y: 155 },
       { x: 305, y: 125 },
@@ -138,43 +112,36 @@ export class Stage3RasgaMortalhaScene implements IScene {
       { index: 5, corName: 'Branca', colorHex: '#f8fafc', x: arcPositions[4].x, y: arcPositions[4].y, width: 140, height: 110 }
     ];
 
-    // 2. Mesa 1: Os 5 Bêbados / Moradores (Ampliada em x: 280, y: 380)
-    this.villagers = [
-      { id: 'v_vaqueiro', name: 'Vaqueiro', x: 220, y: 380, originX: 220, originY: 380, isPushed: false, color: '#eab308' },
-      { id: 'v_rendeira', name: 'Rendeira', x: 250, y: 380, originX: 250, originY: 380, isPushed: false, color: '#38bdf8' },
-      { id: 'v_cantador', name: 'Cantador', x: 280, y: 380, originX: 280, originY: 380, isPushed: false, color: '#f87171' },
-      { id: 'v_ferrador', name: 'Ferrador', x: 310, y: 380, originX: 310, originY: 380, isPushed: false, color: '#4ade80' },
-      { id: 'v_rezadeira', name: 'Rezadeira', x: 340, y: 380, originX: 340, originY: 380, isPushed: false, color: '#f1f5f9' }
+    this.allItems = [
+      // 5 Moradores (Mesa 1 em x: 280, y: 380)
+      { id: 'v_vaqueiro', type: 'morador', name: 'Vaqueiro', icon: '🤠', color: '#eab308', x: 220, y: 380, originX: 220, originY: 380 },
+      { id: 'v_rendeira', type: 'morador', name: 'Rendeira', icon: '👒', color: '#38bdf8', x: 250, y: 380, originX: 250, originY: 380 },
+      { id: 'v_cantador', type: 'morador', name: 'Cantador', icon: '🪕', color: '#f87171', x: 280, y: 380, originX: 280, originY: 380 },
+      { id: 'v_ferrador', type: 'morador', name: 'Ferrador', icon: '🔨', color: '#4ade80', x: 310, y: 380, originX: 310, originY: 380 },
+      { id: 'v_rezadeira', type: 'morador', name: 'Rezadeira', icon: '📿', color: '#f1f5f9', x: 340, y: 380, originX: 340, originY: 380 },
+
+      // 5 Bebidas (Mesa 2 em x: 460, y: 465)
+      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', color: '#38bdf8', x: 410, y: 465, originX: 410, originY: 465 },
+      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', color: '#facc15', x: 435, y: 465, originX: 435, originY: 465 },
+      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', color: '#f87171', x: 460, y: 465, originX: 460, originY: 465 },
+      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', color: '#4ade80', x: 485, y: 465, originX: 485, originY: 465 },
+      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', color: '#78350f', x: 510, y: 465, originX: 510, originY: 465 },
+
+      // 5 Fumos (Mesa 3 em x: 650, y: 465)
+      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', color: '#d97706', x: 600, y: 465, originX: 600, originY: 465 },
+      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', color: '#eab308', x: 625, y: 465, originX: 625, originY: 465 },
+      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', color: '#dc2626', x: 650, y: 465, originX: 650, originY: 465 },
+      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', color: '#16a34a', x: 675, y: 465, originX: 675, originY: 465 },
+      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', color: '#22c55e', x: 700, y: 465, originX: 700, originY: 465 },
+
+      // 5 Animais (Curral 4 em x: 830, y: 380)
+      { id: 'a_bode', type: 'animal', name: 'Bode', icon: '🐐', color: '#cbd5e1', x: 760, y: 380, originX: 760, originY: 380 },
+      { id: 'a_galo', type: 'animal', name: 'Galo', icon: '🐓', color: '#ef4444', x: 790, y: 380, originX: 790, originY: 380 },
+      { id: 'a_tatu', type: 'animal', name: 'Tatu', icon: '🦔', color: '#a16207', x: 820, y: 380, originX: 820, originY: 380 },
+      { id: 'a_cavalo', type: 'animal', name: 'Cavalo', icon: '🐎', color: '#92400e', x: 850, y: 380, originX: 850, originY: 380 },
+      { id: 'a_canario', type: 'animal', name: 'Canário', icon: '🐤', color: '#facc15', x: 880, y: 380, originX: 880, originY: 380 }
     ];
 
-    // 3. Mesa 2: As 5 Bebidas (Ampliada em x: 460, y: 465)
-    this.beverages = [
-      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', x: 410, y: 465, originX: 410, originY: 465 },
-      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', x: 435, y: 465, originX: 435, originY: 465 },
-      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', x: 460, y: 465, originX: 460, originY: 465 },
-      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', x: 485, y: 465, originX: 485, originY: 465 },
-      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', x: 510, y: 465, originX: 510, originY: 465 }
-    ];
-
-    // 4. Mesa 3: Os 5 Fumos (Ampliada em x: 650, y: 465)
-    this.tobaccos = [
-      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', x: 600, y: 465, originX: 600, originY: 465 },
-      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', x: 625, y: 465, originX: 625, originY: 465 },
-      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', x: 650, y: 465, originX: 650, originY: 465 },
-      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', x: 675, y: 465, originX: 675, originY: 465 },
-      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', x: 700, y: 465, originX: 700, originY: 465 }
-    ];
-
-    // 5. Curral 4: Os 5 Animais (Ampliado em x: 830, y: 380)
-    this.animals = [
-      { id: 'a_bode', name: 'Bode', icon: '🐐', x: 760, y: 380, originX: 760, originY: 380, isLeashed: false, speed: 90 },
-      { id: 'a_galo', name: 'Galo', icon: '🐓', x: 790, y: 380, originX: 790, originY: 380, isLeashed: false, speed: 90 },
-      { id: 'a_tatu', name: 'Tatu', icon: '🦔', x: 820, y: 380, originX: 820, originY: 380, isLeashed: false, speed: 90 },
-      { id: 'a_cavalo', name: 'Cavalo', icon: '🐎', x: 850, y: 380, originX: 850, originY: 380, isLeashed: false, speed: 90 },
-      { id: 'a_canario', name: 'Canário', icon: '🐤', x: 880, y: 380, originX: 880, originY: 380, isLeashed: false, speed: 90 }
-    ];
-
-    // Apresentação da Fase (Folheto de Cordel)
     this.narrative.showIntro({
       phaseNumber: 3,
       title: 'A Pena da Rasga-Mortalha',
@@ -183,9 +150,9 @@ export class Stage3RasgaMortalhaScene implements IScene {
         'Na vila da meia-noite onde a coruja esvoaça,',
         'Cinco casas em fileira guardam glória e trapaça;',
         'Escute os dois violeiros no repente afinado,',
-        'E traga a cada morador seu fumo, bicho e trago sagrado!'
+        'Entre nas casas e traga a cada morador seu fumo, bicho e trago sagrado!'
       ],
-      objective: 'Empurre os bêbados, entregue bebidas/fumos e conduza os animais às 5 casas certas!',
+      objective: 'Pegue itens com [E], entre nas casas e solte-os no interior para resolver o enigma!',
       itemReward: {
         id: 'pena',
         name: 'Pena Encantada',
@@ -211,12 +178,14 @@ export class Stage3RasgaMortalhaScene implements IScene {
       return;
     }
 
-    // 1. Voo da Coruja Rasga-Mortalha
-    this.owl.x += this.owlDirection * (this.owl.speed || 130) * dt;
-    if (this.owl.x > 880) this.owlDirection = -1;
-    if (this.owl.x < 80) this.owlDirection = 1;
+    // 1. Voo da Coruja Rasga-Mortalha (apenas na praça exterior)
+    if (this.currentInteriorHouseIdx === null) {
+      this.owl.x += this.owlDirection * (this.owl.speed || 130) * dt;
+      if (this.owl.x > 880) this.owlDirection = -1;
+      if (this.owl.x < 80) this.owlDirection = 1;
+    }
 
-    // 2. Movimento do Jogador
+    // 2. Movimentação do Jogador
     let dx = 0;
     let dy = 0;
 
@@ -256,18 +225,117 @@ export class Stage3RasgaMortalhaScene implements IScene {
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
 
-    this.player.x = Math.max(30, Math.min(930, this.player.x));
-    this.player.y = Math.max(30, Math.min(510, this.player.y));
+    // Limites de tela
+    if (this.currentInteriorHouseIdx !== null) {
+      this.player.x = Math.max(90, Math.min(870, this.player.x));
+      this.player.y = Math.max(90, Math.min(490, this.player.y));
 
-    // 3. Grito Universal [Espaço]
+      // Saída pela porta inferior da casa
+      if (this.player.y >= 470 && (this.player.x > 420 && this.player.x < 540)) {
+        const exitHouse = this.houses.find(h => h.index === this.currentInteriorHouseIdx);
+        this.currentInteriorHouseIdx = null;
+        this.player.x = exitHouse ? exitHouse.x : 480;
+        this.player.y = exitHouse ? exitHouse.y + 70 : 250;
+        this.message = '🚪 Você saiu para a praça da vila.';
+        engine.sound.playUIClick();
+        return;
+      }
+    } else {
+      this.player.x = Math.max(30, Math.min(930, this.player.x));
+      this.player.y = Math.max(30, Math.min(510, this.player.y));
+    }
+
+    // =========================================================================
+    // 3. FLUXO NO INTERIOR DA CASA
+    // =========================================================================
+    if (this.currentInteriorHouseIdx !== null) {
+      const house = this.houses.find(h => h.index === this.currentInteriorHouseIdx)!;
+
+      // 3.1. Grito de Reset [Espaço] dentro da casa: devolve todos os itens da casa às mesas de origem!
+      if (input.action) {
+        engine.sound.playGrito();
+        engine.juice.shake.addTrauma(0.4);
+
+        let resetCount = 0;
+        for (const it of this.allItems) {
+          if (it.assignedHouseIdx === house.index) {
+            it.assignedHouseIdx = undefined;
+            it.x = it.originX;
+            it.y = it.originY;
+            it.interiorX = undefined;
+            it.interiorY = undefined;
+            resetCount++;
+          }
+        }
+
+        house.morador = undefined;
+        house.bebida = undefined;
+        house.fumo = undefined;
+        house.animal = undefined;
+
+        if (resetCount > 0) {
+          this.message = `🗣️ GRITO NA CASA! Os ${resetCount} elementos se assustaram e voltaram para as mesas!`;
+          engine.sound.playItemDescobrir();
+          engine.juice.particles.emit('dust', 480, 270, { count: 18, speed: 60 });
+        } else {
+          this.message = `🗣️ Coisinha soltou um grito no interior da Casa ${house.index}!`;
+        }
+        return;
+      }
+
+      // 3.2. Interações com [E / interactReleased] dentro da casa
+      if (input.interactReleased) {
+        if (this.carriedItem) {
+          const it = this.carriedItem;
+          it.assignedHouseIdx = house.index;
+          it.interiorX = 300 + Math.random() * 360;
+          it.interiorY = 220 + Math.random() * 160;
+
+          if (it.type === 'morador') house.morador = it.name;
+          else if (it.type === 'bebida') house.bebida = it.name;
+          else if (it.type === 'fumo') house.fumo = it.name;
+          else if (it.type === 'animal') house.animal = it.name;
+
+          this.message = `📦 ${it.name} foi colocado no chão da Casa ${house.index} (${house.corName})!`;
+          engine.sound.playPickup();
+          engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 10, speed: 45 });
+          this.carriedItem = undefined;
+          this.checkVictory(engine);
+          return;
+        }
+
+        for (const it of this.allItems) {
+          if (it.assignedHouseIdx === house.index && it.interiorX !== undefined && it.interiorY !== undefined) {
+            if (Math.hypot(this.player.x - it.interiorX, this.player.y - it.interiorY) < 60) {
+              it.assignedHouseIdx = undefined;
+              if (it.type === 'morador') house.morador = undefined;
+              else if (it.type === 'bebida') house.bebida = undefined;
+              else if (it.type === 'fumo') house.fumo = undefined;
+              else if (it.type === 'animal') house.animal = undefined;
+
+              this.carriedItem = it;
+              this.message = `✋ Você recapturou ${it.name} do interior da Casa ${house.index}!`;
+              engine.sound.playPickup();
+              engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 8, speed: 35 });
+              return;
+            }
+          }
+        }
+      }
+
+      return;
+    }
+
+    // =========================================================================
+    // 4. FLUXO NA PRAÇA DA VILA (EXTERIOR)
+    // =========================================================================
+
     if (input.action) {
       engine.sound.playGrito();
       engine.juice.shake.addTrauma(0.35);
     }
 
-    // 4. Interação com os 2 Violeiros [E no release / interactReleased]
     if (input.interactReleased) {
-      // Violeiro 1
       if (Math.hypot(this.player.x - 90, this.player.y - 460) < 70) {
         this.dialogs.startDialog(
           'violeiro_1',
@@ -296,7 +364,6 @@ export class Stage3RasgaMortalhaScene implements IScene {
         return;
       }
 
-      // Violeiro 2
       if (Math.hypot(this.player.x - 170, this.player.y - 460) < 70) {
         this.dialogs.startDialog(
           'violeiro_2',
@@ -326,160 +393,40 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
     }
 
-    // 5. Condução e Fixação dos Bêbados
-    for (const v of this.villagers) {
-      if (v.assignedHouseIdx !== undefined) continue;
-
-      const distHeroV = Math.hypot(this.player.x - v.x, this.player.y - v.y);
-      if (distHeroV < 42) {
-        if (input.interactReleased) {
-          this.message = `🍻 Bêbado: "Eu sou ${v.name}, forasteiro! Me empurre até minha casa..."`;
-          engine.sound.playUIClick();
-        }
-
-        if (this.isMoving) {
-          v.x += dx * 160 * dt;
-          v.y += dy * 160 * dt;
-          v.isPushed = true;
-
-          for (const h of this.houses) {
-            if (Math.hypot(v.x - h.x, v.y - h.y) < 70) {
-              if (h.morador !== v.name) {
-                h.morador = v.name;
-                v.assignedHouseIdx = h.index;
-                v.x = h.x;
-                v.y = h.y;
-                this.message = `🏠 ${v.name} entrou e foi fixado na Casa ${h.index} (${h.corName})!`;
-                engine.sound.playPickup();
-                engine.juice.particles.emit('sparkle', h.x, h.y, { count: 8, speed: 40 });
-                this.checkVictory(engine);
-                break;
-              }
-            }
-          }
-        }
-      } else if (v.isPushed && v.assignedHouseIdx === undefined && distHeroV > 75) {
-        v.x = v.originX;
-        v.y = v.originY;
-        v.isPushed = false;
-        this.message = `🍻 ${v.name} retornou para a Mesa dos Bêbados!`;
+    for (const h of this.houses) {
+      if (Math.hypot(this.player.x - h.x, this.player.y - (h.y + 40)) < 45) {
+        this.currentInteriorHouseIdx = h.index;
+        this.player.x = 480;
+        this.player.y = 440;
+        this.message = `🏠 Entrou na Casa ${h.index} (${h.corName}). Solte itens com [E] ou Grite [Espaço] para resetar!`;
+        engine.sound.playUIClick();
+        return;
       }
     }
 
-    // 6. Ciclo Estrito de Transporte de Bebidas e Fumos
     if (input.interactReleased) {
       if (this.carriedItem) {
-        const item = this.carriedItem;
-        let depositedInHouse = false;
-        for (const h of this.houses) {
-          if (Math.hypot(this.player.x - h.x, this.player.y - h.y) < 80) {
-            if (item.type === 'bebida') {
-              h.bebida = item.name;
-              const bev = this.beverages.find((b) => b.id === item.id);
-              if (bev) bev.assignedHouseIdx = h.index;
-            } else {
-              h.fumo = item.name;
-              const tob = this.tobaccos.find((t) => t.id === item.id);
-              if (tob) tob.assignedHouseIdx = h.index;
-            }
-            this.message = `📦 ${item.name} foi fixado na Casa ${h.index} (${h.corName})!`;
-            engine.sound.playPickup();
-            engine.juice.particles.emit('sparkle', h.x, h.y, { count: 8, speed: 40 });
-            this.carriedItem = undefined;
-            depositedInHouse = true;
-            this.checkVictory(engine);
-            break;
-          }
-        }
-
-        if (!depositedInHouse) {
-          if (item.type === 'bebida') {
-            const bev = this.beverages.find((b) => b.id === item.id);
-            if (bev) {
-              bev.assignedHouseIdx = undefined;
-              bev.x = bev.originX;
-              bev.y = bev.originY;
-            }
-          } else {
-            const tob = this.tobaccos.find((t) => t.id === item.id);
-            if (tob) {
-              tob.assignedHouseIdx = undefined;
-              tob.x = tob.originX;
-              tob.y = tob.originY;
-            }
-          }
-          this.message = `📦 ${item.name} foi solto fora da casa e retornou à mesa!`;
-          engine.sound.playUIClick();
-          this.carriedItem = undefined;
-        }
+        const it = this.carriedItem;
+        it.assignedHouseIdx = undefined;
+        it.x = it.originX;
+        it.y = it.originY;
+        it.interiorX = undefined;
+        it.interiorY = undefined;
+        this.message = `↩️ ${it.name} foi solto fora de uma casa e retornou à sua mesa de origem!`;
+        engine.sound.playPickup();
+        engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 8, speed: 30 });
+        this.carriedItem = undefined;
         return;
       }
 
-      // Tenta pegar na mesa de bebidas
-      for (const b of this.beverages) {
-        if (b.assignedHouseIdx === undefined && Math.hypot(this.player.x - b.x, this.player.y - b.y) < 40 && !this.carriedItem) {
-          b.assignedHouseIdx = -1;
-          this.carriedItem = { type: 'bebida', name: b.name, icon: b.icon, id: b.id };
-          this.message = `🍶 Você pegou a Bebida: ${b.name}! Leve até a casa certa.`;
-          engine.sound.playPickup();
-          return;
-        }
-      }
-
-      // Tenta pegar na mesa de fumos
-      for (const f of this.tobaccos) {
-        if (f.assignedHouseIdx === undefined && Math.hypot(this.player.x - f.x, this.player.y - f.y) < 40 && !this.carriedItem) {
-          f.assignedHouseIdx = -1;
-          this.carriedItem = { type: 'fumo', name: f.name, icon: f.icon, id: f.id };
-          this.message = `🍂 Você pegou o Fumo: ${f.name}! Leve até a casa certa.`;
-          engine.sound.playPickup();
-          return;
-        }
-      }
-
-      // Tenta laçar/soltar animal
-      for (const a of this.animals) {
-        if (a.assignedHouseIdx === undefined && Math.hypot(this.player.x - a.x, this.player.y - a.y) < 50) {
-          a.isLeashed = !a.isLeashed;
-          if (!a.isLeashed) {
-            a.x = a.originX;
-            a.y = a.originY;
-            this.message = `🐾 Soltou o ${a.name}. Retornou ao curral.`;
-          } else {
-            this.message = `🪢 Você laçou o ${a.name}! Conduza-o até a casa.`;
-            engine.sound.playBerroBode(false);
-          }
-          return;
-        }
-      }
-    }
-
-    // 7. Condução e Fixação dos Animais Laçados
-    for (const a of this.animals) {
-      if (a.assignedHouseIdx !== undefined) continue;
-
-      if (a.isLeashed) {
-        const targetX = this.player.x - dx * 35;
-        const targetY = this.player.y - dy * 35;
-        const angle = Math.atan2(targetY - a.y, targetX - a.x);
-        const dist = Math.hypot(targetX - a.x, targetY - a.y);
-        if (dist > 25) {
-          a.x += Math.cos(angle) * 180 * dt;
-          a.y += Math.sin(angle) * 180 * dt;
-        }
-
-        for (const h of this.houses) {
-          if (Math.hypot(a.x - h.x, a.y - h.y) < 70) {
-            h.animal = a.name;
-            a.assignedHouseIdx = h.index;
-            a.isLeashed = false;
-            a.x = h.x;
-            a.y = h.y;
-            this.message = `🏠 ${a.name} guardado e fixado na Casa ${h.index} (${h.corName})!`;
+      for (const it of this.allItems) {
+        if (it.assignedHouseIdx === undefined) {
+          if (Math.hypot(this.player.x - it.x, this.player.y - it.y) < 45) {
+            this.carriedItem = it;
+            this.message = `✋ Você pegou: ${it.name} (${it.icon}). Leve até a casa certa e entre na porta!`;
             engine.sound.playPickup();
-            engine.juice.particles.emit('sparkle', h.x, h.y, { count: 8, speed: 40 });
-            this.checkVictory(engine);
-            break;
+            engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 8, speed: 35 });
+            return;
           }
         }
       }
@@ -528,129 +475,148 @@ export class Stage3RasgaMortalhaScene implements IScene {
   }
 
   public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
-    // 1. Noite Noturna da Vila de Cordel
-    ctx.fillStyle = '#050814';
-    ctx.fillRect(0, 0, 960, 540);
+    // =========================================================================
+    // 1. RENDER DO INTERIOR DA CASA
+    // =========================================================================
+    if (this.currentInteriorHouseIdx !== null) {
+      const house = this.houses.find(h => h.index === this.currentInteriorHouseIdx)!;
 
-    drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+      drawInteriorCasaXilo(ctx, 960, 540, house, { time: this.animTime });
 
-    // Lua Cheia de Xilogravura
-    ctx.fillStyle = '#fef08a';
-    ctx.beginPath();
-    ctx.arc(890, 45, 24, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Voo da Rasga-Mortalha
-    drawRasgaMortalha(ctx, this.owl.x, this.owl.y, this.owl.width, this.owl.height, {
-      time: this.animTime
-    });
-
-    // 2. As 5 Casas em Arco no Topo
-    for (let i = 0; i < this.houses.length; i++) {
-      const h = this.houses[i];
-
-      // Telhado
-      ctx.beginPath();
-      ctx.moveTo(h.x - h.width / 2 - 8, h.y - h.height / 2 + 25);
-      ctx.lineTo(h.x, h.y - h.height / 2);
-      ctx.lineTo(h.x + h.width / 2 + 8, h.y - h.height / 2 + 25);
-      ctx.closePath();
-      ctx.fillStyle = '#7c2d12';
-      ctx.fill();
-      ctx.strokeStyle = '#ea580c';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Corpo da Casa
-      ctx.fillStyle = '#1f2937';
-      ctx.fillRect(h.x - h.width / 2, h.y - h.height / 2 + 25, h.width, h.height - 25);
-      ctx.strokeStyle = h.colorHex;
-      ctx.lineWidth = 2.5;
-      ctx.strokeRect(h.x - h.width / 2, h.y - h.height / 2 + 25, h.width, h.height - 25);
-
-      // Título da Casa
-      drawText(ctx, `Casa ${h.index} (${h.corName})`, h.x, h.y - h.height / 2 + 32, {
-        font: 'bold 10px monospace',
-        color: h.colorHex,
-        align: 'center'
-      });
-
-      // Itens Atribuídos dentro da Casa
-      const slotY = h.y - h.height / 2 + 48;
-      drawText(ctx, `👤 ${h.morador || '---'}`, h.x, slotY, { font: '9px monospace', color: '#f8fafc', align: 'center' });
-      drawText(ctx, `🍶 ${h.bebida || '---'} | 🍂 ${h.fumo || '---'}`, h.x, slotY + 14, { font: '9px monospace', color: '#fde047', align: 'center' });
-      drawText(ctx, `🐾 ${h.animal || '---'}`, h.x, slotY + 28, { font: '9px monospace', color: '#86efac', align: 'center' });
-    }
-
-    // 3. Os 2 Violeiros no Canto Inferior Esquerdo
-    drawVioleiro(ctx, 90, 460, 44, 56, { time: this.animTime });
-    drawText(ctx, '🪕 Violeiro 1', 90, 495, { font: 'bold 10px monospace', color: '#facc15', align: 'center' });
-
-    drawVioleiro(ctx, 170, 460, 44, 56, { time: this.animTime });
-    drawText(ctx, '🪕 Violeiro 2', 170, 495, { font: 'bold 10px monospace', color: '#facc15', align: 'center' });
-
-    // 4. Mesa 1: Os 5 Bêbados (Ampliada)
-    ctx.fillStyle = '#451a03';
-    ctx.fillRect(200, 355, 165, 50);
-    ctx.strokeStyle = '#a16207';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(200, 355, 165, 50);
-    drawText(ctx, '🍻 MESA DOS BÊBADOS', 282, 340, { font: 'bold 9px monospace', color: '#fde047', align: 'center' });
-
-    for (const v of this.villagers) {
-      if (v.assignedHouseIdx === undefined) {
-        drawMoradorBebado(ctx, v.x, v.y, 28, 38, { colorTint: v.color, time: this.animTime });
-      }
-    }
-
-    // 5. Mesa 2: Bebidas (Ampliada)
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(395, 445, 130, 42);
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(395, 445, 130, 42);
-    drawText(ctx, '🍶 BEBIDAS', 460, 435, { font: 'bold 9px monospace', color: '#38bdf8', align: 'center' });
-    for (const b of this.beverages) {
-      if (b.assignedHouseIdx === undefined) {
-        drawText(ctx, b.icon, b.x, b.y - 6, { font: '14px monospace', align: 'center' });
-      }
-    }
-
-    // 6. Mesa 3: Fumos (Ampliada)
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(585, 445, 130, 42);
-    ctx.strokeStyle = '#4ade80';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(585, 445, 130, 42);
-    drawText(ctx, '🍂 FUMOS', 650, 435, { font: 'bold 9px monospace', color: '#4ade80', align: 'center' });
-    for (const f of this.tobaccos) {
-      if (f.assignedHouseIdx === undefined) {
-        drawText(ctx, f.icon, f.x, f.y - 6, { font: '14px monospace', align: 'center' });
-      }
-    }
-
-    // 7. Curral 4: Animais (Ampliado)
-    ctx.fillStyle = '#451a03';
-    ctx.fillRect(740, 355, 165, 50);
-    ctx.strokeStyle = '#d97706';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(740, 355, 165, 50);
-    drawText(ctx, '🐾 CURRAL DOS ANIMAIS', 822, 340, { font: 'bold 9px monospace', color: '#fde047', align: 'center' });
-    for (const a of this.animals) {
-      if (a.assignedHouseIdx === undefined) {
-        drawText(ctx, a.icon, a.x, a.y - 8, { font: '18px monospace', align: 'center' });
-        if (a.isLeashed) {
-          ctx.strokeStyle = '#f59e0b';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(this.player.x, this.player.y);
-          ctx.lineTo(a.x, a.y);
-          ctx.stroke();
+      for (const it of this.allItems) {
+        if (it.assignedHouseIdx === house.index && it.interiorX !== undefined && it.interiorY !== undefined) {
+          ctx.save();
+          if (it.type === 'morador') {
+            drawMoradorBebado(ctx, it.interiorX, it.interiorY, 36, 48, { colorTint: it.color });
+          } else if (it.type === 'animal') {
+            drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
+          } else {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(it.interiorX - 18, it.interiorY - 18, 36, 36);
+            ctx.strokeStyle = '#d4af37';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(it.interiorX - 18, it.interiorY - 18, 36, 36);
+            ctx.font = '20px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(it.icon, it.interiorX, it.interiorY);
+          }
+          drawText(ctx, `[E] ${it.name}`, it.interiorX, it.interiorY + 24, { font: 'bold 10px monospace', align: 'center', color: '#facc15' });
+          ctx.restore();
         }
       }
+
+      ctx.fillStyle = '#854d0e';
+      ctx.fillRect(430, 465, 100, 30);
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(430, 465, 100, 30);
+      drawText(ctx, 'SAÍDA ⬇', 480, 473, { font: 'bold 11px monospace', align: 'center', color: '#fef08a' });
+
+      drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
+        facing: this.facing,
+        isMoving: this.isMoving,
+        time: this.animTime
+      });
+
+      if (this.carriedItem) {
+        ctx.save();
+        ctx.font = '22px monospace';
+        ctx.fillText(this.carriedItem.icon, this.player.x + 22, this.player.y - 20);
+        drawText(ctx, `[${this.carriedItem.name}]`, this.player.x + 22, this.player.y - 34, { font: 'bold 9px monospace', color: '#fef08a', align: 'center' });
+        ctx.restore();
+      }
+
+      drawUnifiedToast(ctx, this.message, 960, 540);
+      return;
     }
 
-    // Herói Coisinha
+    // =========================================================================
+    // 2. RENDER DA PRAÇA DA VILA (EXTERIOR)
+    // =========================================================================
+
+    ctx.fillStyle = '#1e1b18';
+    ctx.fillRect(0, 0, 960, 540);
+    drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+
+    for (const h of this.houses) {
+      ctx.fillStyle = '#292524';
+      ctx.fillRect(h.x - h.width / 2, h.y - h.height / 2, h.width, h.height);
+      ctx.strokeStyle = h.colorHex;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(h.x - h.width / 2, h.y - h.height / 2, h.width, h.height);
+
+      drawText(ctx, `Casa ${h.index}`, h.x, h.y - 48, { font: 'bold 12px monospace', align: 'center', color: h.colorHex });
+      drawText(ctx, h.corName, h.x, h.y - 34, { font: 'bold 10px monospace', align: 'center', color: '#d6d3d1' });
+
+      ctx.fillStyle = '#44403c';
+      ctx.fillRect(h.x - 18, h.y + 12, 36, 42);
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(h.x - 18, h.y + 12, 36, 42);
+      drawText(ctx, 'ENTRAR', h.x, h.y + 26, { font: 'bold 8px monospace', align: 'center', color: '#facc15' });
+
+      const itemsInHouse = this.allItems.filter(it => it.assignedHouseIdx === h.index);
+      if (itemsInHouse.length > 0) {
+        const icons = itemsInHouse.map(it => it.icon).join(' ');
+        drawText(ctx, icons, h.x, h.y - 12, { font: '13px monospace', align: 'center' });
+      }
+    }
+
+    // 4 Mesas / Áreas Interativas Ampliadas na Praça
+    ctx.fillStyle = '#27272a';
+    ctx.fillRect(190, 350, 180, 60);
+    ctx.strokeStyle = '#ca8a04';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(190, 350, 180, 60);
+    drawText(ctx, '🍻 BODEGA DOS MORADORES [E]', 280, 356, { font: 'bold 10px monospace', align: 'center', color: '#facc15' });
+
+    ctx.fillStyle = '#27272a';
+    ctx.fillRect(390, 435, 140, 60);
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(390, 435, 140, 60);
+    drawText(ctx, '🍶 BEBIDAS [E]', 460, 441, { font: 'bold 10px monospace', align: 'center', color: '#38bdf8' });
+
+    ctx.fillStyle = '#27272a';
+    ctx.fillRect(580, 435, 140, 60);
+    ctx.strokeStyle = '#16a34a';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(580, 435, 140, 60);
+    drawText(ctx, '🍂 FUMOS [E]', 650, 441, { font: 'bold 10px monospace', align: 'center', color: '#4ade80' });
+
+    ctx.fillStyle = '#27272a';
+    ctx.fillRect(730, 350, 180, 60);
+    ctx.strokeStyle = '#ea580c';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(730, 350, 180, 60);
+    drawText(ctx, '🐐 CURRAL DE ANIMAIS [E]', 820, 356, { font: 'bold 10px monospace', align: 'center', color: '#fb923c' });
+
+    for (const it of this.allItems) {
+      if (it.assignedHouseIdx === undefined && (!this.carriedItem || this.carriedItem.id !== it.id)) {
+        ctx.save();
+        if (it.type === 'morador') {
+          drawMoradorBebado(ctx, it.x, it.y + 8, 28, 38, { colorTint: it.color });
+        } else if (it.type === 'animal') {
+          drawBode(ctx, it.x, it.y + 8, 30, 26);
+        } else {
+          ctx.font = '18px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(it.icon, it.x, it.y + 6);
+        }
+        drawText(ctx, it.name, it.x, it.y + 22, { font: 'bold 9px monospace', align: 'center', color: '#e2e8f0' });
+        ctx.restore();
+      }
+    }
+
+    drawVioleiro(ctx, 90, 460, 42, 48, { time: this.animTime });
+    drawText(ctx, '🪕 Violeiro 1 [E]', 90, 490, { font: 'bold 10px monospace', align: 'center', color: '#fde047' });
+
+    drawVioleiro(ctx, 170, 460, 42, 48, { time: this.animTime });
+    drawText(ctx, '🪕 Violeiro 2 [E]', 170, 490, { font: 'bold 10px monospace', align: 'center', color: '#93c5fd' });
+
+    drawRasgaMortalha(ctx, this.owl.x, this.owl.y, 48, 36, { time: this.animTime });
+
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
@@ -658,27 +624,21 @@ export class Stage3RasgaMortalhaScene implements IScene {
     });
 
     if (this.carriedItem) {
-      drawText(ctx, `${this.carriedItem.icon} Carregando: ${this.carriedItem.name}`, this.player.x, this.player.y - 32, {
-        font: 'bold 10px monospace',
-        color: '#facc15',
-        align: 'center'
-      });
+      ctx.save();
+      ctx.font = '22px monospace';
+      ctx.fillText(this.carriedItem.icon, this.player.x + 22, this.player.y - 20);
+      drawText(ctx, `[${this.carriedItem.name}]`, this.player.x + 22, this.player.y - 34, { font: 'bold 9px monospace', color: '#fef08a', align: 'center' });
+      ctx.restore();
     }
 
-    // HUD Superior
-    drawText(ctx, '🦉 FASE 3: A VILA DA MEIA-NOITE & O ENIGMA DAS 5 CASAS', 480, 18, {
+    drawText(ctx, '🦉 FASE 3: A PRAÇA DAS 5 CASAS', 480, 16, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
     });
 
-    drawText(ctx, this.message, 480, 515, {
-      font: '11px monospace',
-      align: 'center',
-      color: '#fde047'
-    });
+    drawUnifiedToast(ctx, this.message, 960, 540);
 
-    // Modais e Diálogos
     this.dialogs.render(ctx, 960, 540);
     this.narrative.render(ctx, 960, 540);
   }

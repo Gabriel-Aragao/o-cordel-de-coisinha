@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText } from '../../renderer/shapes';
+import { renderEntity, drawText, drawUnifiedToast } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawCumadeFulozinha,
@@ -881,10 +881,10 @@ export class Stage2FulozinhaScene implements IScene {
     }
     ctx.restore();
 
-    drawText(ctx, this.message, 480, 505, {
-      font: '12px monospace',
-      align: 'center',
-      color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'
+    // Toast Unificado
+    drawUnifiedToast(ctx, this.message, 960, 540, {
+      isError: this.stateStatus === 'FAILED',
+      isSuccess: this.stateStatus === 'SUCCESS'
     });
 
     // Modais e Diálogos

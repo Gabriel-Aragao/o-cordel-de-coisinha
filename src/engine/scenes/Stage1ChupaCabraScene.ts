@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { drawText } from '../../renderer/shapes';
+import { drawText, drawUnifiedToast } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawBode,
@@ -910,10 +910,10 @@ export class Stage1ChupaCabraScene implements IScene {
     }
     ctx.restore();
 
-    drawText(ctx, this.message, 480, 510, {
-      font: '12px monospace',
-      align: 'center',
-      color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'
+    // Toast Unificado
+    drawUnifiedToast(ctx, this.message, 960, 540, {
+      isError: this.stateStatus === 'FAILED',
+      isSuccess: this.stateStatus === 'SUCCESS'
     });
 
     // Diálogos & Modais Narrativos por Cima

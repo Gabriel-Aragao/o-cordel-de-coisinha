@@ -76,19 +76,19 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ## 🌿 Fases 2 e 4: A Fazenda da Cumade Fulozinha & A Botija de Mané Monteiro
 
-### Sistema de 3 Vidas, Moitas de Espinhos e Frutas:
-* O sistema de **3 vidas (HP)**, **moitas de espinhos / cactos** (-1 HP + grito involuntário de dor) e **moitas de frutas regionais** (+1 HP) é **mantido e ativo nas Fases 2 e 4**.
+### Sistema de 3 Vidas, Danos e Quedas Cômicas:
+* O sistema de **3 vidas (HP)**, **moitas de espinhos / cactos** (-1 HP + grito de dor) e **moitas de frutas regionais** (+1 HP) é ativo nas Fases 2 e 4.
+* **Tropeço Trágico na Pedra da Botija (Lote 0):** Ao passar por cima da pedra, o herói **tropeça, cai no chão e perde 1 vida (-1 HP)**, disparando o diálogo cômico (*"Coisinha, tropeçou!"*, *"Coisinha vai arrancar um dedo!"*, *"Coisinha tá adivinhando butija!"*).
+* **Ataque da Cumade Fulozinha (Cadarços Amarrados):** Ao ser alcançado pela Cumade Fulozinha (sem fumo na F2 ou durante a perseguição na F4), o herói **perde 1 vida (-1 HP) e cai no chão** (*"A Cumade Fulozinha amarrou seus cadarços!"*), recebendo um breve período de invulnerabilidade e knockback para tentar fugir.
+* **Condição de Derrota por Vidas (Falha):** Ao perder todas as 3 vidas (HP = 0), a missão falha e o herói retorna imediatamente ao Estúdio de Xilogravura.
 
-### Topologia Rigorosa, Labirintos Densos & Corredor da Pedra:
+### Topologia Rigorosa, Labirintos Espaçosos & Corredor da Pedra:
+* **Passagens Espaçosas & Vãos Livres:** Todas as aberturas entre paredes, portões e corredores possuem largura generosa e espaçosa garantindo que o personagem transite com total fluidez sem ficar preso nas quinas.
 * **Spawn Desimpedido no Lote 0 (Fase 2):** O jogador inicia em área livre e limpa do Lote 0, sem sobreposição com muros ou colisores de labirinto.
 * Paredes de contorno sólidas ao redor de cada lote, com passagens abertas apenas nas conexões oficiais:
   * **Lote 0:** Conexão à direita com **Lote 2a**.
-    - **Pedra da Botija em Posição Idêntica (Fases 2 e 4):** A pedra fica posicionada **exatamente nas mesmas coordenadas** na saída do Lote 0 no meio do corredor estreito, fazendo o herói tropeçar na saída e na reentrada.
+    - **Pedra da Botija em Posição Idêntica (Fases 2 e 4):** A pedra fica posicionada **exatamente nas mesmas coordenadas** na saída do Lote 0 no meio do corredor estreito, fazendo o herói tropeçar e cair na saída e na reentrada.
     - **Sem Legenda Textual na Pedra:** A pedra não possui texto/legenda fixa.
-    - **Diálogos Cômicos de Tropeço:** Ao passar por cima e tropeçar na pedra, exibe uma das falas aleatórias:
-      * *"Coisinha, tropeçou!"*
-      * *"Coisinha vai arrancar um dedo!"*
-      * *"Coisinha tá adivinhando butija!"*
   * **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
   * **Lote 1a:** Conexão à direita com **Lote 1b**.
   * **Lote 3a:** Conexão à direita com **Lote 3b**.

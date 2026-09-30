@@ -31,6 +31,7 @@ interface Goat extends Entity {
   isRescued: boolean;
   isLeashed: boolean;
   hiddenInBushId?: string;
+  targetBushId?: string;
   wanderTimer: number;
   fleeTimer: number;
 }
@@ -98,6 +99,8 @@ export class Stage1ChupaCabraScene implements IScene {
     active: true
   };
 
+  private chupaFleeTimer: number = 0;
+
   private bushes: Bush[] = [];
   private goats: Goat[] = [];
   private hasRope: boolean = false;
@@ -132,6 +135,7 @@ export class Stage1ChupaCabraScene implements IScene {
     this.isAboioActive = false;
     this.isGritoActive = false;
     this.soundWaveRadius = 0;
+    this.chupaFleeTimer = 0;
     this.stateStatus = 'PLAYING';
     this.stepTimer = 0;
     this.rosnadoTimer = 0;
@@ -249,7 +253,7 @@ export class Stage1ChupaCabraScene implements IScene {
         'Procure a corda nas moitas, com sabedoria e vigor,',
         'Traga os bodes de volta antes do golpe do traidor!'
       ],
-      objective: 'Resgate os 4 bodes no curral central e espante o Chupa-Cabra!',
+      objective: 'Resgate os 4 bodes no curral central e espante o Chupa-Cabra com o grito!',
       itemReward: {
         id: 'carimbo',
         name: 'Carimbo Mágico',
@@ -331,21 +335,23 @@ export class Stage1ChupaCabraScene implements IScene {
       if (input.actionHeldTime > 0.35) {
         this.isGritoActive = true;
         this.isAboioActive = false;
-        this.soundWaveRadius = Math.min(350, this.soundWaveRadius + 520 * dt);
+        this.soundWaveRadius = Math.min(380, this.soundWaveRadius + 540 * dt);
         if (!this.lastActionWasGrito) {
           this.lastActionWasGrito = true;
           engine.sound.playGrito();
           engine.juice.shake.addTrauma(0.45);
           engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 75 });
+          this.triggerSoundWave(this.soundWaveRadius, true, engine);
         }
       } else {
         this.isAboioActive = true;
         this.isGritoActive = false;
-        this.soundWaveRadius = Math.min(150, this.soundWaveRadius + 320 * dt);
+        this.soundWaveRadius = Math.min(160, this.soundWaveRadius + 320 * dt);
         if (!this.actionSoundTriggered) {
           this.actionSoundTriggered = true;
           engine.sound.playAboio(1.2);
           engine.juice.particles.emit('note', this.player.x, this.player.y - 20, { count: 2, speed: 20 });
+          this.triggerSoundWave(this.soundWaveRadius, false, engine);
         }
       }
     } else {
@@ -373,7 +379,7 @@ export class Stage1ChupaCabraScene implements IScene {
           {
             speaker: 'Fazendeiro',
             avatarIcon: '👨🌾',
-            text: 'Vasculhe as moitas para achar a corda de laçar, coma frutas de umbu se ferir nos cactos e use o grito contra a besta!'
+            text: 'O aboio faz o bode andar de leve. O grito faz o bode correr para se esconder na moita e AFUGENTA o Chupa-Cabra por 3 segundos!'
           }
         ],
         undefined,
@@ -386,7 +392,7 @@ export class Stage1ChupaCabraScene implements IScene {
     for (const bush of this.bushes) {
       const distHeroBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
 
-      // Colisão física de perto com cactos causa dano involuntário
+      // Colisão física com cactos causa dano involuntário
       if (bush.type === 'cacto' && distHeroBush < bush.radius + 14 && this.hurtCooldown <= 0) {
         this.hurtCooldown = 1.2;
         this.heroHp = Math.max(1, this.heroHp - 1);
@@ -396,8 +402,8 @@ export class Stage1ChupaCabraScene implements IScene {
         engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 14, speed: 80 });
         this.message = '🌵 AI! ESPINHO DE MANDACARU! Você perdeu 1 HP e soltou um grito de dor!';
 
-        // Grito involuntário espanta bodes e Chupa-Cabra ao redor
-        this.triggerSoundWave(300, engine);
+        // Grito involuntário afugenta o Chupa-Cabra e espanta bodes para outras moitas
+        this.triggerSoundWave(320, true, engine);
       }
 
       if (distHeroBush < bush.radius + 35 && input.interactReleased) {
@@ -428,7 +434,7 @@ export class Stage1ChupaCabraScene implements IScene {
             engine.sound.playHurtCacto();
             engine.sound.playGrito();
             engine.juice.shake.addTrauma(0.5);
-            this.triggerSoundWave(300, engine);
+            this.triggerSoundWave(320, true, engine);
           } else {
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 40 });
           }
@@ -439,6 +445,7 @@ export class Stage1ChupaCabraScene implements IScene {
           const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
           if (goat && goat.hiddenInBushId) {
             goat.hiddenInBushId = undefined;
+            goat.targetBushId = undefined;
             goat.x = bush.x + 25;
             goat.y = bush.y + 25;
             bush.hidingGoatId = undefined;
@@ -451,22 +458,17 @@ export class Stage1ChupaCabraScene implements IScene {
       }
     }
 
-    // Aboio ou Grito faz bodes saírem de moitas próximas
-    if (this.isAboioActive || this.isGritoActive) {
-      this.triggerSoundWave(this.soundWaveRadius, engine);
-    }
-
-    // 5. IA do Chupa-Cabra & Ataque com Reação em Cadeia Sonora
+    // 5. IA do Chupa-Cabra (Comportamento de Fuga de 3s vs Caça)
     let isAttackingGoat = false;
     if (this.chupaCabra.active) {
-      const distHeroChupa = Math.hypot(this.player.x - this.chupaCabra.x, this.player.y - this.chupaCabra.y);
-
-      // Grito ou Aboio espantam o Chupa-Cabra
-      if ((this.isGritoActive || this.isAboioActive) && distHeroChupa < this.soundWaveRadius + 50) {
+      if (this.chupaFleeTimer > 0) {
+        // Estado de Pânico e Fuga por 3s provocado pelo Grito
+        this.chupaFleeTimer -= dt;
         const fleeAngle = Math.atan2(this.chupaCabra.y - this.player.y, this.chupaCabra.x - this.player.x);
-        this.chupaCabra.x += Math.cos(fleeAngle) * 340 * dt;
-        this.chupaCabra.y += Math.sin(fleeAngle) * 340 * dt;
+        this.chupaCabra.x += Math.cos(fleeAngle) * 290 * dt;
+        this.chupaCabra.y += Math.sin(fleeAngle) * 290 * dt;
       } else {
+        // Estado Normal: Caça os bodes indefesos visíveis
         let targetGoat: Goat | null = null;
         let minDist = 9999;
 
@@ -488,24 +490,36 @@ export class Stage1ChupaCabraScene implements IScene {
           if (minDist < 32) {
             isAttackingGoat = true;
             targetGoat.hp -= 25 * dt;
-            this.message = `🩸 O CHUPA-CABRA ESTÁ ATACANDO O ${targetGoat.label}! GRITE PARA ESPANTAR!`;
+            this.message = `🩸 O CHUPA-CABRA ESTÁ ATACANDO O ${targetGoat.label}! GRITE [ESPAÇO] PARA AFUGENTAR!`;
 
             this.rosnadoTimer += dt;
             if (this.rosnadoTimer >= 0.7) {
               this.rosnadoTimer = 0;
               engine.sound.playChupaCabraRosnado();
-              engine.sound.playBerroBode(true);
+              engine.sound.playBerroPavorBode();
               engine.juice.shake.addTrauma(0.35);
 
-              // 💥 Reação em cadeia: Berro de pavor espanta todos os bodes próximos!
+              // Berro de pavor faz bodes próximos fugirem para outras moitas
               for (const otherGoat of this.goats) {
-                if (otherGoat.id !== targetGoat.id && !otherGoat.isRescued) {
+                if (otherGoat.id !== targetGoat.id && !otherGoat.isRescued && !otherGoat.hiddenInBushId) {
                   const distBetweenGoats = Math.hypot(otherGoat.x - targetGoat.x, otherGoat.y - targetGoat.y);
-                  if (distBetweenGoats < 320) {
-                    otherGoat.fleeTimer = 1.8;
-                    const panicAngle = Math.atan2(otherGoat.y - targetGoat.y, otherGoat.x - targetGoat.x);
-                    otherGoat.vx = Math.cos(panicAngle) * 230;
-                    otherGoat.vy = Math.sin(panicAngle) * 230;
+                  if (distBetweenGoats < 340) {
+                    otherGoat.fleeTimer = 3.0;
+                    // Procura moita para se esconder
+                    let bestBush: Bush | null = null;
+                    let bestD = 9999;
+                    for (const b of this.bushes) {
+                      if (!b.hidingGoatId && b.type !== 'cacto') {
+                        const d = Math.hypot(b.x - otherGoat.x, b.y - otherGoat.y);
+                        if (d < bestD) {
+                          bestD = d;
+                          bestBush = b;
+                        }
+                      }
+                    }
+                    if (bestBush) {
+                      otherGoat.targetBushId = bestBush.id;
+                    }
                   }
                 }
               }
@@ -527,22 +541,23 @@ export class Stage1ChupaCabraScene implements IScene {
       this.chupaCabra.y = Math.max(40, Math.min(this.mapHeight - 40, this.chupaCabra.y));
     }
 
-    engine.sound.setBGMState({ tension: isAttackingGoat ? 0.9 : 0.2 });
+    engine.sound.setBGMState({ tension: isAttackingGoat ? 0.9 : this.chupaFleeTimer > 0 ? 0.1 : 0.3 });
 
-    // 6. Condução e Comportamento dos Bodes
+    // 6. Condução e Comportamento dos Bodes (Aboio vs Grito & Esconder-se em Moitas)
     let leashedIdx = 1;
     for (const g of this.goats) {
       if (g.isRescued || g.hiddenInBushId) continue;
 
       const distToHero = Math.hypot(this.player.x - g.x, this.player.y - g.y);
 
-      // Entrou no Curral
+      // Entrou no Curral Central -> Resgatado!
       if (
         Math.abs(g.x - this.curral.x) < this.curral.width / 2 - 15 &&
         Math.abs(g.y - this.curral.y) < this.curral.height / 2 - 15
       ) {
         g.isRescued = true;
         g.isLeashed = false;
+        g.targetBushId = undefined;
         engine.sound.playPickup();
         engine.juice.particles.emit('sparkle', g.x, g.y, { count: 8, speed: 45 });
         continue;
@@ -555,6 +570,7 @@ export class Stage1ChupaCabraScene implements IScene {
           engine.juice.particles.emit('dust', g.x, g.y, { count: 4, speed: 20 });
         }
         g.isLeashed = true;
+        g.targetBushId = undefined;
       }
 
       if (g.isLeashed) {
@@ -571,25 +587,42 @@ export class Stage1ChupaCabraScene implements IScene {
           g.y += Math.sin(angle) * 200 * dt;
         }
       } else {
+        // Não está laçado
         if (g.fleeTimer > 0) {
+          // Pânico pelo Grito: corre rápido em busca de uma moita para se esconder
           g.fleeTimer -= dt;
-          g.x += (g.vx || 0) * dt;
-          g.y += (g.vy || 0) * dt;
 
-          for (const bush of this.bushes) {
-            if (!bush.hidingGoatId && bush.type !== 'cacto' && Math.hypot(g.x - bush.x, g.y - bush.y) < bush.radius) {
-              g.hiddenInBushId = bush.id;
-              bush.hidingGoatId = g.id;
+          let targetBush: Bush | undefined;
+          if (g.targetBushId) {
+            targetBush = this.bushes.find((b) => b.id === g.targetBushId && !b.hidingGoatId && b.type !== 'cacto');
+          }
+
+          if (targetBush) {
+            const angle = Math.atan2(targetBush.y - g.y, targetBush.x - g.x);
+            g.x += Math.cos(angle) * 230 * dt;
+            g.y += Math.sin(angle) * 230 * dt;
+
+            // Se entrou na moita, esconde-se dentro dela!
+            if (Math.hypot(g.x - targetBush.x, g.y - targetBush.y) < targetBush.radius * 0.8) {
+              g.hiddenInBushId = targetBush.id;
+              targetBush.hidingGoatId = g.id;
+              g.targetBushId = undefined;
               g.fleeTimer = 0;
-              break;
+              engine.juice.particles.emit('leaf', targetBush.x, targetBush.y, { count: 6, speed: 30 });
             }
+          } else {
+            // Se não encontrou moita, corre para longe do herói
+            const panicAngle = Math.atan2(g.y - this.player.y, g.x - this.player.x);
+            g.x += Math.cos(panicAngle) * 210 * dt;
+            g.y += Math.sin(panicAngle) * 210 * dt;
           }
         } else {
+          // Movimento calmo / empurrão leve de Aboio
           g.wanderTimer -= dt;
           if (g.wanderTimer <= 0) {
             g.wanderTimer = 1.0 + Math.random() * 2.0;
-            g.vx = (Math.random() - 0.5) * 70;
-            g.vy = (Math.random() - 0.5) * 70;
+            g.vx = (Math.random() - 0.5) * 60;
+            g.vy = (Math.random() - 0.5) * 60;
           }
           g.x += (g.vx || 0) * dt;
           g.y += (g.vy || 0) * dt;
@@ -600,7 +633,7 @@ export class Stage1ChupaCabraScene implements IScene {
       g.y = Math.max(40, Math.min(this.mapHeight - 40, g.y));
     }
 
-    // 7. Condição de Vitória (4 bodes resgatados)
+    // 7. Condição de Vitória (4 bodes resgatados no curral)
     const rescuedCount = this.goats.filter((g) => g.isRescued).length;
     if (rescuedCount === 4 && this.stateStatus === 'PLAYING') {
       this.stateStatus = 'SUCCESS';
@@ -630,18 +663,72 @@ export class Stage1ChupaCabraScene implements IScene {
     }
   }
 
-  private triggerSoundWave(radius: number, engine: IGameEngine): void {
-    for (const bush of this.bushes) {
-      if (Math.hypot(this.player.x - bush.x, this.player.y - bush.y) < radius + bush.radius) {
-        if (bush.hidingGoatId) {
-          const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
-          if (goat && goat.hiddenInBushId) {
+  private triggerSoundWave(radius: number, isGrito: boolean, engine: IGameEngine): void {
+    if (isGrito) {
+      // 1. Grito AFUGENTA o Chupa-Cabra por 3 segundos!
+      const distToChupa = Math.hypot(this.player.x - this.chupaCabra.x, this.player.y - this.chupaCabra.y);
+      if (distToChupa < radius + 90) {
+        this.chupaFleeTimer = 3.0;
+        this.message = '🦇 O CHUPA-CABRA FOI AFUGENTADO PELO GRITO! (Fuga de 3s)';
+        engine.sound.playChupaCabraRosnado();
+        engine.juice.particles.emit('dust', this.chupaCabra.x, this.chupaCabra.y, { count: 10, speed: 60 });
+      }
+
+      // 2. Grito faz os Bodes correrem em pânico e procurarem outra moita para se esconder!
+      for (const goat of this.goats) {
+        if (goat.isRescued || goat.isLeashed) continue;
+
+        const distToGoat = Math.hypot(this.player.x - goat.x, this.player.y - goat.y);
+        if (distToGoat < radius + 60) {
+          // Se estava escondido em uma moita, sai assustado
+          if (goat.hiddenInBushId) {
+            const oldBush = this.bushes.find((b) => b.id === goat.hiddenInBushId);
+            if (oldBush) oldBush.hidingGoatId = undefined;
             goat.hiddenInBushId = undefined;
-            goat.x = bush.x + (Math.random() - 0.5) * 40;
-            goat.y = bush.y + (Math.random() - 0.5) * 40;
-            bush.hidingGoatId = undefined;
-            engine.sound.playBerroBode(this.isGritoActive);
           }
+
+          goat.fleeTimer = 3.5;
+          engine.sound.playBerroPavorBode();
+
+          // Encontra ativamente a moita mais próxima livre (não cacto) para se esconder
+          let bestBush: Bush | null = null;
+          let bestD = 9999;
+          for (const b of this.bushes) {
+            if (!b.hidingGoatId && b.type !== 'cacto') {
+              const d = Math.hypot(b.x - goat.x, b.y - goat.y);
+              if (d > 30 && d < bestD) {
+                bestD = d;
+                bestBush = b;
+              }
+            }
+          }
+          if (bestBush) {
+            goat.targetBushId = bestBush.id;
+          }
+        }
+      }
+    } else {
+      // Aboio: NÃO afeta o Chupa-Cabra. Faz bodes andarem um pouco (deslocamento leve).
+      for (const goat of this.goats) {
+        if (goat.isRescued || goat.isLeashed) continue;
+
+        const distToGoat = Math.hypot(this.player.x - goat.x, this.player.y - goat.y);
+        if (distToGoat < radius + 45) {
+          // Se estava na moita, sai calmamente
+          if (goat.hiddenInBushId) {
+            const oldBush = this.bushes.find((b) => b.id === goat.hiddenInBushId);
+            if (oldBush) oldBush.hidingGoatId = undefined;
+            goat.hiddenInBushId = undefined;
+            goat.x = (oldBush ? oldBush.x : goat.x) + 20;
+            goat.y = (oldBush ? oldBush.y : goat.y) + 20;
+          }
+
+          // Deslocamento leve na direção oposta ao herói
+          const pushAngle = Math.atan2(goat.y - this.player.y, goat.x - this.player.x);
+          goat.vx = Math.cos(pushAngle) * 85;
+          goat.vy = Math.sin(pushAngle) * 85;
+          goat.wanderTimer = 1.2;
+          engine.sound.playBerroBode(false);
         }
       }
     }
@@ -762,6 +849,14 @@ export class Stage1ChupaCabraScene implements IScene {
       drawChupaCabra(ctx, this.chupaCabra.x, this.chupaCabra.y, this.chupaCabra.width, this.chupaCabra.height, {
         time: this.animTime
       });
+
+      if (this.chupaFleeTimer > 0) {
+        drawText(ctx, `💨 FUGINDO! (${this.chupaFleeTimer.toFixed(1)}s)`, this.chupaCabra.x, this.chupaCabra.y - 28, {
+          font: 'bold 10px monospace',
+          color: '#38bdf8',
+          align: 'center'
+        });
+      }
     }
 
     // Onda Sonora de Grito / Aboio

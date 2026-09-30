@@ -12,7 +12,7 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ---
 
-## 🚪 Regra Geral de Transição (Sem Portais de Retorno)
+## 🚪 Regra Geral de Transição (Sem Portais)
 * **Nas fases NÃO existem portais manuais de volta ao estúdio.**
 * O jogador só retorna ao Estúdio de Xilogravura por dois caminhos:
   1. **Vitória / Sucesso:** Ao cumprir o objetivo da fase, o jogador recebe o item místico correspondente e é transportado de volta comemorando o sucesso.
@@ -54,25 +54,25 @@ Para completar o cordel do herói e destravar a prensa de saída do estúdio, Co
 
 ### Estrutura do Mapa (6 Lotes em Telas Individuais — Sem Lote 3c):
 * Cada lote é uma tela individual com seu próprio labirinto interno.
-* **Portões Internos:** Portões dentro de cada lote abrem e fecham periodicamente com os assobios.
-* **Porteiras de Fronteira:** As porteiras de passagem entre lotes adjacentes estão **sempre abertas**.
+* **Portões Internos Dinâmicos:** Portões dentro do labirinto abrem e fecham com os assobios. Quando abertos, **permitem a passagem**; quando fechados, **bloqueiam rigidamente a passagem**.
+* **Porteiras de Fronteira:** As porteiras de transição entre lotes adjacentes estão **sempre abertas**.
 * **Moitas:** Todos os lotes possuem moitas espalhadas em seus labirintos.
 * **Topologia dos 6 Lotes:**
   ```
   [Lote 1a]                [Lote 1b] (Fumo na Moita)
       |                        |
-  [Lote 2a] (Pedra) ------ [Lote 2b]
+  [Lote 2a] -------------- [Lote 2b]
       |                        |
-  [Lote 0] (Início)        [Lote 3b] (Cumade Fulozinha)
+  [Lote 0] (Início/Pedra)  [Lote 3b] (Cumade Fulozinha)
       |
   [Lote 3a]
   ```
-* **Lote 0 (Início):** A tela exibe apenas o Lote 0 com seu labirinto e a porteira à direita. A **Pedra da Botija** fica posicionada na saída da porteira para o Lote 2a.
+* **Lote 0 (Início):** A tela exibe apenas o Lote 0. A **Pedra da Botija** fica posicionada **exclusivamente na saída do Lote 0** para o Lote 2a.
 * **Lote 1b:** O **Fumo de Rolo** da Cumade Fulozinha está escondido dentro de uma das moitas.
-* **Lote 3b:** Local de morada da **Cumade Fulozinha**. (Não existe Lote 3c).
+* **Lote 3b:** Morada da **Cumade Fulozinha** (não existe Lote 3c).
 
 ### Mecânica de Caça & Assobios:
-* Ao entrar no Lote 3b, a Cumade Fulozinha começa a caçar o jogador pelo labirinto do lote, aumentando progressivamente a intensidade e frequência dos assobios (que invertem os controles do jogador: cima ⇄ baixo ou esquerda ⇄ direita).
+* Ao entrar no Lote 3b, a Cumade Fulozinha começa a caçar o jogador pelo labirinto do lote, aumentando progressivamente a intensidade e frequência dos assobios (inversão temporária de controles: cima ⇄ baixo ou esquerda ⇄ direita).
 * **Condição de Colisão com a Cumade:**
   - **Com o Fumo:** Ela aceita a oferenda, acalma a mata e entrega a **📄 Página / Folha Rasgada** ➔ Retorno ao estúdio com **Sucesso**!
   - **Sem o Fumo:** Ela desfere uma chicotada de cipó e expulsa o invasor ➔ Retorno ao estúdio com **Falha**!
@@ -81,27 +81,35 @@ Para completar o cordel do herói e destravar a prensa de saída do estúdio, Co
 
 ## 🦉 Fase 3: A Pena da Rasga-Mortalha
 
-### O Enigma de Einstein no Sertão (Arrastar Itens):
-* O vilarejo é composto por **5 casas enfileiradas** e vários itens soltos pelo cenário representando as características (Cores, Moradores, Bebidas, Animais e Fumantes).
-* **Mecânica de Montagem:** O jogador deve ler as pistas em cordel e **arrastar cada item solto para a sua casa correspondente** na interface, preenchendo toda a matriz lógica do vilarejo antes de poder investigar as casas.
+### O Enigma de Einstein no Sertão (Navegação Estrofe a Estrofe por Clique):
+* O vilarejo é composto por **5 casas enfileiradas** e itens soltos no cenário representando as características (Cores, Moradores, Bebidas, Animais e Fumantes).
+* **Paginação de Pistas em Cordel:** As **9 estrofes poéticas** são exibidas em formato de folheto de cordel, aparecendo **uma a uma na tela e mudando de acordo com o clique do jogador** (botão de Avançar / Voltar Estrofe).
+* **Mecânica de Montagem (Drag-and-Drop):** O jogador deve ler as estrofes e arrastar cada item solto para a sua casa correspondente na interface antes de poder investigar as casas.
 
 ### Condições de Desfecho:
-* **Preenchimento com Algum Erro:** Ao tentar confirmar com qualquer inconsistência, o agouro da ave se manifesta e o jogador retorna ao estúdio com **Falha**.
-* **Preenchimento 100% Correto:** A casa exata da ave é revelada (Casa 4 - Verde / Ferrador do Tatu), o jogador interage com a casa, recolhe a **🪶 Pena Encantada** e retorna ao estúdio com **Sucesso**!
+* **Preenchimento com Algum Erro:** Ao confirmar com qualquer inconsistência ➔ O agouro se manifesta e o jogador retorna ao estúdio com **Falha**.
+* **Preenchimento 100% Correto:** A casa exata da ave é revelada (Casa 4 - Verde / Ferrador do Tatu), o jogador recolhe a **🪶 Pena Encantada** e retorna ao estúdio com **Sucesso**!
 
 ---
 
 ## 🏺 Fase 4: A Botija de Mané Monteiro
 
-### Contexto & Regras de Stealth Noturno:
-* A fase utiliza a mesma estrutura de 6 lotes da Fase 2, porém em noite profunda.
-* **A Caça Global da Cumade:** Agora, a Cumade Fulozinha **consegue atravessar livremente entre todos os lotes**, rondando a fazenda inteira à caça do invasor.
-* **Sem Fumo:** Não há fumo disponível para acalmar a criatura nesta fase. Se a Cumade Fulozinha alcançar o personagem ➔ Retorno ao estúdio com **Falha**.
-* **Escuridão & Candeeiro:** Campo de visão limitado ao raio do Candeeiro resgatado na Fase 1.
+### Contexto & O Novo Lote da Igreja (Zona Segura):
+* A fase utiliza a estrutura da fazenda, com uma **NOVA ÁREA**: o **Lote da Igreja**, situado à direita do **Lote 1b**.
+* **Zona Sagrada / Santuário da Igreja:** A Cumade Fulozinha **NÃO CONSEGUE ENTRAR** no Lote da Igreja.
+* **Início da Missão:** O jogador **inicia dentro do Lote da Igreja** e só tem a porteira à sua esquerda para acessar o Lote 1b.
 
-### Condição de Saída & Vitória:
-* Entrar pela porteira no **Lote 1b**, navegar no escuro até o **Lote 0**, desenterrar a botija sob a pedra (velocidade de transporte reduzida pelo peso) e escapar de volta até a Paróquia.
-* Ao entregar a botija ao beato ➔ O jogador recebe o pote de **🖋️ Tinta Encantada** e retorna ao estúdio com **Sucesso**!
+### Caça Global da Cumade & Escuridão:
+* Nos demais lotes da fazenda, a Cumade Fulozinha **atravessa livremente entre todos os lotes** em perseguição global contínua.
+* **Sem Fumo:** Se a Cumade alcançar o personagem nos lotes da fazenda ➔ Retorno ao estúdio com **Falha**.
+* **Escuridão & Candeeiro:** Campo de visão restrito ao círculo de luz do Candeeiro.
+
+### Rota da Missão & Condição de Vitória:
+1. Iniciar no **Lote da Igreja** e cruzar a porteira para o **Lote 1b**.
+2. Navegar furtivamente pela fazenda até o **Lote 0**.
+3. Desenterrar a botija sob a pedra (velocidade de transporte reduzida em 25% pelo peso).
+4. Retornar por todo o trajeto até o **Lote da Igreja** e entregar a botija ao beato.
+5. O beato concede o frasco de **🖋️ Tinta Encantada** ➔ Retorno ao estúdio com **Sucesso**!
 
 ---
 

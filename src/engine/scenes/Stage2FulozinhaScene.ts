@@ -4,6 +4,8 @@ import {
   drawCoisinha,
   drawCumadeFulozinha,
   drawMoita,
+  drawMoitaFrutaRegional,
+  drawMoitaCactoEspinhos,
   drawChaoTerraBatida,
   drawMolduraCordel
 } from '../../renderer/xilogravura';
@@ -27,16 +29,22 @@ interface InternalGate {
   isOpen: boolean;
 }
 
+interface BushEntity {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  type: 'normal' | 'cacto' | 'fruta' | 'fumo';
+  isSearched: boolean;
+}
+
 interface LotData {
   id: LotId;
   name: string;
   color: string;
   walls: Wall[];
   gates: InternalGate[];
-  hasBush?: boolean;
-  bushX?: number;
-  bushY?: number;
-  bushHasFumo?: boolean;
+  bushes: BushEntity[];
 }
 
 export class Stage2FulozinhaScene implements IScene {
@@ -44,6 +52,11 @@ export class Stage2FulozinhaScene implements IScene {
   public name = 'Fase 2: A Fazenda da Cumade Fulozinha';
 
   private currentLot: LotId = '0';
+
+  // Sistema de 3 Vidas
+  private heroHp: number = 3;
+  private maxHeroHp: number = 3;
+  private hurtCooldown: number = 0;
 
   private player: Entity = {
     id: 'hero',
@@ -97,76 +110,91 @@ export class Stage2FulozinhaScene implements IScene {
   private dialogs: DialogSystem = new DialogSystem();
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
-  // Definição dos 6 Lotes com Paredes Perimétricas Sólidas e Aberturas Oficiais
+  // Definição dos 6 Lotes com Paredes Perimétricas Sólidas, Barreiras Densas, Portões Dinâmicos e Moitas
   private lots: Record<LotId, LotData> = {
     '0': {
       id: '0',
       name: 'LOTE 0 — ENTRADA DA FAZENDA',
       color: '#131b2e',
       walls: [
-        // Paredes Perimétricas: Topo, Fundo e Esquerda Sólidos. Direita aberta no meio (210 a 330)
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Paredes Internas
-        { x: 300, y: 180, w: 24, h: 180 },
-        { x: 600, y: 350, w: 24, h: 180 }
+        // Labirinto Interno
+        { x: 260, y: 180, w: 24, h: 220 },
+        { x: 480, y: 350, w: 24, h: 200 },
+        { x: 700, y: 190, w: 24, h: 220 },
+        { x: 480, y: 150, w: 220, h: 24 }
       ],
-      gates: [{ x: 300, y: 320, w: 24, h: 80, isOpen: true }],
-      hasBush: true,
-      bushX: 200,
-      bushY: 200
+      gates: [
+        { x: 260, y: 340, w: 24, h: 80, isOpen: true },
+        { x: 700, y: 360, w: 24, h: 80, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b_0_1', x: 160, y: 140, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_0_2', x: 380, y: 440, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_0_3', x: 600, y: 120, radius: 36, type: 'normal', isSearched: false }
+      ]
     },
     '1a': {
       id: '1a',
       name: 'LOTE 1a — POMAR NORTE',
       color: '#0f2922',
       walls: [
-        // Topo e Esquerda Sólidos. Baixo aberto para 2a, Direita aberta para 1b
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 480, y: 200, w: 320, h: 24 }
+        // Labirinto Interno
+        { x: 320, y: 220, w: 24, h: 240 },
+        { x: 550, y: 320, w: 24, h: 240 },
+        { x: 740, y: 200, w: 24, h: 220 }
       ],
-      gates: [{ x: 480, y: 200, w: 84, h: 24, isOpen: false }],
-      hasBush: true,
-      bushX: 700,
-      bushY: 380
+      gates: [
+        { x: 320, y: 380, w: 24, h: 80, isOpen: true },
+        { x: 550, y: 160, w: 24, h: 80, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b_1a_1', x: 180, y: 380, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_1a_2', x: 440, y: 140, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1a_3', x: 820, y: 350, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '1b': {
       id: '1b',
       name: 'LOTE 1b — PORTEIRA DO TOCO (FUMO NA MOITA)',
       color: '#1e1b2e',
       walls: [
-        // Topo e Direita Sólidos. Esquerda aberta para 1a, Baixo aberto para 2b
         { x: 480, y: 12, w: 960, h: 24 },
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
-        // Internas
-        { x: 350, y: 270, w: 24, h: 260 },
-        { x: 650, y: 200, w: 24, h: 200 }
+        // Labirinto Interno
+        { x: 300, y: 270, w: 24, h: 260 },
+        { x: 540, y: 180, w: 24, h: 200 },
+        { x: 740, y: 360, w: 24, h: 200 }
       ],
-      gates: [{ x: 350, y: 200, w: 24, h: 84, isOpen: true }],
-      hasBush: true,
-      bushX: 720,
-      bushY: 220,
-      bushHasFumo: true
+      gates: [
+        { x: 300, y: 180, w: 24, h: 84, isOpen: true },
+        { x: 540, y: 340, w: 24, h: 84, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b_1b_fumo', x: 780, y: 200, radius: 36, type: 'fumo', isSearched: false },
+        { id: 'b_1b_1', x: 180, y: 160, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1b_2', x: 420, y: 420, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '2a': {
       id: '2a',
       name: 'LOTE 2a — PASTAGEM CENTRAL OESTE',
       color: '#172554',
       walls: [
-        // 4 Aberturas Oficiais: Topo (1a), Baixo (3a), Esquerda (0), Direita (2b)
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 210, y: 528, w: 420, h: 24 },
@@ -175,21 +203,26 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 200, y: 270, w: 24, h: 240 },
-        { x: 500, y: 180, w: 260, h: 24 }
+        // Labirinto Interno
+        { x: 260, y: 270, w: 24, h: 240 },
+        { x: 500, y: 180, w: 260, h: 24 },
+        { x: 700, y: 340, w: 24, h: 200 }
       ],
-      gates: [{ x: 500, y: 180, w: 80, h: 24, isOpen: true }],
-      hasBush: true,
-      bushX: 300,
-      bushY: 420
+      gates: [
+        { x: 500, y: 180, w: 80, h: 24, isOpen: true },
+        { x: 700, y: 200, w: 24, h: 80, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b_2a_1', x: 160, y: 420, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_2a_2', x: 380, y: 140, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2a_3', x: 800, y: 220, radius: 36, type: 'normal', isSearched: false }
+      ]
     },
     '2b': {
       id: '2b',
       name: 'LOTE 2b — PASTAGEM CENTRAL LESTE',
       color: '#172554',
       walls: [
-        // Direita Sólida. Topo (1b), Baixo (3b), Esquerda (2a)
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
@@ -197,58 +230,71 @@ export class Stage2FulozinhaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 400, y: 350, w: 24, h: 200 },
-        { x: 680, y: 220, w: 24, h: 220 }
+        // Labirinto Interno
+        { x: 340, y: 340, w: 24, h: 220 },
+        { x: 620, y: 200, w: 24, h: 240 },
+        { x: 480, y: 220, w: 180, h: 24 }
       ],
-      gates: [{ x: 680, y: 380, w: 24, h: 80, isOpen: false }],
-      hasBush: true,
-      bushX: 250,
-      bushY: 180
+      gates: [
+        { x: 620, y: 360, w: 24, h: 80, isOpen: false },
+        { x: 340, y: 180, w: 24, h: 80, isOpen: true }
+      ],
+      bushes: [
+        { id: 'b_2b_1', x: 200, y: 180, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2b_2', x: 500, y: 420, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_2b_3', x: 780, y: 380, radius: 36, type: 'normal', isSearched: false }
+      ]
     },
     '3a': {
       id: '3a',
       name: 'LOTE 3a — BOSQUE SUL PROFUNDO',
       color: '#2a1b12',
       walls: [
-        // Fundo e Esquerda Sólidos. Topo (2a), Direita (3b)
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 480, y: 300, w: 340, h: 24 }
+        // Labirinto Interno
+        { x: 300, y: 300, w: 24, h: 260 },
+        { x: 620, y: 220, w: 24, h: 240 },
+        { x: 460, y: 320, w: 200, h: 24 }
       ],
-      gates: [{ x: 480, y: 300, w: 84, h: 24, isOpen: true }],
-      hasBush: true,
-      bushX: 650,
-      bushY: 380
+      gates: [
+        { x: 460, y: 320, w: 84, h: 24, isOpen: true },
+        { x: 620, y: 380, w: 24, h: 80, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b_3a_1', x: 160, y: 380, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_3a_2', x: 460, y: 160, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3a_3', x: 780, y: 320, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '3b': {
       id: '3b',
       name: 'LOTE 3b — MORADA DA CUMADE FULOZINHA',
       color: '#3b0764',
       walls: [
-        // Fundo e Direita Sólidos. Topo (2b), Esquerda (3a)
         { x: 480, y: 528, w: 960, h: 24 },
         { x: 948, y: 270, w: 24, h: 540 },
         { x: 210, y: 12, w: 420, h: 24 },
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Internas
-        { x: 300, y: 270, w: 24, h: 280 },
-        { x: 600, y: 270, w: 24, h: 280 }
+        // Labirinto Interno
+        { x: 280, y: 270, w: 24, h: 280 },
+        { x: 620, y: 270, w: 24, h: 280 }
       ],
       gates: [
-        { x: 300, y: 200, w: 24, h: 84, isOpen: true },
-        { x: 600, y: 340, w: 24, h: 84, isOpen: false }
+        { x: 280, y: 180, w: 24, h: 84, isOpen: true },
+        { x: 620, y: 360, w: 24, h: 84, isOpen: false }
       ],
-      hasBush: true,
-      bushX: 480,
-      bushY: 270
+      bushes: [
+        { id: 'b_3b_1', x: 160, y: 200, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3b_2', x: 480, y: 140, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_3b_3', x: 780, y: 380, radius: 36, type: 'cacto', isSearched: false }
+      ]
     }
   };
 
@@ -256,6 +302,8 @@ export class Stage2FulozinhaScene implements IScene {
     this.currentLot = '0';
     this.player.x = 480;
     this.player.y = 380;
+    this.heroHp = 3;
+    this.hurtCooldown = 0;
     this.fulozinha.x = 750;
     this.fulozinha.y = 270;
     this.hasFumo = false;
@@ -289,6 +337,7 @@ export class Stage2FulozinhaScene implements IScene {
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
+    if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
 
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
       this.narrative.update(dt, input, engine);
@@ -520,15 +569,65 @@ export class Stage2FulozinhaScene implements IScene {
     this.player.x = Math.max(20, Math.min(940, this.player.x));
     this.player.y = Math.max(20, Math.min(520, this.player.y));
 
-    // 4. Vasculhar Moita do Lote 1b com [E / Enter no release]
-    if (this.currentLot === '1b' && lot.hasBush && lot.bushHasFumo && !this.hasFumo) {
-      const distToBush = Math.hypot(this.player.x - (lot.bushX || 0), this.player.y - (lot.bushY || 0));
-      if (distToBush < 60 && input.interactReleased) {
-        this.hasFumo = true;
-        this.message = '🍂 FUMO DE ROLO ENCONTRADO NA MOITA! Leve a oferenda à Cumade no Lote 3b!';
-        engine.sound.playPickup();
-        engine.sound.playItemDescobrir();
-        engine.juice.particles.emit('leaf', lot.bushX || 0, lot.bushY || 0, { count: 12, speed: 45 });
+    // 4. Moitas, Cactos (-1 HP) e Frutas (+1 HP) do Lote
+    for (const bush of lot.bushes) {
+      const distToBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
+
+      // Colisão de proximidade com cactos causa dano involuntário
+      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0) {
+        this.hurtCooldown = 1.2;
+        this.heroHp = Math.max(0, this.heroHp - 1);
+        engine.sound.playHurtCacto();
+        engine.sound.playGrito();
+        engine.juice.shake.addTrauma(0.45);
+        engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 70 });
+        this.message = '🌵 AI! ESPINHO DE CACTO! Você perdeu 1 HP e soltou um grito!';
+
+        if (this.heroHp <= 0) {
+          this.stateStatus = 'FAILED';
+          this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+          engine.sound.playDefeatJingle();
+          setTimeout(() => engine.switchScene('STUDIO'), 2500);
+          return;
+        }
+      }
+
+      // Interação [E / Enter no release] com a moita
+      if (distToBush < bush.radius + 30 && input.interactReleased) {
+        if (!bush.isSearched) {
+          bush.isSearched = true;
+
+          if (bush.type === 'fumo' && !this.hasFumo) {
+            this.hasFumo = true;
+            this.message = '🍂 FUMO DE ROLO ENCONTRADO NA MOITA! Leve a oferenda à Cumade no Lote 3b!';
+            engine.sound.playPickup();
+            engine.sound.playItemDescobrir();
+            engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 12, speed: 45 });
+          } else if (bush.type === 'fruta') {
+            if (this.heroHp < this.maxHeroHp) {
+              this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
+              this.message = '🍎 FRUTA REGIONAL! Você recuperou +1 HP!';
+            } else {
+              this.message = '🍎 Fruta deliciosa da caatinga!';
+            }
+            engine.sound.playFruitEat();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
+          } else if (bush.type === 'cacto') {
+            this.heroHp = Math.max(0, this.heroHp - 1);
+            engine.sound.playHurtCacto();
+            engine.sound.playGrito();
+            engine.juice.shake.addTrauma(0.45);
+            if (this.heroHp <= 0) {
+              this.stateStatus = 'FAILED';
+              this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+              engine.sound.playDefeatJingle();
+              setTimeout(() => engine.switchScene('STUDIO'), 2500);
+              return;
+            }
+          } else {
+            engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 35 });
+          }
+        }
       }
     }
 
@@ -620,18 +719,24 @@ export class Stage2FulozinhaScene implements IScene {
       });
     }
 
-    // Moita no Lote
-    if (lot.hasBush && lot.bushX && lot.bushY) {
-      drawMoita(ctx, lot.bushX, lot.bushY, 34, {
-        hasItem: lot.bushHasFumo && !this.hasFumo,
-        searched: this.hasFumo
-      });
-
-      drawText(ctx, lot.bushHasFumo && !this.hasFumo ? '🌿 [FUMO]' : '🌿', lot.bushX, lot.bushY - 12, {
-        font: 'bold 10px monospace',
-        color: '#fef08a',
-        align: 'center'
-      });
+    // Moitas do Lote (Homogêneas até serem vasculhadas)
+    for (const bush of lot.bushes) {
+      if (bush.isSearched) {
+        if (bush.type === 'cacto') {
+          drawMoitaCactoEspinhos(ctx, bush.x, bush.y, bush.radius);
+        } else if (bush.type === 'fruta') {
+          drawMoitaFrutaRegional(ctx, bush.x, bush.y, bush.radius, { searched: true });
+        } else if (bush.type === 'fumo') {
+          drawMoita(ctx, bush.x, bush.y, bush.radius, { hasItem: !this.hasFumo, searched: true });
+          if (!this.hasFumo) {
+            drawText(ctx, '🍂 FUMO', bush.x, bush.y - 14, { font: 'bold 9px monospace', color: '#facc15', align: 'center' });
+          }
+        } else {
+          drawMoita(ctx, bush.x, bush.y, bush.radius, { hasItem: false, searched: true });
+        }
+      } else {
+        drawMoita(ctx, bush.x, bush.y, bush.radius, { hasItem: false, searched: false });
+      }
     }
 
     // Pedra da Botija (EXCLUSIVAMENTE no Lote 0)
@@ -673,12 +778,26 @@ export class Stage2FulozinhaScene implements IScene {
       time: this.animTime
     });
 
-    // Topologia Minimapa / HUD Superior
+    // HUD Superior
     drawText(ctx, `🌿 FASE 2: ${lot.name}`, 480, 20, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
     });
+
+    // Indicador de 3 Vidas no HUD Superior Esquerdo
+    ctx.save();
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(30, 10, 105, 30);
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(30, 10, 105, 30);
+
+    for (let h = 0; h < this.maxHeroHp; h++) {
+      ctx.font = '16px monospace';
+      ctx.fillText(h < this.heroHp ? '❤️' : '🖤', 42 + h * 30, 31);
+    }
+    ctx.restore();
 
     drawText(ctx, this.message, 480, 505, {
       font: '12px monospace',

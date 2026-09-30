@@ -18,6 +18,11 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ---
 
+## 🚪 Regra Geral de Transição (Sem Portais)
+* **Sem portais manuais de volta nas fases:** O jogador só retorna ao Estúdio de Xilogravura por **Sucesso** (cumprimento da missão e ganho do item) ou por **Falha** (morte de um bode, ser pego sem fumo pela criatura ou erro no enigma).
+
+---
+
 ## 🎨 Os 4 Instrumentos da Xilogravura Mestre
 
 ```
@@ -32,66 +37,55 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🗺️ As 4 Fases & Mecânicas de Gameplay
 
-### 🐐 1. O Ataque do Chupa-Cabra (Ação, Pastoreio & Resgate)
-* **Objetivo:** Ajudar o fazendeiro a resgatar **4 bodes perdidos** na caatinga antes que o Chupa-Cabra os devore.
+### 🐐 1. O Ataque do Chupa-Cabra (Pastoreio, Moitas & Defesa)
+* **Objetivo:** Salvar **4 bodes** e trancá-los no curral central antes que o Chupa-Cabra drene sua vida.
 * **Mecânicas Principais:**
-  - **Aboiar (Grito):** Segurar o botão de ação solta um grito potente que afasta o Chupa-Cabra, mas assusta os bodes soltos.
-  - **Itens:** Corda (para laçar e conduzir bodes) e Candeeiro (ilumina uma área ao redor do jogador).
-* **Recompensa:** 🪓 **Carimbo Mágico**.
+  - **Mapa Amplo & Câmera:** Cenário expandido com câmera que acompanha o jogador.
+  - **Moitas & Itens:** Os bodes se escondem em moitas. Interagir com moitas permite encontrar a **Corda** e o **Candeeiro**.
+  - **Aboiar vs. Gritar:** Aboiar faz o bode sair e afasta um pouco; Gritar espanta o bode para procurar outra moita e afasta o Chupa-Cabra.
+  - **Vida dos Bodes:** Cada bode possui barra de HP individual. Se 1 bode morrer ➔ **Falha** (volta ao estúdio).
+* **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.
 
-### 🌿 2. A Fazenda da Cumade Fulozinha (Labirinto Dinâmico & Inversão)
-* **Objetivo:** Navegar por um labirinto dinâmico de 7 lotes interconectados para encontrar o fumo de rolo no Lote 3a e entregá-lo como oferenda à Cumade Fulozinha no Lote 3c.
+### 🌿 2. A Fazenda da Cumade Fulozinha (6 Lotes em Telas Individuais & Inversão)
+* **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**. (Não existe Lote 3c).
 * **Mecânicas Principais:**
-  - **Assobios Encantados:** Abrem/fecham passagens de paredes e invertem temporariamente os eixos de controle (cima ⇄ baixo / esquerda ⇄ direita).
-  - **Pista Oculta:** O jogador descobre uma pedra solta no chão (local secreto da botija).
-* **Recompensa:** 📄 **Página / Folha Rasgada**.
+  - **Telas Individuais de Lotes:** O mapa é composto por 6 lotes (`Lote 0, 1a, 1b, 2a, 2b, 3a, 3b`). Ao iniciar no Lote 0, a tela exibe apenas o Lote 0.
+  - **Portões Internos & Porteiras:** Portões internos abrem/fecham com assobios, mas porteiras entre lotes estão sempre abertas.
+  - **Pedra da Botija:** Localizada na saída da porteira do Lote 0 para o Lote 2a.
+  - **Caça & Assobios:** No Lote 3b, a Cumade caça o jogador e intensifica os assobios (inversão de controles).
+  - **Colisão:** Com fumo ➔ **Sucesso** (ganha a Página); Sem fumo ➔ **Falha** (expulso ao estúdio).
+* **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
-### 🦉 3. A Pena da Rasga-Mortalha (Dedução Lógica / Enigma de Einstein)
-* **Objetivo:** Descobrir em qual das 5 casas de um vilarejo sertanejo caiu a pena mística da ave do agouro.
+### 🦉 3. A Pena da Rasga-Mortalha (Dedução Lógica com Arrastar de Itens)
+* **Objetivo:** Preencher toda a matriz do vilarejo arrastando os itens soltos para as 5 casas corretas e recolher a pena.
 * **Mecânicas Principais:**
-  - **Enigma das 5 Casas:** Pistas em sextilhas de cordel relacionando Cor da Casa, Ofício do Morador, Bebida Típica, Animal de Estimação e Tipo de Fumo.
-* **Recompensa:** 🪶 **Pena Encantada**.
+  - **Montagem Completa:** O jogador deve arrastar todos os itens para as casas com base nas pistas em cordel antes de investigar.
+  - **Validação:** Qualquer erro ➔ **Falha** (volta ao estúdio); 100% correto (Casa 4 Verde / Ferrador do Tatu) ➔ **Sucesso** (conquista a pena).
+* **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
-### 🏺 4. A Botija de Mané Monteiro (Stealth & Sobrevivência Noturna)
-* **Objetivo:** Infiltrar-se na fazenda à noite pelo Lote 1b, desenterrar a botija sob a pedra no Lote 0 e entregá-la ao beato na paróquia.
+### 🏺 4. A Botija de Mané Monteiro (Stealth Noturno & Caça Global)
+* **Objetivo:** Infiltrar-se à noite pelo Lote 1b, desenterrar a botija no Lote 0 sob a pedra e levá-la à Paróquia.
 * **Mecânicas Principais:**
-  - **Escuridão & Candeeiro:** Campo de visão limitado sem a luz do candeeiro.
-  - **Cumade Furiosa:** Sem oferenda de fumo, a entidade vaga velozmente pelo labirinto; o jogador deve desviar de seu raio de detecção.
-* **Recompensa:** 🖋️ **Tinta Encantada**.
+  - **Caça Global da Cumade:** A entidade agora atravessa livremente entre todos os lotes. Sem fumo, se alcançar o jogador ➔ **Falha**.
+  - **Escuridão & Candeeiro:** Visão limitada ao círculo de luz do Candeeiro.
+  - **Peso do Ouro:** Redução de velocidade ao carregar a botija pesada.
+* **Recompensa (Sucesso):** 🖋️ **Tinta Encantada**.
 
 ### 🏆 Encerramento & Vitória
-De volta ao estúdio, o jogador fixa os 4 cordéis no varal, une os 4 instrumentos, digita seu nome/nickname e imprime a capa do seu próprio cordel:  
+Somente após reunir os **4 itens místicos**, o jogador interage com a prensa, digita seu **Nickname** e estampa a capa do seu cordel:  
 > **"O Cordel de [Nickname]: O Herói do Sertão"**
 
 ---
 
 ## 🚀 Diretriz de Desenvolvimento: Abordagem MVP First
 
-Para garantir validação ágil da jogabilidade e mecânicas nas primeiras horas da Jam:
-
 1. **Protótipo em Formas Geométricas com Legendas:**
-   - Jogador = Quadrado/Círculo azul `[HEROI]`.
-   - Bodes = Círculos brancos `[BODE]`.
-   - Chupa-Cabra = Triângulo vermelho `[CHUPA-CABRA]`.
-   - Lotes da Fazenda = Blocos retangulares em grade `[LOTE 0, 1a, 2a...]`.
+   - Jogador = `[HEROI]`, Bodes = `[BODE]`, Chupa-Cabra = `[CHUPA-CABRA]`, Moitas = `[MOITA]`.
 2. **Validação do Core Loop:**
-   - Teste de movimentação, condução de bodes e grito de aboio.
-   - Teste de inversão temporária de controles por assobios.
-   - Teste da máquina lógica de validação do enigma das 5 casas.
-   - Teste de iluminação por raio de candeeiro no escuro.
-3. **Segunda Onda de Polimento (Pós-MVP):**
-   - Inserção de sprites em estilo xilogravura 2D.
-   - Trilha sonora chiptune/baião e efeitos sonoros regionais (@koji).
-   - Telas de HUD ricas desenhadas pela @maya.
-
----
-
-## 🌐 Hub de Ferramentas & Plataformas Web
-
-* **Framework Base:** Phaser 3 / HTML5 Canvas + Vite + TypeScript.
-* **Áudio & SFX:** [jsfxr](https://sfxr.me/) | [Bfxr](https://www.bfxr.net/) | [BeepBox](https://www.beepbox.co/).
-* **Arte & Pixel Art:** [Piskel](https://www.piskelapp.com/) | [LibreSprite](https://libresprite.github.io/) | [Lospec](https://lospec.com/).
-* **Deploy Web em 1 Clique:** [Vercel](https://vercel.com/) | [GitHub Pages](https://pages.github.com/).
+   - Teste da física de HP dos bodes e fuga de moitas.
+   - Teste da transição entre os 6 lotes em telas individuais e caça da Cumade.
+   - Teste do sistema de arrastar itens na Fase 3.
+   - Teste da perseguição global noturna na Fase 4.
 
 ---
 *Documentação oficial mantida pela equipe XIUD para a Tungão GameJam 2024.*

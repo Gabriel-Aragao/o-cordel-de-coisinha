@@ -44,10 +44,13 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
   - **Moitas de Cactos:** Causam dano (-1 HP) e fazem o herói **gritar involuntariamente de dor**.
   - **Moitas de Frutas (Umbu/Mandacaru):** Recuperam a vida do herói (+1 HP).
   - **Moitas com Itens:** Escondem a **Corda de Laçar** ou o **Candeeiro**.
-* **Comportamento dos Bodes:**
-  - Bodes atacados pelo Chupa-Cabra **gritam de pavor**, espantando bodes próximos.
-  - **Aboio:** Faz o bode sair da moita e se afastar.
-  - **Grito:** Espanta o bode para procurar outra moita e afugenta o predador.
+* **Comportamento dos Bodes & Resposta ao Som:**
+  - **Aboio:** Faz o bode andar um pouco (deslocamento suave).
+  - **Grito:** Faz o bode correr rápido procurando outra moita para se esconder.
+  - **Bode Atacado:** Grita de pavor ao sofrer ataque, espantando bodes próximos.
+* **Comportamento do Chupa-Cabra ao Som:**
+  - **Aboio:** Ignora completamente.
+  - **Grito:** Foge imediatamente para o mais longe possível por 3 segundos antes de retomar a caça.
   - Cada bode possui barra individual de HP. Se 1 bode morrer ➔ **Falha**.
 * **Vitória:** Resgatar os 4 bodes no curral ➔ **🪓 Carimbo Mágico**.
 

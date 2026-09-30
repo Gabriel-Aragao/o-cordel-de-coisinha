@@ -59,13 +59,13 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Vida dos Bodes:** Morte de 1 bode ➔ **Falha**.
 * **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.
 
-### 🌿 2. A Fazenda da Cumade Fulozinha (Labirintos Fechados, Spawn Seguro & Pedra)
+### 🌿 2. A Fazenda da Cumade Fulozinha (Passagens Espaçosas, Queda na Pedra & Cadarços da Fulô)
 * **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**.
 * **Mecânicas Principais:**
-  - **Spawn Livre de Paredes:** Início em clareira desimpedida do Lote 0.
-  - **Labirinto Denso:** Mais paredes internas, passagens estreitas e portões dinâmicos que transmitem sensação de labirinto complexo.
-  - **Pedra da Botija no Corredor (F2 e F4):** Mesma posição exata em ambas as fases, sem legenda e com diálogos cômicos ao tropeçar.
-  - **3 Vidas & Moitas:** Sistema de 3 vidas, espinhos (-1 HP) e frutas (+1 HP) ativo.
+  - **Passagens e Vãos Espaçosos:** Vãos e corredores calibrados para travessia livre sem colisões indesejadas.
+  - **Tropeço com Dano na Pedra (Lote 0):** Ao pisar na pedra, o herói cai no chão e **perde 1 vida (-1 HP)** com diálogo cômico.
+  - **Ataque da Fulô:** Ao ser pego sem fumo, o herói **cai e perde 1 vida (-1 HP)** (*"A Cumade amarrou seus cadarços!"*), com invulnerabilidade temporária.
+  - **Derrota por Vidas (3 Vidas):** Se o HP zerar ➔ Retorno ao Estúdio (Falha).
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
 ### 🦉 3. A Pena da Rasga-Mortalha (Espaço Amplo, Violeiros & Ciclo de Mesas)

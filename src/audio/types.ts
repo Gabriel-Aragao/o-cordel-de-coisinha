@@ -10,6 +10,7 @@ export type SFXName =
   | 'aboio'
   | 'grito'
   | 'berro_bode'
+  | 'berro_pavor_bode'
   | 'chupacabra_rosnado'
   | 'cumade_assobio'
   | 'cordel_folhear'
@@ -24,7 +25,11 @@ export type SFXName =
   | 'ui_click'
   | 'ui_hover'
   | 'victory_jingle'
-  | 'defeat_jingle';
+  | 'defeat_jingle'
+  | 'glitch_censura'
+  | 'hurt_cacto'
+  | 'fruit_eat'
+  | 'viola_repente';
 
 export interface SoundManagerConfig {
   masterVolume?: number;
@@ -69,4 +74,9 @@ export interface ISoundManager {
   playUIHover(): void;
   playVictoryJingle(): void;
   playDefeatJingle(): void;
+  playGlitchCensura(): void;
+  playHurtCacto(): void;
+  playFruitEat(): void;
+  playBerroPavorBode(): void;
+  playViolaRepente(): void;
 }

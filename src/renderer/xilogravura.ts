@@ -1306,3 +1306,518 @@ export function drawVaral(
 
   ctx.restore();
 }
+
+// ============================================================================
+// 5. NOVOS SPRITES: VIOLEIROS, MORADORES BÊBADOS, CACTOS & TELAS DE CORDEL
+// ============================================================================
+
+/**
+ * 🪕 VIOLEIRO DO REPENTE (VIOLA DE 10 CORDAS DE XILO)
+ */
+export function drawVioleiro(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options: XiloRenderOptions = {}
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+  if (options.facing === 'left') {
+    ctx.scale(-1, 1);
+  }
+
+  const t = options.time || 0;
+  const strum = Math.sin(t * 8) * 3;
+  const w = width;
+  const h = height;
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.ellipse(0, h * 0.42, w * 0.4, h * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Corpo / Camisa Xilogravada
+  ctx.fillStyle = options.colorTint || XILO_COLORS.brownWood;
+  ctx.fillRect(-w * 0.28, -h * 0.08, w * 0.56, h * 0.45);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(-w * 0.28, -h * 0.08, w * 0.56, h * 0.45);
+
+  // Calça e Botas
+  ctx.fillStyle = XILO_COLORS.darkWood;
+  ctx.fillRect(-w * 0.22, h * 0.35, w * 0.18, h * 0.15);
+  ctx.fillRect(w * 0.04, h * 0.35, w * 0.18, h * 0.15);
+
+  // Rosto & Expressão de Cantador
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.2, w * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Bigode de Cantador
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.16, w * 0.1, 0, Math.PI);
+  ctx.fill();
+
+  // Boca Cantando
+  ctx.fillStyle = XILO_COLORS.redAccent;
+  ctx.beginPath();
+  ctx.ellipse(0, -h * 0.12, w * 0.06, h * 0.04, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Chapéu de Couro Sertanejo
+  ctx.fillStyle = XILO_COLORS.darkWood;
+  ctx.beginPath();
+  ctx.ellipse(0, -h * 0.32, w * 0.48, h * 0.14, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // 🪕 VIOLA DE CORDEL (Madeira Talhada)
+  ctx.save();
+  ctx.translate(w * 0.1, h * 0.08);
+  ctx.rotate(-Math.PI * 0.2);
+
+  // Bojo da Viola (em 8)
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.arc(0, h * 0.08, w * 0.18, 0, Math.PI * 2);
+  ctx.arc(0, -h * 0.05, w * 0.14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Boca da Viola
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.beginPath();
+  ctx.arc(0, 0, w * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Braço & Cravelhas
+  ctx.fillStyle = XILO_COLORS.darkWood;
+  ctx.fillRect(-w * 0.04, -h * 0.32, w * 0.08, h * 0.28);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(-w * 0.04, -h * 0.32, w * 0.08, h * 0.28);
+
+  // Cordas
+  ctx.strokeStyle = XILO_COLORS.whiteHatch;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(-w * 0.02, -h * 0.3);
+  ctx.lineTo(-w * 0.02, h * 0.15);
+  ctx.moveTo(w * 0.02, -h * 0.3);
+  ctx.lineTo(w * 0.02, h * 0.15);
+  ctx.stroke();
+
+  ctx.restore();
+
+  // Braço do Cantador Dedilhando
+  ctx.strokeStyle = XILO_COLORS.kraftPaper;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-w * 0.15, 0);
+  ctx.lineTo(w * 0.05 + strum, h * 0.08);
+  ctx.stroke();
+
+  // Notas Musicais Flutuantes em Xilogravura
+  ctx.fillStyle = XILO_COLORS.goldAccent;
+  ctx.font = 'bold 12px monospace';
+  ctx.fillText('♫', w * 0.35, -h * 0.3 + strum);
+
+  ctx.restore();
+}
+
+/**
+ * 🍻 MORADOR BÊBADO / FOLIÃO DO SERTÃO
+ */
+export function drawMoradorBebado(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  options: XiloRenderOptions = {}
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const t = options.time || 0;
+  const sway = Math.sin(t * 4) * 6;
+  const w = width;
+  const h = height;
+
+  ctx.rotate((sway * Math.PI) / 180);
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.ellipse(0, h * 0.42, w * 0.38, h * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Corpo / Camisa Aberta
+  ctx.fillStyle = options.colorTint || '#475569';
+  ctx.fillRect(-w * 0.26, -h * 0.08, w * 0.52, h * 0.45);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(-w * 0.26, -h * 0.08, w * 0.52, h * 0.45);
+
+  // Rosto Bêbado & Bochechas Vermelhas
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.2, w * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Bochechas coradas de cachaça
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
+  ctx.beginPath();
+  ctx.arc(-w * 0.1, -h * 0.18, w * 0.05, 0, Math.PI * 2);
+  ctx.arc(w * 0.1, -h * 0.18, w * 0.05, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Olhos vesgos / tontos
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillText('x', -w * 0.08, -h * 0.22);
+  ctx.fillText('x', w * 0.04, -h * 0.22);
+
+  // Chapéu Torto
+  ctx.save();
+  ctx.rotate(0.3);
+  ctx.fillStyle = XILO_COLORS.goldAccent;
+  ctx.beginPath();
+  ctx.ellipse(0, -h * 0.32, w * 0.44, h * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+
+  // Garrafa de Cachaça na Mão
+  ctx.fillStyle = '#065f46';
+  ctx.fillRect(w * 0.2, 0, w * 0.12, h * 0.22);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(w * 0.2, 0, w * 0.12, h * 0.22);
+  // Gargalo
+  ctx.fillStyle = '#92400e';
+  ctx.fillRect(w * 0.23, -h * 0.06, w * 0.06, h * 0.08);
+
+  ctx.restore();
+}
+
+/**
+ * 🌵 CACTO MANDACARU (ÁRVORE DA CAATINGA)
+ */
+export function drawCactoMandacaru(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  _options: XiloRenderOptions = {}
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+  const w = width;
+  const h = height;
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.ellipse(0, h * 0.45, w * 0.4, h * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Tronco Principal
+  ctx.fillStyle = '#14532d';
+  ctx.beginPath();
+  ctx.roundRect(-w * 0.15, -h * 0.45, w * 0.3, h * 0.9, [8, 8, 4, 4]);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Galho Esquerdo (Braço do Mandacaru)
+  ctx.beginPath();
+  ctx.roundRect(-w * 0.42, -h * 0.28, w * 0.28, h * 0.12, [6, 0, 0, 6]);
+  ctx.roundRect(-w * 0.42, -h * 0.42, w * 0.14, h * 0.24, [6, 6, 0, 0]);
+  ctx.fill();
+  ctx.stroke();
+
+  // Galho Direito
+  ctx.beginPath();
+  ctx.roundRect(w * 0.14, -h * 0.18, w * 0.28, h * 0.12, [0, 6, 6, 0]);
+  ctx.roundRect(w * 0.28, -h * 0.36, w * 0.14, h * 0.28, [6, 6, 0, 0]);
+  ctx.fill();
+  ctx.stroke();
+
+  // Espinhos Brancos de Xilo
+  ctx.strokeStyle = XILO_COLORS.whiteHatch;
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  for (let py = -0.35; py <= 0.35; py += 0.12) {
+    ctx.moveTo(-w * 0.15, h * py);
+    ctx.lineTo(-w * 0.22, h * (py - 0.02));
+    ctx.moveTo(w * 0.15, h * py);
+    ctx.lineTo(w * 0.22, h * (py - 0.02));
+  }
+  ctx.stroke();
+
+  // Flor Branca de Mandacaru no Topo
+  ctx.fillStyle = XILO_COLORS.whiteHatch;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.46, w * 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = XILO_COLORS.goldAccent;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.46, w * 0.04, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/**
+ * 🍎 MOITA COM FRUTAS REGIONAIS (UMBU / MANDACARU - RECUPERA VIDA)
+ */
+export function drawMoitaFrutaRegional(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  options: { searched?: boolean } = {}
+): void {
+  ctx.save();
+  drawMoita(ctx, x, y, radius, { searched: options.searched });
+
+  if (!options.searched) {
+    // Frutas suculentas coloridas
+    ctx.translate(x, y);
+    const r = radius;
+    // Fruta 1 (Vermelha)
+    ctx.fillStyle = XILO_COLORS.redAccent;
+    ctx.beginPath();
+    ctx.arc(-r * 0.3, -r * 0.25, r * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = XILO_COLORS.black;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Fruta 2 (Amarela / Umbu)
+    ctx.fillStyle = XILO_COLORS.goldAccent;
+    ctx.beginPath();
+    ctx.arc(r * 0.28, -r * 0.3, r * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Brilho saudável
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(-r * 0.32, -r * 0.28, r * 0.05, 0, Math.PI * 2);
+    ctx.arc(r * 0.26, -r * 0.33, r * 0.05, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * 🌵 MOITA DE CACTOS COM ESPINHOS (CAUSA DANO & GRITO)
+ */
+export function drawMoitaCactoEspinhos(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+  const r = radius;
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+  ctx.beginPath();
+  ctx.ellipse(0, r * 0.4, r * 0.85, r * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Arbusto espinhoso agressivo
+  ctx.fillStyle = '#1e3a1e';
+  ctx.beginPath();
+  ctx.arc(0, -r * 0.2, r * 0.65, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Dezenas de Espinhos Afiados
+  ctx.strokeStyle = XILO_COLORS.whiteHatch;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+    const ex = Math.cos(angle) * r * 0.65;
+    const ey = -r * 0.2 + Math.sin(angle) * r * 0.65;
+    const tx = Math.cos(angle) * r * 0.95;
+    const ty = -r * 0.2 + Math.sin(angle) * r * 0.95;
+    ctx.moveTo(ex, ey);
+    ctx.lineTo(tx, ty);
+  }
+  ctx.stroke();
+
+  // Alerta de Espinhos
+  ctx.fillStyle = XILO_COLORS.redAccent;
+  ctx.font = 'bold 12px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚠', 0, -r * 0.2);
+
+  ctx.restore();
+}
+
+/**
+ * 📜 TELA DE APRESENTAÇÃO DE FASE EM FOLHETO DE CORDEL
+ */
+export function drawTelaApresentacaoCordel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stageNum: number,
+  title: string,
+  stanzas: string[],
+  options: { prompt?: string } = {}
+): void {
+  ctx.save();
+
+  // Fundo Papel Kraft
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.fillRect(x, y, w, h);
+
+  // Moldura Dupla de Xilogravura
+  drawMolduraCordel(ctx, x + 16, y + 14, w - 32, h - 28, { borderWeight: 4 });
+
+  // Cabeçalho de Folheto
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 18px "Courier New", Courier, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`FOLHETO Nº ${stageNum} — DO VELHO SERTÃO`, x + w / 2, y + 50);
+
+  ctx.font = '13px "Courier New", Courier, monospace';
+  ctx.fillText('═══════════════════════════════════════════════════════════', x + w / 2, y + 68);
+
+  // Título da História
+  ctx.font = 'bold 22px "Courier New", Courier, monospace';
+  ctx.fillText(`"${title.toUpperCase()}"`, x + w / 2, y + 105);
+
+  ctx.font = '13px "Courier New", Courier, monospace';
+  ctx.fillText('═══════════════════════════════════════════════════════════', x + w / 2, y + 124);
+
+  // Estrofes Narrativas do Cordel
+  ctx.font = '15px "Courier New", Courier, monospace';
+  ctx.fillStyle = XILO_COLORS.black;
+  let lineY = y + 165;
+  for (const st of stanzas) {
+    ctx.fillText(st, x + w / 2, lineY);
+    lineY += 28;
+  }
+
+  // Prompt de Início
+  const promptText = options.prompt || '[ Pressione ESPAÇO ou ENTER para Iniciar o Conto ]';
+  ctx.fillStyle = XILO_COLORS.goldAccent;
+  ctx.fillRect(x + w / 2 - 240, y + h - 75, 480, 36);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x + w / 2 - 240, y + h - 75, 480, 36);
+
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 13px monospace';
+  ctx.fillText(promptText, x + w / 2, y + h - 52);
+
+  ctx.restore();
+}
+
+/**
+ * 🏆 TELA DE ENCERRAMENTO DE FASE EM FOLHETO DE CORDEL
+ */
+export function drawTelaEncerramentoCordel(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  stageNum: number,
+  title: string,
+  itemMistico: { name: string; icon: string; desc: string },
+  stanzas: string[],
+  options: { prompt?: string } = {}
+): void {
+  ctx.save();
+
+  // Fundo Papel Kraft
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.fillRect(x, y, w, h);
+
+  // Moldura de Xilogravura
+  drawMolduraCordel(ctx, x + 16, y + 14, w - 32, h - 28, { borderWeight: 4 });
+
+  // Cabeçalho de Vitória
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 18px "Courier New", Courier, monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(`🎉 DESFECHO DO CONTO ${stageNum} — VITÓRIA NO SERTÃO!`, x + w / 2, y + 48);
+
+  ctx.font = '13px "Courier New", Courier, monospace';
+  ctx.fillText('═══════════════════════════════════════════════════════════', x + w / 2, y + 66);
+
+  // Título
+  ctx.font = 'bold 20px "Courier New", Courier, monospace';
+  ctx.fillText(`"${title.toUpperCase()}"`, x + w / 2, y + 98);
+
+  // Box do Item Místico Conquistado
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(x + w / 2 - 180, y + 118, 360, 60);
+  ctx.fillStyle = XILO_COLORS.kraftLight;
+  ctx.fillRect(x + w / 2 - 177, y + 121, 354, 54);
+  ctx.strokeStyle = XILO_COLORS.goldAccent;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(x + w / 2 - 177, y + 121, 354, 54);
+
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 16px monospace';
+  ctx.fillText(`${itemMistico.icon} ${itemMistico.name.toUpperCase()} CONQUISTADO!`, x + w / 2, y + 145);
+  ctx.font = '11px monospace';
+  ctx.fillStyle = '#525252';
+  ctx.fillText(itemMistico.desc, x + w / 2, y + 163);
+
+  // Estrofes de Fechamento
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = '15px "Courier New", Courier, monospace';
+  let lineY = y + 215;
+  for (const st of stanzas) {
+    ctx.fillText(st, x + w / 2, lineY);
+    lineY += 28;
+  }
+
+  // Prompt de Retorno
+  const promptText = options.prompt || '[ Pressione ESPAÇO ou ENTER para Voltar ao Estúdio ]';
+  ctx.fillStyle = '#15803d';
+  ctx.fillRect(x + w / 2 - 240, y + h - 75, 480, 36);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x + w / 2 - 240, y + h - 75, 480, 36);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 13px monospace';
+  ctx.fillText(promptText, x + w / 2, y + h - 52);
+
+  ctx.restore();
+}

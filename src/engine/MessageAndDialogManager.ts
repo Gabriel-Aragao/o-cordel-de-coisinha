@@ -26,6 +26,7 @@ export class MessageAndDialogManager {
   public currentNPCId: string = '';
   private onDialogComplete?: () => void;
   private introducedNPCs: Set<string> = new Set();
+  public dialogCooldown: number = 0;
 
   // Fila Atômica Sequencial de Toasts/Mensagens (Anti-Stacking)
   private toastQueue: ToastItem[] = [];
@@ -82,6 +83,7 @@ export class MessageAndDialogManager {
     onComplete?: () => void,
     engine?: IGameEngine
   ): void {
+    if (this.dialogCooldown > 0) return;
     this.currentNPCId = npcId;
     this.onDialogComplete = onComplete;
     this.currentLineIdx = 0;
@@ -128,6 +130,11 @@ export class MessageAndDialogManager {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
+    // 0. Atualizar Cooldown de Diálogo
+    if (this.dialogCooldown > 0) {
+      this.dialogCooldown = Math.max(0, this.dialogCooldown - dt);
+    }
+
     // 1. Atualizar Toasts (Tempo e Fila Atômica)
     if (this.activeToast) {
       this.activeToast.timer += dt;
@@ -139,9 +146,12 @@ export class MessageAndDialogManager {
       }
     }
 
-    // 2. Atualizar Diálogo
+    // 2. Atualizar Diálogo e Consumir Input para Evitar Reabertura em Loop
     if (this.isDialogActive) {
-      if (input.interactReleased) {
+      if (input.interactReleased || input.interactJustPressed) {
+        // Consumir input no mesmo frame
+        input.interactReleased = false;
+        input.interactJustPressed = false;
         this.advanceDialog(engine);
       }
     }
@@ -153,6 +163,7 @@ export class MessageAndDialogManager {
     this.currentLineIdx++;
     if (this.currentLineIdx >= this.currentLines.length) {
       this.isDialogActive = false;
+      this.dialogCooldown = 0.25; // 0.25s de cooldown para evitar reabertura imediata
       engine.sound.playUIClick();
       if (this.onDialogComplete) {
         this.onDialogComplete();
@@ -226,13 +237,7 @@ export class MessageAndDialogManager {
       return;
     }
 
-    // 4. Estado Idle do Painel Inferior: Mensagem Guia do Sertão
-    ctx.fillStyle = '#6b543e';
-    ctx.font = 'italic 13px "Courier New", monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('📜 "O sertanejo é, antes de tudo, um forte." — Explore os arredores e converse com os moradores com [E].', width / 2, panelY + panelH / 2);
-
+    // 4. Estado Idle do Painel Inferior: Painel limpo sem citação estática
     ctx.restore();
   }
 }

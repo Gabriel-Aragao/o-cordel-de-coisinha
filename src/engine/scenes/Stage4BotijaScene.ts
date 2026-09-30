@@ -1,5 +1,5 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { drawText, drawUnifiedToast } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
 import {
   drawCoisinha,
   drawCumadeFulozinha,
@@ -11,7 +11,6 @@ import {
   drawChaoTerraBatida,
   drawMolduraCordel
 } from '../../renderer/xilogravura';
-import { DialogSystem } from '../dialogs';
 import { NarrativeModalManager } from '../narrative';
 
 type LotId = 'igreja' | '0' | '1a' | '1b' | '2a' | '2b' | '3a' | '3b';
@@ -137,7 +136,7 @@ export class Stage4BotijaScene implements IScene {
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
 
-  private dialogs: DialogSystem = new DialogSystem();
+  // Sistema Narrativo de Cordel
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
   // Ciclo de patrulha da Fulô (exclui a Igreja)
@@ -578,7 +577,7 @@ export class Stage4BotijaScene implements IScene {
       const distToBeato = Math.hypot(this.player.x - this.beato.x, this.player.y - this.beato.y);
       if (distToBeato < 80 && input.interactReleased) {
         if (!this.hasBotija) {
-          this.dialogs.startDialog(
+          engine.messages.startDialog(
             'beato',
             'Beato Frei Damião',
             '📿',
@@ -926,7 +925,7 @@ export class Stage4BotijaScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
     const lot = this.lots[this.currentLot];
 
     // Fundo
@@ -1123,14 +1122,14 @@ export class Stage4BotijaScene implements IScene {
     ctx.restore();
 
     // Toast Unificado
-    drawUnifiedToast(ctx, this.message, 960, 540, {
+    // Notificar gerenciador global de mensagens na base
+    engine.messages.postMessage(this.message, {
       isError: this.stateStatus === 'FAILED',
       isSuccess: this.stateStatus === 'SUCCESS'
     });
 
-    // Modais e Diálogos Narrativos
-    this.dialogs.render(ctx, 960, 540);
-    this.narrative.render(ctx, 960, 540);
+    // Modais Narrativos
+    this.narrative.render(ctx, 960, 460);
   }
 
   public destroy(): void {}

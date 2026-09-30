@@ -15,14 +15,15 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
-### 1.2 Sistema Global de Diálogos & Telas Narrativas
+### 1.2 Sistema Global de Diálogos & Controles
 * **Diálogo de Censura na 1ª Interação com NPCs:**
   - Primeira conversa com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**):
     * NPC pergunta: *"Como é teu nome, forasteiro?"*
     * Jogador responde: `"Meu nome é @#$!*&%#!"` *(áudio de erro/censura)*
     * NPC reage: `"Entendi foi nada!"`
-  - Todas as falas seguintes iniciam chamando o herói de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes sumiram..."*).
-  - NPCs-chave (fazendeiro, padre) fornecem dicas claras dos objetivos de cada fase.
+  - Todas as falas seguintes iniciam chamando o herói de **"Coisinha"** e fornecem dicas contextuais.
+  - **Avanço de Diálogos no Release (`keyUp`) de `E`:** Sem repetição contínua.
+* **Obtenção da Corda & Candeeiro:** Encontrados exclusivamente ao vasculhar moitas.
 * **Telas de Abertura e Encerramento:** Apresentação poética em folheto antes de cada fase e tela de celebração no encerramento exibindo o item místico obtido.
 * **Controles Universais:** O comando de **Grito** (`Espaço`) e **Interação** (`E`) funcionam em todas as telas.
 
@@ -39,11 +40,10 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ---
 
 ### 🐐 FASE 1: O Ataque do Chupa-Cabra
-* **Ambiente & Câmera:** Cenário expandido de caatinga com rolagem de tela (*camera lerp*).
-* **Moitas com Cactos e Frutas:**
+* **Moitas 100% Homogêneas:** Todas as moitas possuem visual idêntico em xilogravura. O conteúdo só se revela ao interagir com `E`:
   - **Moitas de Cactos:** Causam dano (-1 HP) e fazem o herói **gritar involuntariamente de dor**.
-  - **Moitas de Frutas (Umbu/Mandacaru):** Recuperam a vida do herói.
-  - **Moitas com Itens:** Escondem a **Corda de Laçar** e o **Candeeiro**.
+  - **Moitas de Frutas (Umbu/Mandacaru):** Recuperam a vida do herói (+1 HP).
+  - **Moitas com Itens:** Escondem a **Corda de Laçar** ou o **Candeeiro**.
 * **Comportamento dos Bodes:**
   - Bodes atacados pelo Chupa-Cabra **gritam de pavor**, espantando bodes próximos.
   - **Aboio:** Faz o bode sair da moita e se afastar.
@@ -56,35 +56,34 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
 * **Topologia Fechada de Lotes & Paredes Perimétricas:**
   - Paredes sólidas de limite ao redor de cada lote, abertas **apenas nas conexões oficiais**:
-    * **Lote 0:** Apenas conexão à direita com **Lote 2a** (Pedra da botija na saída).
+    * **Lote 0:** Conexão à direita com **Lote 2a** (Pedra da botija na saída).
     * **Lote 2a:** Conexão acima com **Lote 1a**, abaixo com **Lote 3a**, à direita com **Lote 2b**.
     * **Lote 1a:** Conexão à direita com **Lote 1b**.
     * **Lote 3a:** Conexão à direita com **Lote 3b**.
     * **Lote 2b:** Conexão acima com **Lote 1b**, abaixo com **Lote 3b**.
-  - Labirintos internos com portões dinâmicos (colisão sólida quando fechados) e moitas.
+  - Labirintos internos com mais paredes e portões dinâmicos alternantes.
+  - **Física da Cumade:** A Fulô **NÃO atravessa paredes sólidas**, movendo-se apenas por caminhos livres e portões abertos.
 * **Objetivo:** Fumo de rolo na moita do Lote 1b; entregar à Cumade no Lote 3b ➔ **📄 Página Rasgada**.
 
 ---
 
-### 🦉 FASE 3: A Pena da Rasga-Mortalha (Violeiros, Casas em Arco & 4 Mesas)
-* **2 Violeiros no Canto Inferior Esquerdo:**
-  - As estrofes poéticas são declamadas sob interação com os violeiros:
-    * **Violeiro 1:** Repete as 4 primeiras estrofes.
-    * **Violeiro 2:** Repete as 5 estrofes finais.
-* **5 Casas em Arco:** Dispostas na parte superior sob o voo da ave.
-* **4 Mesas Interativas:**
-  1. **Mesa dos Moradores:** Moradores bêbados dizem sua profissão ao levantar e devem ser **empurrados** até suas casas.
-  2. **Mesa das Bebidas:** Transportar 1 a 1 para as casas.
-  3. **Mesa dos Fumos:** Depositar nas casas.
-  4. **Área dos Animais:** Laçar com Corda ou tanger (o animal só sai da casa se o jogador gritar).
+### 🦉 FASE 3: A Pena da Rasga-Mortalha (Layout Amplo & Ciclo de Mesas)
+* **2 Violeiros no Canto Inferior Esquerdo:** Violeiro 1 declama 4 estrofes; Violeiro 2 declama 5 estrofes sob interação (`E` release).
+* **5 Casas em Arco:** Posicionadas na parte superior sob o voo da ave.
+* **Mesas & Curral Ampliados:**
+  1. **Mesa dos Moradores:** Moradores bêbados dizem sua profissão ao levantar e devem ser **empurrados** até suas casas. Parar antes da casa retorna o bêbado à mesa; dentro da casa, não sai mais.
+  2. **Mesa das Bebidas & Fumos:** Pegar da mesa faz o item sumir dela. Soltar fora da casa retorna à mesa; soltar na casa fixa o item nela.
+  3. **Área dos Animais:** Laçar com Corda ou tanger até a casa. Parar antes da casa retorna o animal ao curral; dentro da casa, não sai mais.
 * **Vitória:** Organização correta da vila ➔ **🪶 Pena Encantada**.
 
 ---
 
 ### 🏺 FASE 4: A Botija de Mané Monteiro
 * **Santuário da Igreja:** A Cumade Fulozinha **NÃO CONSEGUE ENTRAR** no Lote da Igreja.
-* **Conexão Especial:** Abertura da porteira do Lote 1b para a Igreja (ativa apenas na Fase 4).
-* **Ciclo:** Spawn na Igreja ➔ Ir ao Lote 0 desenterrar a botija (-25% vel) sob perseguição global da Fulô ➔ Retornar à Igreja e entregar ao Beato ➔ **🖋️ Tinta Encantada**.
+* **Escuridão Total & Candeeiro:** Área de visão curta no escuro; visão ampliada ao encontrar o Candeeiro em moita.
+* **Portões Alternantes & Inversão:** Mantidos em todos os lotes.
+* **Física da Fulô:** Respeita paredes sólidas e não atravessa obstáculos.
+* **Ciclo:** Spawn na Igreja ➔ Ir ao Lote 0 desenterrar a botija (-25% vel) ➔ Retornar à Igreja e entregar ao Beato ➔ **🖋️ Tinta Encantada**.
 
 ---
 
@@ -94,4 +93,4 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 3. Prensagem e abertura da porta mística com exibição da capa oficial do cordel.
 
 ---
-*GDD Canônico atualizado para a Onda 3 de Refinamentos Globais.*
+*GDD Canônico atualizado para a Onda 4 de Correções.*

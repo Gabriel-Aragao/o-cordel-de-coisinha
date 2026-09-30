@@ -176,9 +176,14 @@ export class MessageAndDialogManager {
 
   /**
    * RENDERIZAÇÃO ESTREITA NO PAINEL DEDICADO NA BASE (Y: 460 a 600, Altura 140px)
-   * Mantém o Viewport de Gameplay (0 a 460px) 100% Desobstruído de Qualquer Mensagem!
+   * ESTREITAMENTE SOB DEMANDA: Ocultado 100% no estado ocioso para não cobrir o cenário!
    */
   public renderBottomPanel(ctx: CanvasRenderingContext2D, width: number = 960, _height: number = 600): void {
+    // SE NÃO HOUVER DIÁLOGO NEM TOAST ATIVO: NÃO DESENHAR ABSOLUTAMENTE NADA!
+    if (!this.isDialogActive && !this.activeToast) {
+      return;
+    }
+
     const panelY = 460;
     const panelH = 140;
 
@@ -237,7 +242,6 @@ export class MessageAndDialogManager {
       return;
     }
 
-    // 4. Estado Idle do Painel Inferior: Painel limpo sem citação estática
     ctx.restore();
   }
 }

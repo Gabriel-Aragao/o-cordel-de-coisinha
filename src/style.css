@@ -252,9 +252,10 @@ body {
 
 /* ==========================================================================
    PAINEL DEDICADO DE MENSAGENS & DIÁLOGOS (ABAIXO DA ÁREA DE JOGO)
+   ESTRITAMENTE SOB DEMANDA: Ocultado no estado ocioso (Zero Bloco Idle)
    ========================================================================== */
 .game-message-panel {
-  display: flex;
+  display: none;
   flex-direction: column;
   width: 100%;
   max-width: 960px;
@@ -266,6 +267,10 @@ body {
   gap: 6px;
   position: relative;
   transition: all 0.2s ease;
+}
+
+.game-message-panel.active {
+  display: flex;
 }
 
 .message-panel-header {

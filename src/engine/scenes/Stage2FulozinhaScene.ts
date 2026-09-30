@@ -60,12 +60,13 @@ export class Stage2FulozinhaScene implements IScene {
     speed: 155
   };
 
+  // Pedra da Botija: Exclusivamente na saída do Lote 0 para o Lote 2a
   private pedraItem: Entity = {
     id: 'pedra',
     x: 880,
     y: 270,
-    width: 26,
-    height: 26,
+    width: 28,
+    height: 28,
     color: '#64748b',
     label: '[PEDRA DA BOTIJA]',
     shape: 'rect'
@@ -88,10 +89,10 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 0 — ENTRADA DA FAZENDA',
       color: '#131b2e',
       walls: [
-        { x: 300, y: 150, w: 20, h: 220 },
-        { x: 600, y: 350, w: 20, h: 180 }
+        { x: 300, y: 150, w: 24, h: 220 },
+        { x: 600, y: 350, w: 24, h: 180 }
       ],
-      gates: [{ x: 300, y: 320, w: 20, h: 70, isOpen: true }],
+      gates: [{ x: 300, y: 320, w: 24, h: 80, isOpen: true }],
       hasBush: true,
       bushX: 200,
       bushY: 200
@@ -101,10 +102,10 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 1a — POMAR NORTE',
       color: '#0f2922',
       walls: [
-        { x: 480, y: 200, w: 320, h: 20 },
-        { x: 250, y: 380, w: 20, h: 140 }
+        { x: 480, y: 200, w: 320, h: 24 },
+        { x: 250, y: 380, w: 24, h: 140 }
       ],
-      gates: [{ x: 480, y: 200, w: 80, h: 20, isOpen: false }],
+      gates: [{ x: 480, y: 200, w: 84, h: 24, isOpen: false }],
       hasBush: true,
       bushX: 700,
       bushY: 380
@@ -114,10 +115,10 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 1b — PORTEIRA DO TOCO (FUMO NA MOITA)',
       color: '#1e1b2e',
       walls: [
-        { x: 350, y: 270, w: 20, h: 260 },
-        { x: 650, y: 200, w: 20, h: 200 }
+        { x: 350, y: 270, w: 24, h: 260 },
+        { x: 650, y: 200, w: 24, h: 200 }
       ],
-      gates: [{ x: 350, y: 200, w: 20, h: 80, isOpen: true }],
+      gates: [{ x: 350, y: 200, w: 24, h: 84, isOpen: true }],
       hasBush: true,
       bushX: 720,
       bushY: 220,
@@ -125,13 +126,13 @@ export class Stage2FulozinhaScene implements IScene {
     },
     '2a': {
       id: '2a',
-      name: 'LOTE 2a — PASTAGEM CENTRAL OESTE (PEDRA)',
+      name: 'LOTE 2a — PASTAGEM CENTRAL OESTE',
       color: '#172554',
       walls: [
-        { x: 200, y: 270, w: 20, h: 240 },
-        { x: 500, y: 180, w: 260, h: 20 }
+        { x: 200, y: 270, w: 24, h: 240 },
+        { x: 500, y: 180, w: 260, h: 24 }
       ],
-      gates: [{ x: 500, y: 180, w: 70, h: 20, isOpen: true }],
+      gates: [{ x: 500, y: 180, w: 80, h: 24, isOpen: true }],
       hasBush: true,
       bushX: 300,
       bushY: 420
@@ -141,10 +142,10 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 2b — PASTAGEM CENTRAL LESTE',
       color: '#172554',
       walls: [
-        { x: 400, y: 350, w: 20, h: 200 },
-        { x: 680, y: 220, w: 20, h: 220 }
+        { x: 400, y: 350, w: 24, h: 200 },
+        { x: 680, y: 220, w: 24, h: 220 }
       ],
-      gates: [{ x: 680, y: 380, w: 20, h: 70, isOpen: false }],
+      gates: [{ x: 680, y: 380, w: 24, h: 80, isOpen: false }],
       hasBush: true,
       bushX: 250,
       bushY: 180
@@ -154,9 +155,9 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 3a — BOSQUE SUL PROFUNDO',
       color: '#2a1b12',
       walls: [
-        { x: 480, y: 300, w: 340, h: 20 }
+        { x: 480, y: 300, w: 340, h: 24 }
       ],
-      gates: [{ x: 480, y: 300, w: 80, h: 20, isOpen: true }],
+      gates: [{ x: 480, y: 300, w: 84, h: 24, isOpen: true }],
       hasBush: true,
       bushX: 650,
       bushY: 380
@@ -166,12 +167,12 @@ export class Stage2FulozinhaScene implements IScene {
       name: 'LOTE 3b — MORADA DA CUMADE FULOZINHA',
       color: '#3b0764',
       walls: [
-        { x: 300, y: 270, w: 20, h: 280 },
-        { x: 600, y: 270, w: 20, h: 280 }
+        { x: 300, y: 270, w: 24, h: 280 },
+        { x: 600, y: 270, w: 24, h: 280 }
       ],
       gates: [
-        { x: 300, y: 200, w: 20, h: 80, isOpen: true },
-        { x: 600, y: 340, w: 20, h: 80, isOpen: false }
+        { x: 300, y: 200, w: 24, h: 84, isOpen: true },
+        { x: 600, y: 340, w: 24, h: 84, isOpen: false }
       ],
       hasBush: true,
       bushX: 480,
@@ -258,56 +259,79 @@ export class Stage2FulozinhaScene implements IScene {
     }
 
     const speed = this.player.speed || 230;
-    const nextX = this.player.x + dx * speed * dt;
-    const nextY = this.player.y + dy * speed * dt;
-
-    // Colisão com paredes e portões fechados do lote atual
     const lot = this.lots[this.currentLot];
-    let blocked = false;
+    const halfW = this.player.width / 2;
+    const halfH = this.player.height / 2;
 
-    // Paredes
+    // Teste de colisão no eixo X
+    const targetX = this.player.x + dx * speed * dt;
+    let blockedX = false;
+
     for (const w of lot.walls) {
       if (
-        nextX + this.player.width / 2 > w.x - w.w / 2 &&
-        nextX - this.player.width / 2 < w.x + w.w / 2 &&
-        nextY + this.player.height / 2 > w.y - w.h / 2 &&
-        nextY - this.player.height / 2 < w.y + w.h / 2
+        targetX + halfW > w.x - w.w / 2 &&
+        targetX - halfW < w.x + w.w / 2 &&
+        this.player.y + halfH > w.y - w.h / 2 &&
+        this.player.y - halfH < w.y + w.h / 2
       ) {
-        blocked = true;
+        blockedX = true;
         break;
       }
     }
 
-    // Portões
     for (const g of lot.gates) {
       if (!g.isOpen) {
         if (
-          nextX + this.player.width / 2 > g.x - g.w / 2 &&
-          nextX - this.player.width / 2 < g.x + g.w / 2 &&
-          nextY + this.player.height / 2 > g.y - g.h / 2 &&
-          nextY - this.player.height / 2 < g.y + g.h / 2
+          targetX + halfW > g.x - g.w / 2 &&
+          targetX - halfW < g.x + g.w / 2 &&
+          this.player.y + halfH > g.y - g.h / 2 &&
+          this.player.y - halfH < g.y + g.h / 2
         ) {
-          blocked = true;
+          blockedX = true;
           break;
         }
       }
     }
 
-    if (!blocked) {
-      this.player.x = nextX;
-      this.player.y = nextY;
+    if (!blockedX) {
+      this.player.x = targetX;
+    }
+
+    // Teste de colisão no eixo Y
+    const targetY = this.player.y + dy * speed * dt;
+    let blockedY = false;
+
+    for (const w of lot.walls) {
+      if (
+        this.player.x + halfW > w.x - w.w / 2 &&
+        this.player.x - halfW < w.x + w.w / 2 &&
+        targetY + halfH > w.y - w.h / 2 &&
+        targetY - halfH < w.y + w.h / 2
+      ) {
+        blockedY = true;
+        break;
+      }
+    }
+
+    for (const g of lot.gates) {
+      if (!g.isOpen) {
+        if (
+          this.player.x + halfW > g.x - g.w / 2 &&
+          this.player.x - halfW < g.x + g.w / 2 &&
+          targetY + halfH > g.y - g.h / 2 &&
+          targetY - halfH < g.y + g.h / 2
+        ) {
+          blockedY = true;
+          break;
+        }
+      }
+    }
+
+    if (!blockedY) {
+      this.player.y = targetY;
     }
 
     // 3. Porteiras de Borda (Transições entre Telas de Lotes)
-    // Topologia dos 6 Lotes:
-    // [1a]          [1b]
-    //   |             |
-    // [2a] -------  [2b]
-    //   |             |
-    // [0]           [3b]
-    //   |
-    // [3a]
-
     // Borda Direita (X > 940)
     if (this.player.x > 940) {
       if (this.currentLot === '0') {
@@ -376,10 +400,10 @@ export class Stage2FulozinhaScene implements IScene {
       }
     }
 
-    // 5. Pista da Pedra da Botija (Lote 0 / 2a)
-    if (this.currentLot === '0' || this.currentLot === '2a') {
-      if (Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y) < 35) {
-        this.message = '🪨 PISTA SECRETA: Uma pedra solta no chão... Sob ela jaz a Botija de Mané!';
+    // 5. Pista da Pedra da Botija (EXCLUSIVAMENTE no Lote 0)
+    if (this.currentLot === '0') {
+      if (Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y) < 40) {
+        this.message = '🪨 PISTA SECRETA: Uma pedra solta na saída do Lote 0... Sob ela jaz a Botija de Mané!';
       }
     }
 
@@ -427,15 +451,15 @@ export class Stage2FulozinhaScene implements IScene {
       ctx.strokeRect(w.x - w.w / 2, w.y - w.h / 2, w.w, w.h);
     }
 
-    // Portões Internos Dinâmicos
+    // Portões Internos Dinâmicos com Feedback Rígido
     for (const g of lot.gates) {
       ctx.fillStyle = g.isOpen ? '#16a34a' : '#dc2626';
       ctx.fillRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
 
-      drawText(ctx, g.isOpen ? 'ABERTO' : 'FECHADO', g.x, g.y - 12, {
+      drawText(ctx, g.isOpen ? 'ABERTO (PASSAGEM)' : 'FECHADO (BLOQUEIO)', g.x, g.y - 14, {
         font: 'bold 9px monospace',
         color: g.isOpen ? '#4ade80' : '#f87171',
         align: 'center'
@@ -459,8 +483,8 @@ export class Stage2FulozinhaScene implements IScene {
       });
     }
 
-    // Pedra da Botija (Lote 0 e 2a)
-    if (this.currentLot === '0' || this.currentLot === '2a') {
+    // Pedra da Botija (EXCLUSIVAMENTE no Lote 0)
+    if (this.currentLot === '0') {
       renderEntity(ctx, this.pedraItem);
     }
 

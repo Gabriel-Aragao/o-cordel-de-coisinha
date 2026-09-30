@@ -12,9 +12,12 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ---
 
-## 🎭 Sistema Global de Diálogos & Controles de Interação
+## 🎭 Sistema Global de Diálogos & Interface Unificada
 
-### 1. Diálogo Canônico de Censura (1ª Interação com NPCs):
+### 1. Interface Gráfica Padronizada (Caixa de Diálogo & Notificações):
+* **Todas as mensagens de informação, toasts e dicas que aparecem na parte inferior da tela** utilizam **exatamente a mesma interface gráfica da caixa de diálogo** (moldura de cordel em madeira entalhada, fundo de papel kraft e tipografia xilográfica de alto contraste).
+
+### 2. Diálogo Canônico de Censura (1ª Interação com NPCs):
 * A primeira vez que o jogador interage com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):
   - **NPC:** *"Opa, forasteiro! Qual é o seu nome?"*
   - **Jogador:** *"Meu nome é @#$!*&%#!"* *(com som cômico de erro/glitch/censura)*
@@ -119,28 +122,24 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ---
 
-## 🦉 Fase 3: A Pena da Rasga-Mortalha (Espaço Ampliado & Ciclo de Transporte)
+## 🦉 Fase 3: A Pena da Rasga-Mortalha (Casas Interiores & Captura Universal com 'E')
 
-### 1. Layout Amplo & 2 Violeiros:
-* Mesas dos bêbados, bebidas, fumos e o curral dos animais são **significativamente maiores** para facilitar o trânsito do personagem.
+### 1. Mecânica Universal de Captura e Soltura (`E`):
+* Todos os elementos das casas (**Fumos, Bebidas, Moradores/Bêbados e Animais**) possuem **a mesma mecânica de interação**:
+  - Pressionar/soltar a tecla `E` próximo ao elemento para **capturar / segurar** (o herói carrega 1 item/morador/animal por vez, que se move junto a ele).
+  - Pressionar/soltar a tecla `E` novamente para **soltar**.
+  - Soltar qualquer elemento **fora de uma casa** faz com que ele **retorne automaticamente para sua posição original na mesa ou curral**.
+
+### 2. Telas Interiores das 5 Casas:
+* As 5 casas no vilarejo são **espaços onde o personagem entra fisicamente (transportado para uma tela/cenário interior daquela casa)** ao cruzar a porta.
+* **Depósito:** Ao entrar na tela interior da casa, o herói aperta `E` para soltar e fixar o elemento nos nichos daquela casa.
+* **Remoção de Itens da Casa:**
+  - O jogador pode capturar individualmente um item de dentro da casa apertando `E` e levá-lo para fora.
+  - **Grito de Reset da Casa:** Ao dar um **Grito (`Espaço`) dentro de uma casa**, **TODOS os itens, moradores e animais daquela casa são expulsos e retornam instantaneamente para suas respectivas mesas e curral**.
+
+### 3. Violeiros & Desfecho:
 * **2 Violeiros no Canto Inferior Esquerdo:** Violeiro 1 declama as primeiras 4 estrofes; Violeiro 2 declama as 5 estrofes finais sob interação (`E` release).
-* **5 Casas em Arco:** Posicionadas na parte superior sob o voo da ave.
-
-### 2. Regras de Transporte e Fixação:
-* **Bebidas e Fumos:**
-  - Ao pegar um item da mesa, ele **desaparece da mesa** e é carregado pelo herói.
-  - Soltar o item **fora de uma casa** faz com que ele **retorne automaticamente para sua posição na mesa**.
-  - Soltar o item **dentro de uma casa** fixa o item na casa (não volta mais para a mesa).
-* **Moradores Bêbados:**
-  - Interagir faz o bêbado levantar e dizer sua profissão. O jogador o empurra até sua respectiva casa.
-  - Parar de empurrar o bêbado antes de colocá-lo na casa faz com que ele **retorne à mesa**.
-  - Uma vez dentro da casa correta, o morador **não sai mais**.
-* **Animais do Curral:**
-  - **Com Corda:** Laça e conduz o animal.
-  - **Sem Corda:** Tange o animal até a casa.
-  - Parar de tanger o animal antes de entrar na casa faz com que ele **retorne ao curral**.
-  - Uma vez dentro da casa, o animal **não sai mais**.
-* **Desfecho:** Todas as casas preenchidas corretamente ➔ A ave entrega a **🪶 Pena Encantada** ➔ **Sucesso**!
+* **Desfecho:** Todas as 5 casas com os 4 elementos corretos em seus interiores ➔ A ave entrega a **🪶 Pena Encantada** ➔ **Sucesso**!
 
 ---
 

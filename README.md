@@ -53,7 +53,8 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 * **Objetivo:** Salvar **4 bodes** e trancá-los no curral central antes que o Chupa-Cabra drene sua vida.
 * **Mecânicas Principais:**
   - **Moitas Idênticas:** Todas as moitas possuem visual exterior homogêneo de xilogravura. O conteúdo (Cactos, Frutas, Bodes, Corda ou Candeeiro) só é revelado ao interagir.
-  - **Cactos vs. Frutas:** Cactos causam dano (-1 HP) e grito involuntário de dor; Frutas recuperam vida.
+  - **Aboio vs. Grito para os Bodes:** O aboio faz o bode andar um pouco; o grito faz o bode correr em disparada procurando outra moita para se esconder.
+  - **Aboio vs. Grito para o Chupa-Cabra:** O Chupa-Cabra ignora o aboio, mas o grito o afugenta por 3 segundos para o mais longe possível.
   - **Grito dos Bodes:** Bodes atacados berram de pavor, assustando e dispersando bodes vizinhos.
   - **Vida dos Bodes:** Morte de 1 bode ➔ **Falha**.
 * **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.

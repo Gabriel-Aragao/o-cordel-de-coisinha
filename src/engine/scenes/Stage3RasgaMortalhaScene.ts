@@ -11,6 +11,11 @@ interface HouseSlot {
   animal: string;
 }
 
+interface CordelStanza {
+  title: string;
+  lines: string[];
+}
+
 export class Stage3RasgaMortalhaScene implements IScene {
   public id: SceneId = 'STAGE_3_RASGAMORTALHA';
   public name = 'Fase 3: A Pena da Rasga-Mortalha';
@@ -41,32 +46,96 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private selectedHouseIndex: number = 0;
   private selectedRow: number = 0; // 0: morador, 1: bebida, 2: fumo, 3: animal
 
-  private message: string = 'Preencha os dados das 5 casas sertanejas com base nas dicas e clique em Validar Dedução!';
+  private currentStanza: number = 0;
+
+  // As 9 Estrofes Poéticas de Cordel Canônicas
+  private stanzas: CordelStanza[] = [
+    {
+      title: 'Estrofe I — A Vila da Meia-Noite',
+      lines: [
+        'Na vila da meia-noite, onde a coruja piava,',
+        'Cinco casas em fileira o luar iluminava:',
+        'Cada qual com sua cor, seu dono e o que criava.'
+      ]
+    },
+    {
+      title: 'Estrofe II — O Sanfoneiro e a Casa Azul',
+      lines: [
+        'O Vaqueiro sertanejo na Casa Amarela habita,',
+        'E bebe Água de pote bem gelada que palpita;',
+        'Ao seu lado a Casa Azul a cantiga ressuscita.'
+      ]
+    },
+    {
+      title: 'Estrofe III — A Rendeira e o Galo',
+      lines: [
+        'A Rendeira caprichosa mora na bela Casa Azul,',
+        'Cria o Galo de Campina que canta de norte a sul;',
+        'Bebendo doce Garapa na cuia do Cariri.'
+      ]
+    },
+    {
+      title: 'Estrofe IV — A Casa Vermelha e a Cachaça',
+      lines: [
+        'O Cantador de repente mora na Casa Vermelha,',
+        'Bate o pé e toma Cachaça acendendo sua centelha;',
+        'Pita Fumo Desfiado que na brasa se assemelha.'
+      ]
+    },
+    {
+      title: 'Estrofe V — A Casa Verde do Ferrador',
+      lines: [
+        'A Casa Verde e caiada fica ao lado da Branca,',
+        'Seu dono bebe bom Umbu e no trabalho não manca;',
+        'É o Ferrador afamado que qualquer prego arranca.'
+      ]
+    },
+    {
+      title: 'Estrofe VI — O Cavalo e o Fumo Arapiraca',
+      lines: [
+        'O Ferrador cria o Cavalo de trote veloz e forte,',
+        'Pita o Fumo Arapiraca trazido lá do seu norte;',
+        'E guarda o mistério antigo que desafia a morte.'
+      ]
+    },
+    {
+      title: 'Estrofe VII — A Rezadeira na Casa Branca',
+      lines: [
+        'A Rezadeira bendita habita a Casa Branca,',
+        'Toma Café bem amargo e com fé tudo estanca;',
+        'Pita o suave Trevo que a tristeza desbanca.'
+      ]
+    },
+    {
+      title: 'Estrofe VIII — O Bode e o Canário',
+      lines: [
+        'Na primeira Casa Amarela o Bode pasta no terreiro,',
+        'Com o Fumo de Paieiro do bom vaqueiro rasteiro;',
+        'E na Casa Branca o Canário é o canto pioneiro.'
+      ]
+    },
+    {
+      title: 'Estrofe IX — O Tatu e a Revelação Final',
+      lines: [
+        'O Cantador cria o Tatu que na terra fura o chão...',
+        'Diga agora, forasteiro, com firme dedução:',
+        'A CASA 4 (VERDE / FERRADOR) TEM A PENA DO SERTÃO!'
+      ]
+    }
+  ];
+
+  private message: string = 'Clique no painel superior para ler as 9 estrofes, deduza os dados das 5 casas e valide a solução!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
   private endTimer: number = 0;
-
-  // Dicas de Cordel
-  private stanzas = [
-    '1. O Vaqueiro mora na Casa Amarela e bebe Água de pote.',
-    '2. A Rendeira mora na Casa Azul e cria o Galo.',
-    '3. O Cantador mora na Casa Vermelha e bebe Cachaça.',
-    '4. A Casa Verde fica ao lado da Branca e seu dono bebe Umbu.',
-    '5. O Ferrador cria o Cavalo e fuma Arapiraca.',
-    '6. A Rezadeira mora na Casa Branca e toma Café.',
-    '7. O dono da Casa 1 cria o Bode e fuma Paieiro.',
-    '8. Quem fuma Palha mora na Casa Azul e bebe Garapa.',
-    '9. O Cantador fuma Desfiado e cria o Tatu.',
-    '10. A Rezadeira fuma Trevo e cria o Canário.',
-    '11. A Casa 4 (Verde / Ferrador) guarda a 🪶 PENA ENCANTADA!'
-  ];
 
   public init(engine: IGameEngine): void {
     this.stateStatus = 'PLAYING';
     this.endTimer = 0;
     this.selectedHouseIndex = 0;
     this.selectedRow = 0;
+    this.currentStanza = 0;
 
-    // Inicializa as 5 Casas vazias ou pré-carregadas para o jogador
+    // Inicializa as 5 Casas com os valores de dedução
     this.houses = [
       { index: 1, corName: 'Amarela', colorHex: '#eab308', morador: 'Vaqueiro', bebida: 'Água', fumo: 'Paieiro', animal: 'Bode' },
       { index: 2, corName: 'Azul', colorHex: '#2563eb', morador: 'Rendeira', bebida: 'Garapa', fumo: 'Palha', animal: 'Galo' },
@@ -94,7 +163,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     if (this.owl.x > 880) this.owlDirection = -1;
     if (this.owl.x < 80) this.owlDirection = 1;
 
-    // Navegação no Teclado (Setas / WASD)
+    // Navegação no Teclado
     if (input.left) {
       this.selectedHouseIndex = Math.max(0, this.selectedHouseIndex - 1);
     } else if (input.right) {
@@ -112,12 +181,22 @@ export class Stage3RasgaMortalhaScene implements IScene {
       const mx = input.mouse.x;
       const my = input.mouse.y;
 
-      // Checa se clicou nas casas
+      // 1. Clique no Painel de Estrofes de Cordel (topo) ➔ Avança estrofe
+      if (mx >= 40 && mx <= 920 && my >= 38 && my <= 140) {
+        // Checa clique nas setas ou no painel
+        if (mx >= 40 && mx <= 120) {
+          this.currentStanza = (this.currentStanza - 1 + this.stanzas.length) % this.stanzas.length;
+        } else {
+          this.currentStanza = (this.currentStanza + 1) % this.stanzas.length;
+        }
+      }
+
+      // 2. Clique nas Casas Sertanejas
       for (let i = 0; i < this.houses.length; i++) {
-        const hx = 70 + i * 170;
+        const hx = 60 + i * 170;
         const hy = 160;
         const hw = 150;
-        const hh = 230;
+        const hh = 250;
 
         if (mx >= hx && mx <= hx + hw && my >= hy && my <= hy + hh) {
           this.selectedHouseIndex = i;
@@ -138,14 +217,16 @@ export class Stage3RasgaMortalhaScene implements IScene {
         }
       }
 
-      // Checa clique no Botão de Validar Dedução
+      // 3. Clique no Botão de Validar Dedução
       if (mx >= 330 && mx <= 630 && my >= 430 && my <= 485) {
         this.validateSolution(engine);
       }
     }
 
-    // Ação com Teclado (Espaço / Enter para alternar atributo ou validar)
-    if (input.action || input.interact) {
+    // Ação com Teclado (Espaço para avançar estrofe ou alternar atributo)
+    if (input.action) {
+      this.currentStanza = (this.currentStanza + 1) % this.stanzas.length;
+    } else if (input.interact) {
       this.cycleAttribute(this.selectedHouseIndex, this.selectedRow);
     }
   }
@@ -222,17 +303,31 @@ export class Stage3RasgaMortalhaScene implements IScene {
       color: '#f7d070'
     });
 
-    // Painel de Dicas de Cordel
+    // Painel Dinâmico de Estrofe por Estrofe (9 Estrofes ao Clique)
     ctx.fillStyle = '#111827';
-    ctx.fillRect(40, 42, 880, 100);
+    ctx.fillRect(40, 40, 880, 102);
     ctx.strokeStyle = '#eab308';
     ctx.lineWidth = 2;
-    ctx.strokeRect(40, 42, 880, 100);
+    ctx.strokeRect(40, 40, 880, 102);
 
-    drawText(ctx, '📜 VERSOS DE CORDEL & PISTAS DO ENIGMA:', 55, 48, { font: 'bold 11px monospace', color: '#facc15' });
-    for (let i = 0; i < 4; i++) {
-      drawText(ctx, this.stanzas[i], 55, 68 + i * 16, { font: '10px monospace', color: '#fef3c7' });
-      drawText(ctx, this.stanzas[i + 4], 470, 68 + i * 16, { font: '10px monospace', color: '#fef3c7' });
+    const s = this.stanzas[this.currentStanza];
+
+    // Cabeçalho da Estrofe com Botões de Navegação
+    drawText(
+      ctx,
+      `📜 ${s.title.toUpperCase()} (${this.currentStanza + 1}/9) — [Clique no Painel ou aperte Espaço p/ Avançar]`,
+      480,
+      48,
+      { font: 'bold 12px monospace', color: '#facc15', align: 'center' }
+    );
+
+    // Versos da Estrofe Atual
+    for (let i = 0; i < s.lines.length; i++) {
+      drawText(ctx, s.lines[i], 480, 72 + i * 20, {
+        font: 'bold 12px monospace',
+        color: '#fef3c7',
+        align: 'center'
+      });
     }
 
     // Render das 5 Casas Interativas

@@ -2085,13 +2085,17 @@ export function drawCaixaDialogoXilo(
   speaker: string,
   text: string,
   options: {
+    speaker?: string;
     prompt?: string;
     speakerColor?: string;
+    isGlitchName?: boolean;
     isToast?: boolean;
     borderWeight?: number;
   } = {}
 ): void {
   ctx.save();
+
+  const finalSpeaker = options.speaker || speaker;
 
   // Sombra profunda
   ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
@@ -2118,18 +2122,19 @@ export function drawCaixaDialogoXilo(
   ctx.fillRect(x + w - 5 - cs, y + h - 5 - cs, cs, cs);
 
   // Placa do Locutor / Título
-  if (speaker) {
+  if (finalSpeaker) {
+    const isGlitch = options.isGlitchName;
     ctx.fillStyle = XILO_COLORS.black;
-    ctx.fillRect(x + 18, y - 12, speaker.length * 10 + 24, 22);
-    ctx.strokeStyle = options.speakerColor || XILO_COLORS.goldAccent;
+    ctx.fillRect(x + 18, y - 12, finalSpeaker.length * 10 + 24, 22);
+    ctx.strokeStyle = isGlitch ? '#ef4444' : options.speakerColor || XILO_COLORS.goldAccent;
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(x + 18, y - 12, speaker.length * 10 + 24, 22);
+    ctx.strokeRect(x + 18, y - 12, finalSpeaker.length * 10 + 24, 22);
 
-    ctx.fillStyle = options.speakerColor || '#fef08a';
+    ctx.fillStyle = isGlitch ? '#f87171' : options.speakerColor || '#fef08a';
     ctx.font = 'bold 12px monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(speaker.toUpperCase(), x + 28, y - 1);
+    ctx.fillText(finalSpeaker.toUpperCase(), x + 28, y - 1);
   }
 
   // Texto da Fala / Notificação

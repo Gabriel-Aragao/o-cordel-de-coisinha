@@ -130,7 +130,7 @@ body {
 #canvas-container {
   position: relative;
   width: 960px;
-  height: 540px;
+  height: 600px;
   background: #000;
   border: 3px solid #8b5a2b;
   border-radius: 8px;
@@ -248,4 +248,59 @@ body {
 .btn-action:hover {
   background: #047857;
   border-color: #34d399;
+}
+
+/* ==========================================================================
+   PAINEL DEDICADO DE MENSAGENS & DIÁLOGOS (ABAIXO DA ÁREA DE JOGO)
+   ========================================================================== */
+.game-message-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 960px;
+  background: #20150e;
+  border: 3px solid #14100c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), inset 0 0 0 1px #d97706;
+  border-radius: 6px;
+  padding: 10px 16px;
+  gap: 6px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.message-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.message-badge {
+  background: #14100c;
+  color: #fef08a;
+  border: 1px solid #d97706;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: monospace;
+  padding: 2px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.message-hint {
+  font-size: 0.72rem;
+  font-family: monospace;
+  color: #a1a1aa;
+}
+
+.message-panel-body {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #f4ebd9;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
 }

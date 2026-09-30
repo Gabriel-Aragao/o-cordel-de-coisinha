@@ -10,6 +10,7 @@ import { InputManager } from './input';
 import { SoundManager } from '../audio/SoundManager';
 import { ISoundManager, BGMTrackId } from '../audio/types';
 import { JuiceManager } from './juice';
+import { MessageAndDialogManager } from './MessageAndDialogManager';
 import { StudioScene } from './scenes/StudioScene';
 import { Stage1ChupaCabraScene } from './scenes/Stage1ChupaCabraScene';
 import { Stage2FulozinhaScene } from './scenes/Stage2FulozinhaScene';
@@ -31,6 +32,7 @@ export class GameEngine implements IGameEngine {
   public fps: number = 60;
   public sound: ISoundManager;
   public juice: JuiceManager;
+  public messages!: MessageAndDialogManager;
 
   private scenes: Map<SceneId, IScene> = new Map();
   private currentScene: IScene | null = null;
@@ -53,6 +55,7 @@ export class GameEngine implements IGameEngine {
     this.inputManager = new InputManager(this.canvas);
     this.sound = new SoundManager();
     this.juice = new JuiceManager();
+    this.messages = new MessageAndDialogManager();
 
     this.registerScenes();
   }
@@ -164,6 +167,9 @@ export class GameEngine implements IGameEngine {
     // Juice update (partículas, screenshake e transição)
     this.juice.update(dt);
 
+    // Message and Dialog update
+    this.messages.update(dt, input, this);
+
     // Update da cena ativa
     if (this.currentScene) {
       this.currentScene.update(dt, input, this);
@@ -185,6 +191,10 @@ export class GameEngine implements IGameEngine {
     this.juice.renderParticles(this.ctx);
 
     this.ctx.restore();
+
+    // RENDERIZAÇÃO ESTREITA DO PAINEL DE DIÁLOGOS E MENSAGENS ABAIXO DO GAMEPLAY (Y: 460 a 600)
+    // Mantém o Viewport do Jogo (0 a 460px) 100% Desobstruído e Sem Sobreposição sobre Itens/Salas
+    this.messages.renderBottomPanel(this.ctx, this.canvas.width, this.canvas.height);
 
     // Transição visual de Cordel por cima
     this.juice.renderTransition(this.ctx, this.canvas.width, this.canvas.height);

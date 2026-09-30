@@ -5,6 +5,9 @@ import {
   drawCumadeFulozinha,
   drawBeato,
   drawItemBotija,
+  drawMoita,
+  drawMoitaFrutaRegional,
+  drawMoitaCactoEspinhos,
   drawChaoTerraBatida,
   drawMolduraCordel
 } from '../../renderer/xilogravura';
@@ -34,14 +37,29 @@ interface LotData {
   walls: Wall[];
   gates: InternalGate[];
   isSanctuary?: boolean;
+  bushes: BushEntity[];
+}
+
+interface BushEntity {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  type: 'normal' | 'cacto' | 'fruta';
+  isSearched: boolean;
 }
 
 export class Stage4BotijaScene implements IScene {
   public id: SceneId = 'STAGE_4_BOTIJA';
   public name = 'Fase 4: A Botija de Mané Monteiro';
 
-  // Início no Santuário da Igreja
   private currentLot: LotId = 'igreja';
+
+  // Sistema de 3 Vidas
+  private heroHp: number = 3;
+  private maxHeroHp: number = 3;
+  private hurtCooldown: number = 0;
+  private tripCooldown: number = 0;
 
   private player: Entity = {
     id: 'hero',
@@ -141,7 +159,8 @@ export class Stage4BotijaScene implements IScene {
         { x: 260, y: 270, w: 20, h: 260 },
         { x: 700, y: 270, w: 20, h: 260 }
       ],
-      gates: []
+      gates: [],
+      bushes: []
     },
     '0': {
       id: '0',
@@ -152,14 +171,19 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno Complexo
+        // Corredor Estreito Obrigatório da Pedra de Tropeço
+        { x: 800, y: 190, w: 240, h: 24 },
+        { x: 800, y: 350, w: 240, h: 24 },
         { x: 250, y: 180, w: 24, h: 220 },
-        { x: 480, y: 380, w: 24, h: 200 },
-        { x: 700, y: 200, w: 24, h: 220 }
+        { x: 480, y: 380, w: 24, h: 200 }
       ],
       gates: [
         { x: 250, y: 340, w: 24, h: 80, isOpen: true },
-        { x: 700, y: 360, w: 24, h: 80, isOpen: false }
+        { x: 480, y: 200, w: 80, h: 24, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b4_0_1', x: 200, y: 140, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b4_0_2', x: 500, y: 440, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '1a': {
@@ -172,11 +196,18 @@ export class Stage4BotijaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
         { x: 340, y: 220, w: 24, h: 240 },
-        { x: 620, y: 320, w: 24, h: 240 }
+        { x: 620, y: 320, w: 24, h: 240 },
+        { x: 480, y: 160, w: 180, h: 24 }
       ],
-      gates: [{ x: 480, y: 200, w: 100, h: 24, isOpen: false }]
+      gates: [
+        { x: 480, y: 200, w: 100, h: 24, isOpen: false },
+        { x: 340, y: 380, w: 24, h: 80, isOpen: true }
+      ],
+      bushes: [
+        { id: 'b4_1a_1', x: 180, y: 380, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b4_1a_2', x: 740, y: 180, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '1b': {
       id: '1b',
@@ -189,11 +220,14 @@ export class Stage4BotijaScene implements IScene {
         { x: 948, y: 435, w: 24, h: 210 },
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
-        // Labirinto Interno
         { x: 360, y: 270, w: 24, h: 260 },
         { x: 620, y: 220, w: 24, h: 220 }
       ],
-      gates: [{ x: 360, y: 180, w: 24, h: 80, isOpen: true }]
+      gates: [{ x: 360, y: 180, w: 24, h: 80, isOpen: true }],
+      bushes: [
+        { id: 'b4_1b_1', x: 200, y: 180, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b4_1b_2', x: 760, y: 400, radius: 36, type: 'cacto', isSearched: false }
+      ]
     },
     '2a': {
       id: '2a',
@@ -207,12 +241,15 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 435, w: 24, h: 210 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
         { x: 260, y: 270, w: 24, h: 220 },
         { x: 500, y: 220, w: 240, h: 24 },
         { x: 720, y: 350, w: 24, h: 200 }
       ],
-      gates: [{ x: 500, y: 220, w: 80, h: 24, isOpen: true }]
+      gates: [{ x: 500, y: 220, w: 80, h: 24, isOpen: true }],
+      bushes: [
+        { id: 'b4_2a_1', x: 160, y: 400, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b4_2a_2', x: 780, y: 160, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '2b': {
       id: '2b',
@@ -225,11 +262,14 @@ export class Stage4BotijaScene implements IScene {
         { x: 750, y: 528, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
         { x: 380, y: 340, w: 24, h: 220 },
         { x: 650, y: 200, w: 24, h: 240 }
       ],
-      gates: [{ x: 650, y: 360, w: 24, h: 80, isOpen: false }]
+      gates: [{ x: 650, y: 360, w: 24, h: 80, isOpen: false }],
+      bushes: [
+        { id: 'b4_2b_1', x: 200, y: 160, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b4_2b_2', x: 500, y: 420, radius: 36, type: 'cacto', isSearched: false }
+      ]
     },
     '3a': {
       id: '3a',
@@ -241,11 +281,14 @@ export class Stage4BotijaScene implements IScene {
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
         { x: 320, y: 300, w: 24, h: 260 },
         { x: 640, y: 220, w: 24, h: 240 }
       ],
-      gates: [{ x: 480, y: 300, w: 100, h: 24, isOpen: true }]
+      gates: [{ x: 480, y: 300, w: 100, h: 24, isOpen: true }],
+      bushes: [
+        { id: 'b4_3a_1', x: 180, y: 380, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b4_3a_2', x: 760, y: 360, radius: 36, type: 'fruta', isSearched: false }
+      ]
     },
     '3b': {
       id: '3b',
@@ -257,13 +300,16 @@ export class Stage4BotijaScene implements IScene {
         { x: 750, y: 12, w: 420, h: 24 },
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
-        // Labirinto Interno
         { x: 280, y: 270, w: 24, h: 280 },
         { x: 620, y: 270, w: 24, h: 280 }
       ],
       gates: [
         { x: 280, y: 180, w: 24, h: 80, isOpen: true },
         { x: 620, y: 360, w: 24, h: 80, isOpen: false }
+      ],
+      bushes: [
+        { id: 'b4_3b_1', x: 160, y: 180, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b4_3b_2', x: 760, y: 380, radius: 36, type: 'cacto', isSearched: false }
       ]
     }
   };
@@ -272,6 +318,9 @@ export class Stage4BotijaScene implements IScene {
     this.currentLot = 'igreja';
     this.player.x = 480;
     this.player.y = 360;
+    this.heroHp = 3;
+    this.hurtCooldown = 0;
+    this.tripCooldown = 0;
     this.fuloCurrentLot = '2b';
     this.fuloLotChangeTimer = 4.0;
     this.whistleTimer = 6.0;
@@ -309,6 +358,8 @@ export class Stage4BotijaScene implements IScene {
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
+    if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
+    if (this.tripCooldown > 0) this.tripCooldown -= dt;
 
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
       this.narrative.update(dt, input, engine);
@@ -688,9 +739,25 @@ export class Stage4BotijaScene implements IScene {
     this.player.x = Math.max(20, Math.min(940, this.player.x));
     this.player.y = Math.max(20, Math.min(520, this.player.y));
 
-    // 6. Escavação da Botija no Lote 0
+    // 6. Escavação e Tropeço na Pedra da Botija no Lote 0
     if (this.currentLot === '0' && !this.hasBotija) {
       const distToPedra = Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y);
+
+      // Efeito de Tropeço Cômico ao cruzar a pedra no corredor
+      if (distToPedra < 26 && this.tripCooldown <= 0) {
+        this.tripCooldown = 2.5;
+        const tripPhrases = [
+          '🗣️ "Coisinha, tropeçou!"',
+          '🗣️ "Coisinha vai arrancar um dedo!"',
+          '🗣️ "Coisinha tá adivinhando butija!"'
+        ];
+        this.message = tripPhrases[Math.floor(Math.random() * tripPhrases.length)];
+        engine.sound.playUIClick();
+        engine.juice.shake.addTrauma(0.28);
+        engine.juice.particles.emit('dust', this.player.x, this.player.y + 18, { count: 6, speed: 30 });
+        this.player.x += (this.player.x > this.pedraItem.x ? 1 : -1) * 12;
+      }
+
       if (distToPedra < 55) {
         if (input.interact) {
           this.isDigging = true;
@@ -715,6 +782,60 @@ export class Stage4BotijaScene implements IScene {
           }
         } else {
           this.isDigging = false;
+        }
+      }
+    }
+
+    // 7. Interação com Moitas, Cactos (-1 HP) e Frutas (+1 HP)
+    for (const bush of lot.bushes) {
+      const distToBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
+
+      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0) {
+        this.hurtCooldown = 1.2;
+        this.heroHp = Math.max(0, this.heroHp - 1);
+        engine.sound.playHurtCacto();
+        engine.sound.playGrito();
+        engine.juice.shake.addTrauma(0.45);
+        engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 70 });
+        this.message = '🌵 AI! ESPINHO DE CACTO! Você perdeu 1 HP e soltou um grito!';
+
+        if (this.heroHp <= 0) {
+          this.stateStatus = 'FAILED';
+          this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+          engine.sound.playDefeatJingle();
+          setTimeout(() => engine.switchScene('STUDIO'), 2500);
+          return;
+        }
+      }
+
+      if (distToBush < bush.radius + 30 && input.interactReleased) {
+        if (!bush.isSearched) {
+          bush.isSearched = true;
+
+          if (bush.type === 'fruta') {
+            if (this.heroHp < this.maxHeroHp) {
+              this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
+              this.message = '🍎 FRUTA REGIONAL! Você recuperou +1 HP!';
+            } else {
+              this.message = '🍎 Fruta deliciosa da caatinga!';
+            }
+            engine.sound.playFruitEat();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
+          } else if (bush.type === 'cacto') {
+            this.heroHp = Math.max(0, this.heroHp - 1);
+            engine.sound.playHurtCacto();
+            engine.sound.playGrito();
+            engine.juice.shake.addTrauma(0.45);
+            if (this.heroHp <= 0) {
+              this.stateStatus = 'FAILED';
+              this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+              engine.sound.playDefeatJingle();
+              setTimeout(() => engine.switchScene('STUDIO'), 2500);
+              return;
+            }
+          } else {
+            engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 35 });
+          }
         }
       }
     }
@@ -795,7 +916,22 @@ export class Stage4BotijaScene implements IScene {
       ctx.strokeRect(g.x - g.w / 2, g.y - g.h / 2, g.w, g.h);
     }
 
-    // Pedra da Botija (Lote 0)
+    // Moitas do Lote (Homogêneas até serem vasculhadas)
+    for (const bush of lot.bushes) {
+      if (bush.isSearched) {
+        if (bush.type === 'cacto') {
+          drawMoitaCactoEspinhos(ctx, bush.x, bush.y, bush.radius);
+        } else if (bush.type === 'fruta') {
+          drawMoitaFrutaRegional(ctx, bush.x, bush.y, bush.radius, { searched: true });
+        } else {
+          drawMoita(ctx, bush.x, bush.y, bush.radius, { hasItem: false, searched: true });
+        }
+      } else {
+        drawMoita(ctx, bush.x, bush.y, bush.radius, { hasItem: false, searched: false });
+      }
+    }
+
+    // Pedra da Botija (Lote 0 - Sem Legenda Textual)
     if (this.currentLot === '0' && !this.hasBotija) {
       drawItemBotija(ctx, this.pedraItem.x, this.pedraItem.y, 32);
 
@@ -886,6 +1022,20 @@ export class Stage4BotijaScene implements IScene {
       align: 'center',
       color: '#f7d070'
     });
+
+    // Indicador de 3 Vidas no HUD Superior Esquerdo
+    ctx.save();
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(30, 10, 105, 30);
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(30, 10, 105, 30);
+
+    for (let h = 0; h < this.maxHeroHp; h++) {
+      ctx.font = '16px monospace';
+      ctx.fillText(h < this.heroHp ? '❤️' : '🖤', 42 + h * 30, 31);
+    }
+    ctx.restore();
 
     drawText(ctx, this.message, 480, 505, {
       font: '12px monospace',

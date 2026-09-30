@@ -46,27 +46,29 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Vida dos Bodes:** Cada bode possui barra de HP individual. Se 1 bode morrer ➔ **Falha** (volta ao estúdio).
 * **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.
 
-### 🌿 2. A Fazenda da Cumade Fulozinha (6 Lotes em Telas Individuais & Inversão)
+### 🌿 2. A Fazenda da Cumade Fulozinha (6 Lotes em Telas Individuais & Portões)
 * **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**. (Não existe Lote 3c).
 * **Mecânicas Principais:**
   - **Telas Individuais de Lotes:** O mapa é composto por 6 lotes (`Lote 0, 1a, 1b, 2a, 2b, 3a, 3b`). Ao iniciar no Lote 0, a tela exibe apenas o Lote 0.
-  - **Portões Internos & Porteiras:** Portões internos abrem/fecham com assobios, mas porteiras entre lotes estão sempre abertas.
-  - **Pedra da Botija:** Localizada na saída da porteira do Lote 0 para o Lote 2a.
+  - **Portões Internos com Colisão:** Portões abrem e fecham com assobios — permitem passagem quando abertos e bloqueiam quando fechados.
+  - **Pedra da Botija:** Localizada **exclusivamente na saída do Lote 0** para o Lote 2a.
   - **Caça & Assobios:** No Lote 3b, a Cumade caça o jogador e intensifica os assobios (inversão de controles).
   - **Colisão:** Com fumo ➔ **Sucesso** (ganha a Página); Sem fumo ➔ **Falha** (expulso ao estúdio).
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
-### 🦉 3. A Pena da Rasga-Mortalha (Dedução Lógica com Arrastar de Itens)
-* **Objetivo:** Preencher toda a matriz do vilarejo arrastando os itens soltos para as 5 casas corretas e recolher a pena.
+### 🦉 3. A Pena da Rasga-Mortalha (Dedução Lógica com Pistas Estrofe a Estrofe)
+* **Objetivo:** Ler as pistas poéticas estrofe a estrofe, preencher a matriz do vilarejo arrastando os itens soltos para as 5 casas corretas e recolher a pena.
 * **Mecânicas Principais:**
-  - **Montagem Completa:** O jogador deve arrastar todos os itens para as casas com base nas pistas em cordel antes de investigar.
+  - **Paginação de Pistas por Clique:** As 9 estrofes em cordel aparecem uma a uma na tela, avançando com clique.
+  - **Drag-and-Drop:** O jogador arrasta todos os itens para as casas antes de investigar.
   - **Validação:** Qualquer erro ➔ **Falha** (volta ao estúdio); 100% correto (Casa 4 Verde / Ferrador do Tatu) ➔ **Sucesso** (conquista a pena).
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
-### 🏺 4. A Botija de Mané Monteiro (Stealth Noturno & Caça Global)
-* **Objetivo:** Infiltrar-se à noite pelo Lote 1b, desenterrar a botija no Lote 0 sob a pedra e levá-la à Paróquia.
+### 🏺 4. A Botija de Mané Monteiro (Lote da Igreja, Stealth Noturno & Caça Global)
+* **Objetivo:** Iniciar no novo **Lote da Igreja** (zona segura à direita do 1b), cruzar a fazenda até o Lote 0, desenterrar a botija e retornar à Igreja.
 * **Mecânicas Principais:**
-  - **Caça Global da Cumade:** A entidade agora atravessa livremente entre todos os lotes. Sem fumo, se alcançar o jogador ➔ **Falha**.
+  - **Novo Lote da Igreja (Santuário):** O jogador inicia na Igreja; a Cumade **NÃO consegue entrar** neste lote.
+  - **Caça Global da Cumade:** Nos demais lotes, a entidade atravessa livremente entre as telas. Sem fumo, se alcançar o jogador ➔ **Falha**.
   - **Escuridão & Candeeiro:** Visão limitada ao círculo de luz do Candeeiro.
   - **Peso do Ouro:** Redução de velocidade ao carregar a botija pesada.
 * **Recompensa (Sucesso):** 🖋️ **Tinta Encantada**.
@@ -80,12 +82,11 @@ Somente após reunir os **4 itens místicos**, o jogador interage com a prensa, 
 ## 🚀 Diretriz de Desenvolvimento: Abordagem MVP First
 
 1. **Protótipo em Formas Geométricas com Legendas:**
-   - Jogador = `[HEROI]`, Bodes = `[BODE]`, Chupa-Cabra = `[CHUPA-CABRA]`, Moitas = `[MOITA]`.
+   - Jogador = `[HEROI]`, Bodes = `[BODE]`, Chupa-Cabra = `[CHUPA-CABRA]`, Moitas = `[MOITA]`, Igreja = `[IGREJA]`.
 2. **Validação do Core Loop:**
-   - Teste da física de HP dos bodes e fuga de moitas.
-   - Teste da transição entre os 6 lotes em telas individuais e caça da Cumade.
-   - Teste do sistema de arrastar itens na Fase 3.
-   - Teste da perseguição global noturna na Fase 4.
+   - Teste da colisão ativa de portões na Fase 2 e pedra única no Lote 0.
+   - Teste da navegação de estrofes de cordel na Fase 3.
+   - Teste do Lote da Igreja seguro e rota completa da Fase 4.
 
 ---
 *Documentação oficial mantida pela equipe XIUD para a Tungão GameJam 2024.*

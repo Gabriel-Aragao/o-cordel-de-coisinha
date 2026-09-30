@@ -679,4 +679,120 @@ export class SFXSynth {
       offset += note.d * 0.8;
     });
   }
+
+  // 18. SOM CÔMICO DE GLITCH / CENSURA ("Meu nome é @#$!*&%#!")
+  public playGlitchCensura(): void {
+    const t = this.ctx.currentTime;
+    const duration = 0.42;
+
+    // Onda quadrada modulada caoticamente (Beep de censura com glitch)
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'square';
+    // Frequências rápidas caóticas
+    osc.frequency.setValueAtTime(950, t);
+    osc.frequency.setValueAtTime(420, t + 0.08);
+    osc.frequency.setValueAtTime(1200, t + 0.16);
+    osc.frequency.setValueAtTime(310, t + 0.24);
+    osc.frequency.setValueAtTime(880, t + 0.32);
+
+    gain.gain.setValueAtTime(0.35, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+
+    // Ruído digital intercalado
+    const noise = this.ctx.createBufferSource();
+    const noiseGain = this.ctx.createGain();
+    noise.buffer = this.createNoiseBuffer(duration);
+    noiseGain.gain.setValueAtTime(0.25, t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    noise.connect(noiseGain);
+    noiseGain.connect(this.sfxGain);
+
+    osc.start(t);
+    noise.start(t);
+    osc.stop(t + duration);
+    noise.stop(t + duration);
+  }
+
+  // 19. DANO DE CACTO / ESPINHO (Espinho penetrante + estalo agudo)
+  public playHurtCacto(): void {
+    const t = this.ctx.currentTime;
+    const duration = 0.28;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(750, t);
+    osc.frequency.exponentialRampToValueAtTime(140, t + duration);
+
+    gain.gain.setValueAtTime(0.4, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(t);
+    osc.stop(t + duration);
+  }
+
+  // 20. COMER FRUTA REGIONAL (Umbu / Pitomba / Mandacaru -> Cura saborosa)
+  public playFruitEat(): void {
+    const t = this.ctx.currentTime;
+    // Arpejo ascendente de cura: G4 -> C5 -> E5 -> G5
+    const notes = [392.0, 523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const noteTime = t + i * 0.07;
+      const duration = 0.18;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, noteTime);
+
+      gain.gain.setValueAtTime(0.01, noteTime);
+      gain.gain.linearRampToValueAtTime(0.28, noteTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + duration);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(noteTime);
+      osc.stop(noteTime + duration);
+    });
+  }
+
+  // 21. BERRO DE PAVOR DO BODE
+  public playBerroPavorBode(): void {
+    this.playBerroBode(true);
+  }
+
+  // 22. VIOLA DO REPENTE / DEDILHADO
+  public playViolaRepente(): void {
+    const t = this.ctx.currentTime;
+    const chords = [220.0, 277.18, 329.63, 440.0]; // A Maior de Viola
+    chords.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const strumTime = t + idx * 0.035;
+      const duration = 0.45;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, strumTime);
+
+      gain.gain.setValueAtTime(0.001, strumTime);
+      gain.gain.linearRampToValueAtTime(0.25, strumTime + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, strumTime + duration);
+
+      osc.connect(gain);
+      gain.connect(this.sfxGain);
+
+      osc.start(strumTime);
+      osc.stop(strumTime + duration);
+    });
+  }
 }

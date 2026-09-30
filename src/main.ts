@@ -124,5 +124,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Inicializa e inicia o motor
   engine.start();
+  (window as any).gameEngine = engine;
   console.log('🎮 O Cordel de Coisinha Game Engine iniciado com sucesso a 60 FPS.');
 });

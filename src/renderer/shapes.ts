@@ -7,6 +7,11 @@ import {
   drawRasgaMortalha,
   drawFazendeiro,
   drawBeato,
+  drawVioleiro,
+  drawMoradorBebado,
+  drawCactoMandacaru,
+  drawMoitaFrutaRegional,
+  drawMoitaCactoEspinhos,
   drawItemCarimbo,
   drawItemFolha,
   drawItemPena,
@@ -16,6 +21,8 @@ import {
   drawPrensa,
   drawVaral,
   drawMolduraCordel,
+  drawTelaApresentacaoCordel,
+  drawTelaEncerramentoCordel,
 } from './xilogravura';
 
 export * from './xilogravura';
@@ -32,6 +39,24 @@ export function renderEntity(ctx: CanvasRenderingContext2D, entity: Entity, time
       time,
       isMoving: false,
     });
+  } else if (id.includes('violeiro') || label.includes('violeiro') || label.includes('repentista')) {
+    drawVioleiro(ctx, entity.x, entity.y, entity.width || 44, entity.height || 50, {
+      time,
+      colorTint: id.includes('1') ? '#78350f' : '#1e3a8a',
+    });
+  } else if (id.includes('bebado') || id.includes('drunk') || label.includes('bêbado') || label.includes('morador')) {
+    drawMoradorBebado(ctx, entity.x, entity.y, entity.width || 38, entity.height || 48, {
+      time,
+      colorTint: entity.color || '#475569',
+    });
+  } else if (id.includes('cacto') || label.includes('cacto') || label.includes('mandacaru')) {
+    drawCactoMandacaru(ctx, entity.x, entity.y, entity.width || 48, entity.height || 72, {
+      time,
+    });
+  } else if (id.includes('moita_fruta') || label.includes('fruta') || label.includes('umbu')) {
+    drawMoitaFrutaRegional(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) / 2 || 26);
+  } else if (id.includes('moita_espinho') || label.includes('espinho')) {
+    drawMoitaCactoEspinhos(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) / 2 || 26);
   } else if (id.includes('bode') || label.includes('bode') || id.includes('goat')) {
     drawBode(ctx, entity.x, entity.y, entity.width || 44, entity.height || 36, {
       time,
@@ -161,4 +186,4 @@ export function drawText(
   ctx.restore();
 }
 
-export { drawMolduraCordel };
+export { drawMolduraCordel, drawTelaApresentacaoCordel, drawTelaEncerramentoCordel };

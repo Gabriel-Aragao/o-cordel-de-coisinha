@@ -6,15 +6,21 @@ import {
   drawChupaCabra,
   drawFazendeiro,
   drawMoita,
+  drawMoitaFrutaRegional,
+  drawMoitaCactoEspinhos,
   drawChaoTerraBatida
 } from '../../renderer/xilogravura';
+import { DialogSystem } from '../dialogs';
+import { NarrativeModalManager } from '../narrative';
+
+export type BushType = 'normal' | 'corda' | 'candeeiro' | 'bode' | 'cacto' | 'fruta';
 
 interface Bush {
   id: string;
   x: number;
   y: number;
   radius: number;
-  hasItem?: 'corda' | 'candeeiro';
+  type: BushType;
   isSearched: boolean;
   hidingGoatId?: string;
 }
@@ -33,17 +39,22 @@ export class Stage1ChupaCabraScene implements IScene {
   public id: SceneId = 'STAGE_1_CHUPACABRA';
   public name = 'Fase 1: O Ataque do Chupa-Cabra';
 
-  // Dimensões do mapa amplo
-  private mapWidth = 1920;
-  private mapHeight = 1080;
+  // Mapa Expandido
+  private mapWidth = 2400;
+  private mapHeight = 1350;
 
-  // Câmera
+  // Câmera Suave
   private camera = { x: 0, y: 0 };
+
+  // Vida do Herói (3 Pontos)
+  private heroHp: number = 3;
+  private maxHeroHp: number = 3;
+  private hurtCooldown: number = 0;
 
   private player: Entity = {
     id: 'hero',
-    x: 960,
-    y: 650,
+    x: 1200,
+    y: 780,
     width: 36,
     height: 50,
     color: '#3b82f6',
@@ -54,10 +65,10 @@ export class Stage1ChupaCabraScene implements IScene {
 
   private curral: Entity = {
     id: 'curral',
-    x: 960,
-    y: 540,
-    width: 220,
-    height: 160,
+    x: 1200,
+    y: 675,
+    width: 240,
+    height: 180,
     color: '#713f12',
     label: '[CURRAL]',
     shape: 'rect'
@@ -65,8 +76,8 @@ export class Stage1ChupaCabraScene implements IScene {
 
   private fazendeiro: Entity = {
     id: 'fazendeiro',
-    x: 960,
-    y: 490,
+    x: 1200,
+    y: 620,
     width: 36,
     height: 50,
     color: '#15803d',
@@ -76,8 +87,8 @@ export class Stage1ChupaCabraScene implements IScene {
 
   private chupaCabra: Entity = {
     id: 'chupa',
-    x: 200,
-    y: 200,
+    x: 350,
+    y: 350,
     width: 44,
     height: 44,
     color: '#dc2626',
@@ -95,10 +106,9 @@ export class Stage1ChupaCabraScene implements IScene {
   private isAboioActive: boolean = false;
   private isGritoActive: boolean = false;
   private soundWaveRadius: number = 0;
-  private message: string = 'Vasculhe as moitas [E], use Aboio/Grito [Espaço] e resgate os 4 bodes no curral!';
+  private message: string = 'Fale com o Fazendeiro [E], vasculhe as moitas e salve os 4 bodes!';
 
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
-  private endTimer: number = 0;
 
   private stepTimer: number = 0;
   private rosnadoTimer: number = 0;
@@ -108,40 +118,56 @@ export class Stage1ChupaCabraScene implements IScene {
   private facing: 'left' | 'right' | 'up' | 'down' = 'down';
   private isMoving: boolean = false;
 
-  public init(engine: IGameEngine): void {
-    this.player.x = 960;
-    this.player.y = 650;
+  // Sistemas Globais de Diálogo e Narrativa
+  private dialogs: DialogSystem = new DialogSystem();
+  private narrative: NarrativeModalManager = new NarrativeModalManager();
+
+  public init(_engine: IGameEngine): void {
+    this.player.x = 1200;
+    this.player.y = 780;
+    this.heroHp = 3;
+    this.hurtCooldown = 0;
     this.hasRope = false;
     this.hasLantern = false;
     this.isAboioActive = false;
     this.isGritoActive = false;
     this.soundWaveRadius = 0;
     this.stateStatus = 'PLAYING';
-    this.endTimer = 0;
     this.stepTimer = 0;
     this.rosnadoTimer = 0;
     this.actionSoundTriggered = false;
     this.lastActionWasGrito = false;
     this.animTime = 0;
 
-    // Moitas espalhadas pelo mapa amplo
+    // 16 Moitas espalhadas pelo mapa amplo
     this.bushes = [
-      { id: 'b1', x: 450, y: 300, radius: 46, hasItem: 'corda', isSearched: false, hidingGoatId: 'goat_1' },
-      { id: 'b2', x: 1450, y: 300, radius: 46, hasItem: 'candeeiro', isSearched: false, hidingGoatId: 'goat_2' },
-      { id: 'b3', x: 400, y: 800, radius: 48, isSearched: false, hidingGoatId: 'goat_3' },
-      { id: 'b4', x: 1500, y: 800, radius: 48, isSearched: false, hidingGoatId: 'goat_4' },
-      { id: 'b5', x: 960, y: 220, radius: 44, isSearched: false },
-      { id: 'b6', x: 960, y: 880, radius: 44, isSearched: false },
-      { id: 'b7', x: 250, y: 540, radius: 42, isSearched: false },
-      { id: 'b8', x: 1680, y: 540, radius: 42, isSearched: false }
+      { id: 'b1', x: 600, y: 400, radius: 46, type: 'corda', isSearched: false, hidingGoatId: 'goat_1' },
+      { id: 'b2', x: 1800, y: 400, radius: 46, type: 'candeeiro', isSearched: false, hidingGoatId: 'goat_2' },
+      { id: 'b3', x: 500, y: 1000, radius: 48, type: 'bode', isSearched: false, hidingGoatId: 'goat_3' },
+      { id: 'b4', x: 1900, y: 1000, radius: 48, type: 'bode', isSearched: false, hidingGoatId: 'goat_4' },
+      // Moitas de Cacto (Dano + Grito)
+      { id: 'b_c1', x: 850, y: 350, radius: 44, type: 'cacto', isSearched: false },
+      { id: 'b_c2', x: 1550, y: 350, radius: 44, type: 'cacto', isSearched: false },
+      { id: 'b_c3', x: 800, y: 1100, radius: 44, type: 'cacto', isSearched: false },
+      { id: 'b_c4', x: 1600, y: 1100, radius: 44, type: 'cacto', isSearched: false },
+      // Moitas de Frutas Regionais (Cura +1 HP)
+      { id: 'b_f1', x: 1200, y: 300, radius: 44, type: 'fruta', isSearched: false },
+      { id: 'b_f2', x: 1200, y: 1150, radius: 44, type: 'fruta', isSearched: false },
+      { id: 'b_f3', x: 350, y: 700, radius: 44, type: 'fruta', isSearched: false },
+      { id: 'b_f4', x: 2050, y: 700, radius: 44, type: 'fruta', isSearched: false },
+      // Moitas Comuns
+      { id: 'b5', x: 950, y: 550, radius: 42, type: 'normal', isSearched: false },
+      { id: 'b6', x: 1450, y: 550, radius: 42, type: 'normal', isSearched: false },
+      { id: 'b7', x: 300, y: 350, radius: 42, type: 'normal', isSearched: false },
+      { id: 'b8', x: 2100, y: 350, radius: 42, type: 'normal', isSearched: false }
     ];
 
-    // 4 bodes com 100 HP cada
+    // 4 Bodes
     this.goats = [
       {
         id: 'goat_1',
-        x: 450,
-        y: 300,
+        x: 600,
+        y: 400,
         width: 36,
         height: 32,
         color: '#f8fafc',
@@ -158,8 +184,8 @@ export class Stage1ChupaCabraScene implements IScene {
       },
       {
         id: 'goat_2',
-        x: 1450,
-        y: 300,
+        x: 1800,
+        y: 400,
         width: 36,
         height: 32,
         color: '#f8fafc',
@@ -176,8 +202,8 @@ export class Stage1ChupaCabraScene implements IScene {
       },
       {
         id: 'goat_3',
-        x: 400,
-        y: 800,
+        x: 500,
+        y: 1000,
         width: 36,
         height: 32,
         color: '#f8fafc',
@@ -194,8 +220,8 @@ export class Stage1ChupaCabraScene implements IScene {
       },
       {
         id: 'goat_4',
-        x: 1500,
-        y: 800,
+        x: 1900,
+        y: 1000,
         width: 36,
         height: 32,
         color: '#f8fafc',
@@ -212,19 +238,42 @@ export class Stage1ChupaCabraScene implements IScene {
       }
     ];
 
-    if (engine.inventory.carimbo) {
-      this.message = '✓ Fase já conquistada! Carimbo Mágico em mãos.';
-    }
+    // Tela de Apresentação de Fase (Folheto de Cordel)
+    this.narrative.showIntro({
+      phaseNumber: 1,
+      title: 'O Ataque do Chupa-Cabra',
+      subtitle: 'Pastoreio, coragem e o mistério na Caatinga',
+      verses: [
+        'Na noite fria da caatinga o bicho feio atacou,',
+        'Os quatro bodes do curral com pavor afugentou;',
+        'Procure a corda nas moitas, com sabedoria e vigor,',
+        'Traga os bodes de volta antes do golpe do traidor!'
+      ],
+      objective: 'Resgate os 4 bodes no curral central e espante o Chupa-Cabra!',
+      itemReward: {
+        id: 'carimbo',
+        name: 'Carimbo Mágico',
+        icon: '🪓'
+      }
+    });
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
+    if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
+
+    // Atualiza Diálogos e Modais Narrativos
+    if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
+      this.narrative.update(dt, input, engine);
+      return;
+    }
+
+    if (this.dialogs.isActive) {
+      this.dialogs.update(dt, input, engine);
+      return;
+    }
 
     if (this.stateStatus !== 'PLAYING') {
-      this.endTimer += dt;
-      if (this.endTimer >= 2.5) {
-        engine.switchScene('STUDIO');
-      }
       return;
     }
 
@@ -271,28 +320,28 @@ export class Stage1ChupaCabraScene implements IScene {
     this.player.x = Math.max(30, Math.min(this.mapWidth - 30, this.player.x));
     this.player.y = Math.max(30, Math.min(this.mapHeight - 30, this.player.y));
 
-    // Câmera suave centralizada no herói com clamp
-    this.camera.x = Math.max(0, Math.min(this.mapWidth - 960, this.player.x - 480));
-    this.camera.y = Math.max(0, Math.min(this.mapHeight - 540, this.player.y - 270));
+    // Câmera Suave com Lerp
+    const targetCamX = Math.max(0, Math.min(this.mapWidth - 960, this.player.x - 480));
+    const targetCamY = Math.max(0, Math.min(this.mapHeight - 540, this.player.y - 270));
+    this.camera.x += (targetCamX - this.camera.x) * 6 * dt;
+    this.camera.y += (targetCamY - this.camera.y) * 6 * dt;
 
-    // 2. Ação: Aboiar (toque curto) vs Gritar (segurar > 0.35s)
+    // 2. Ação Universal: Grito (Espaço) / Aboio
     if (input.action) {
       if (input.actionHeldTime > 0.35) {
-        // Grito Potente
         this.isGritoActive = true;
         this.isAboioActive = false;
-        this.soundWaveRadius = Math.min(320, this.soundWaveRadius + 500 * dt);
+        this.soundWaveRadius = Math.min(350, this.soundWaveRadius + 520 * dt);
         if (!this.lastActionWasGrito) {
           this.lastActionWasGrito = true;
           engine.sound.playGrito();
-          engine.juice.shake.addTrauma(0.4);
-          engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 70 });
+          engine.juice.shake.addTrauma(0.45);
+          engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 75 });
         }
       } else {
-        // Aboio Suave
         this.isAboioActive = true;
         this.isGritoActive = false;
-        this.soundWaveRadius = Math.min(140, this.soundWaveRadius + 300 * dt);
+        this.soundWaveRadius = Math.min(150, this.soundWaveRadius + 320 * dt);
         if (!this.actionSoundTriggered) {
           this.actionSoundTriggered = true;
           engine.sound.playAboio(1.2);
@@ -307,63 +356,107 @@ export class Stage1ChupaCabraScene implements IScene {
       this.lastActionWasGrito = false;
     }
 
-    // 3. Vasculhar Moitas com [E / Enter]
-    if (input.interact) {
-      for (const bush of this.bushes) {
-        if (Math.hypot(this.player.x - bush.x, this.player.y - bush.y) < bush.radius + 30) {
-          if (!bush.isSearched) {
-            bush.isSearched = true;
+    // 3. Interação com o Fazendeiro [E / Enter] (Diálogo Canônico de Censura)
+    const distToFazendeiro = Math.hypot(this.player.x - this.fazendeiro.x, this.player.y - this.fazendeiro.y);
+    if (distToFazendeiro < 140 && input.interact) {
+      const rescuedCount = this.goats.filter((g) => g.isRescued).length;
+      this.dialogs.startDialog(
+        'fazendeiro',
+        'Fazendeiro Zé do Bode',
+        '👨🌾',
+        [
+          {
+            speaker: 'Fazendeiro',
+            avatarIcon: '👨🌾',
+            text: `Então, Coisinha! Meus 4 bodes fugiram pelo pasto. Você já salvou ${rescuedCount} de 4!`
+          },
+          {
+            speaker: 'Fazendeiro',
+            avatarIcon: '👨🌾',
+            text: 'Vasculhe as moitas para achar a corda de laçar, coma frutas de umbu se ferir nos cactos e use o grito contra a besta!'
+          }
+        ],
+        undefined,
+        engine
+      );
+      return;
+    }
+
+    // 4. Interação com Moitas, Cactos e Frutas
+    for (const bush of this.bushes) {
+      const distHeroBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
+
+      // Colisão física de perto com cactos causa dano involuntário
+      if (bush.type === 'cacto' && distHeroBush < bush.radius + 14 && this.hurtCooldown <= 0) {
+        this.hurtCooldown = 1.2;
+        this.heroHp = Math.max(1, this.heroHp - 1);
+        engine.sound.playHurtCacto();
+        engine.sound.playGrito();
+        engine.juice.shake.addTrauma(0.5);
+        engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 14, speed: 80 });
+        this.message = '🌵 AI! ESPINHO DE MANDACARU! Você perdeu 1 HP e soltou um grito de dor!';
+
+        // Grito involuntário espanta bodes e Chupa-Cabra ao redor
+        this.triggerSoundWave(300, engine);
+      }
+
+      if (distHeroBush < bush.radius + 30 && input.interact) {
+        if (!bush.isSearched) {
+          bush.isSearched = true;
+
+          if (bush.type === 'corda' && !this.hasRope) {
+            this.hasRope = true;
+            this.message = '🪢 CORDA ENCONTRADA! Agora você laça os bodes ao se aproximar!';
+            engine.sound.playPickup();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+          } else if (bush.type === 'candeeiro' && !this.hasLantern) {
+            this.hasLantern = true;
+            this.message = '🏮 CANDEEIRO ENCONTRADO! Iluminação expandida na caatinga!';
+            engine.sound.playPickup();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+          } else if (bush.type === 'fruta') {
+            if (this.heroHp < this.maxHeroHp) {
+              this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
+              this.message = '🍎 FRUTA SABOROSA DE UMBU! Você recuperou +1 HP!';
+            } else {
+              this.message = '🍎 Fruta deliciosa da caatinga!';
+            }
+            engine.sound.playFruitEat();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 12, speed: 45 });
+          } else if (bush.type === 'cacto') {
+            this.heroHp = Math.max(1, this.heroHp - 1);
+            engine.sound.playHurtCacto();
+            engine.sound.playGrito();
+            engine.juice.shake.addTrauma(0.5);
+            this.triggerSoundWave(300, engine);
+          } else {
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 40 });
-            if (bush.hasItem === 'corda' && !this.hasRope) {
-              this.hasRope = true;
-              this.message = '🪢 CORDA ENCONTRADA NA MOITA! Agora você pode laçar os bodes!';
-              engine.sound.playPickup();
-              engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
-            } else if (bush.hasItem === 'candeeiro' && !this.hasLantern) {
-              this.hasLantern = true;
-              this.message = '🏮 CANDEEIRO ENCONTRADO NA MOITA! Iluminação expandida na caatinga!';
-              engine.sound.playPickup();
-              engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
-            }
           }
+        }
 
-          // Se tiver bode escondido, faz sair
-          if (bush.hidingGoatId) {
-            const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
-            if (goat && goat.hiddenInBushId) {
-              goat.hiddenInBushId = undefined;
-              goat.x = bush.x + 20;
-              goat.y = bush.y + 20;
-              bush.hidingGoatId = undefined;
-              this.message = '🐐 Você descobriu um bode escondido na moita!';
-              engine.sound.playBerroBode(false);
-              engine.sound.playItemDescobrir();
-              engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 6, speed: 35 });
-            }
+        // Se tiver bode escondido, faz sair
+        if (bush.hidingGoatId) {
+          const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
+          if (goat && goat.hiddenInBushId) {
+            goat.hiddenInBushId = undefined;
+            goat.x = bush.x + 25;
+            goat.y = bush.y + 25;
+            bush.hidingGoatId = undefined;
+            this.message = '🐐 Você descobriu um bode escondido na moita!';
+            engine.sound.playBerroBode(false);
+            engine.sound.playItemDescobrir();
+            engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 6, speed: 35 });
           }
         }
       }
     }
 
-    // Aboio ou grito faz bodes saírem da moita próxima
+    // Aboio ou Grito faz bodes saírem de moitas próximas
     if (this.isAboioActive || this.isGritoActive) {
-      for (const bush of this.bushes) {
-        if (Math.hypot(this.player.x - bush.x, this.player.y - bush.y) < this.soundWaveRadius + bush.radius) {
-          if (bush.hidingGoatId) {
-            const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
-            if (goat && goat.hiddenInBushId) {
-              goat.hiddenInBushId = undefined;
-              goat.x = bush.x + (Math.random() - 0.5) * 40;
-              goat.y = bush.y + (Math.random() - 0.5) * 40;
-              bush.hidingGoatId = undefined;
-              engine.sound.playBerroBode(this.isGritoActive);
-            }
-          }
-        }
-      }
+      this.triggerSoundWave(this.soundWaveRadius, engine);
     }
 
-    // 4. IA do Chupa-Cabra & Ataque com Drenagem de HP
+    // 5. IA do Chupa-Cabra & Ataque com Reação em Cadeia Sonora
     let isAttackingGoat = false;
     if (this.chupaCabra.active) {
       const distHeroChupa = Math.hypot(this.player.x - this.chupaCabra.x, this.player.y - this.chupaCabra.y);
@@ -371,10 +464,9 @@ export class Stage1ChupaCabraScene implements IScene {
       // Grito ou Aboio espantam o Chupa-Cabra
       if ((this.isGritoActive || this.isAboioActive) && distHeroChupa < this.soundWaveRadius + 50) {
         const fleeAngle = Math.atan2(this.chupaCabra.y - this.player.y, this.chupaCabra.x - this.player.x);
-        this.chupaCabra.x += Math.cos(fleeAngle) * 320 * dt;
-        this.chupaCabra.y += Math.sin(fleeAngle) * 320 * dt;
+        this.chupaCabra.x += Math.cos(fleeAngle) * 340 * dt;
+        this.chupaCabra.y += Math.sin(fleeAngle) * 340 * dt;
       } else {
-        // Encontra o bode solto mais próximo
         let targetGoat: Goat | null = null;
         let minDist = 9999;
 
@@ -393,41 +485,51 @@ export class Stage1ChupaCabraScene implements IScene {
           this.chupaCabra.x += Math.cos(angle) * 140 * dt;
           this.chupaCabra.y += Math.sin(angle) * 140 * dt;
 
-          // Se estiver encostado no bode, drena HP!
-          if (minDist < 30) {
+          if (minDist < 32) {
             isAttackingGoat = true;
             targetGoat.hp -= 25 * dt;
             this.message = `🩸 O CHUPA-CABRA ESTÁ ATACANDO O ${targetGoat.label}! GRITE PARA ESPANTAR!`;
 
             this.rosnadoTimer += dt;
-            if (this.rosnadoTimer >= 0.75) {
+            if (this.rosnadoTimer >= 0.7) {
               this.rosnadoTimer = 0;
               engine.sound.playChupaCabraRosnado();
               engine.sound.playBerroBode(true);
-              engine.juice.shake.addTrauma(0.3);
+              engine.juice.shake.addTrauma(0.35);
+
+              // 💥 Reação em cadeia: Berro de pavor espanta todos os bodes próximos!
+              for (const otherGoat of this.goats) {
+                if (otherGoat.id !== targetGoat.id && !otherGoat.isRescued) {
+                  const distBetweenGoats = Math.hypot(otherGoat.x - targetGoat.x, otherGoat.y - targetGoat.y);
+                  if (distBetweenGoats < 320) {
+                    otherGoat.fleeTimer = 1.8;
+                    const panicAngle = Math.atan2(otherGoat.y - targetGoat.y, otherGoat.x - targetGoat.x);
+                    otherGoat.vx = Math.cos(panicAngle) * 230;
+                    otherGoat.vy = Math.sin(panicAngle) * 230;
+                  }
+                }
+              }
             }
 
-            // Verificação de Morte do Bode ➔ FALHA!
             if (targetGoat.hp <= 0) {
               targetGoat.hp = 0;
               this.stateStatus = 'FAILED';
               this.message = '💀 UM BODE MORREU! Missão Falhou. Retornando ao Estúdio...';
               engine.sound.playDefeatJingle();
+              setTimeout(() => engine.switchScene('STUDIO'), 2500);
               return;
             }
           }
-        } else {
-          this.chupaCabra.x += Math.sin(Date.now() / 1000) * 80 * dt;
         }
       }
 
-      this.chupaCabra.x = Math.max(30, Math.min(this.mapWidth - 30, this.chupaCabra.x));
-      this.chupaCabra.y = Math.max(30, Math.min(this.mapHeight - 30, this.chupaCabra.y));
+      this.chupaCabra.x = Math.max(40, Math.min(this.mapWidth - 40, this.chupaCabra.x));
+      this.chupaCabra.y = Math.max(40, Math.min(this.mapHeight - 40, this.chupaCabra.y));
     }
 
     engine.sound.setBGMState({ tension: isAttackingGoat ? 0.9 : 0.2 });
 
-    // 5. Comportamento e Condução dos Bodes
+    // 6. Condução e Comportamento dos Bodes
     let leashedIdx = 1;
     for (const g of this.goats) {
       if (g.isRescued || g.hiddenInBushId) continue;
@@ -442,12 +544,12 @@ export class Stage1ChupaCabraScene implements IScene {
         g.isRescued = true;
         g.isLeashed = false;
         engine.sound.playPickup();
-        engine.juice.particles.emit('sparkle', g.x, g.y, { count: 6, speed: 40 });
+        engine.juice.particles.emit('sparkle', g.x, g.y, { count: 8, speed: 45 });
         continue;
       }
 
       // Laçar com a corda
-      if (this.hasRope && distToHero < 70) {
+      if (this.hasRope && distToHero < 75) {
         if (!g.isLeashed) {
           engine.sound.playBerroBode(false);
           engine.juice.particles.emit('dust', g.x, g.y, { count: 4, speed: 20 });
@@ -469,22 +571,13 @@ export class Stage1ChupaCabraScene implements IScene {
           g.y += Math.sin(angle) * 200 * dt;
         }
       } else {
-        // Sem corda: se grito potente ativo, corre procurando moita
-        if (this.isGritoActive && distToHero < this.soundWaveRadius + 40) {
-          g.fleeTimer = 1.2;
-          const fleeAngle = Math.atan2(g.y - this.player.y, g.x - this.player.x);
-          g.vx = Math.cos(fleeAngle) * 220;
-          g.vy = Math.sin(fleeAngle) * 220;
-        }
-
         if (g.fleeTimer > 0) {
           g.fleeTimer -= dt;
           g.x += (g.vx || 0) * dt;
           g.y += (g.vy || 0) * dt;
 
-          // Se alcançar uma moita vazia, esconde-se nela
           for (const bush of this.bushes) {
-            if (!bush.hidingGoatId && Math.hypot(g.x - bush.x, g.y - bush.y) < bush.radius) {
+            if (!bush.hidingGoatId && bush.type !== 'cacto' && Math.hypot(g.x - bush.x, g.y - bush.y) < bush.radius) {
               g.hiddenInBushId = bush.id;
               bush.hidingGoatId = g.id;
               g.fleeTimer = 0;
@@ -492,7 +585,6 @@ export class Stage1ChupaCabraScene implements IScene {
             }
           }
         } else {
-          // Movimento errante
           g.wanderTimer -= dt;
           if (g.wanderTimer <= 0) {
             g.wanderTimer = 1.0 + Math.random() * 2.0;
@@ -508,23 +600,58 @@ export class Stage1ChupaCabraScene implements IScene {
       g.y = Math.max(40, Math.min(this.mapHeight - 40, g.y));
     }
 
-    // 6. Condição de Vitória (4 bodes no curral) ➔ SUCESSO!
+    // 7. Condição de Vitória (4 bodes resgatados)
     const rescuedCount = this.goats.filter((g) => g.isRescued).length;
     if (rescuedCount === 4 && this.stateStatus === 'PLAYING') {
       this.stateStatus = 'SUCCESS';
       engine.unlockItem('carimbo');
-      this.message = '🎉 TODOS OS 4 BODES SALVOS! O Fazendeiro entregou o 🪓 Carimbo Mágico!';
       engine.sound.playVictoryJingle();
-      engine.juice.particles.emit('sparkle', this.fazendeiro.x, this.fazendeiro.y, { count: 20, speed: 60 });
+
+      this.narrative.showOutro(
+        {
+          phaseNumber: 1,
+          title: 'O Ataque do Chupa-Cabra',
+          verses: [
+            'Com laço firme e grito de vaqueiro destemido,',
+            'O rebanho sagrado foi salvo e protegido;',
+            'O Fazendeiro grato lhe entrega a matriz entalhada:',
+            'O Carimbo Mágico da lenda consagrada!'
+          ],
+          itemReward: {
+            id: 'carimbo',
+            name: 'Carimbo Mágico',
+            icon: '🪓'
+          }
+        },
+        () => {
+          engine.switchScene('STUDIO');
+        }
+      );
+    }
+  }
+
+  private triggerSoundWave(radius: number, engine: IGameEngine): void {
+    for (const bush of this.bushes) {
+      if (Math.hypot(this.player.x - bush.x, this.player.y - bush.y) < radius + bush.radius) {
+        if (bush.hidingGoatId) {
+          const goat = this.goats.find((g) => g.id === bush.hidingGoatId);
+          if (goat && goat.hiddenInBushId) {
+            goat.hiddenInBushId = undefined;
+            goat.x = bush.x + (Math.random() - 0.5) * 40;
+            goat.y = bush.y + (Math.random() - 0.5) * 40;
+            bush.hidingGoatId = undefined;
+            engine.sound.playBerroBode(this.isGritoActive);
+          }
+        }
+      }
     }
   }
 
   public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
     ctx.save();
-    // Aplica Câmera do mundo
     ctx.translate(-this.camera.x, -this.camera.y);
 
-    // 1. Piso de Terra Batida da Caatinga (Xilogravura da Maya)
+    // 1. Piso de Terra Batida da Caatinga
     drawChaoTerraBatida(ctx, 0, 0, this.mapWidth, this.mapHeight);
 
     // Iluminação do Candeeiro
@@ -536,13 +663,13 @@ export class Stage1ChupaCabraScene implements IScene {
         40,
         this.player.x,
         this.player.y,
-        280
+        320
       );
-      lanternGrad.addColorStop(0, 'rgba(254, 240, 138, 0.3)');
+      lanternGrad.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
       lanternGrad.addColorStop(1, 'rgba(38, 23, 13, 0)');
       ctx.fillStyle = lanternGrad;
       ctx.beginPath();
-      ctx.arc(this.player.x, this.player.y, 280, 0, Math.PI * 2);
+      ctx.arc(this.player.x, this.player.y, 320, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
@@ -563,30 +690,38 @@ export class Stage1ChupaCabraScene implements IScene {
       this.curral.width,
       this.curral.height
     );
-    drawText(ctx, '[CURRAL]', this.curral.x, this.curral.y - 10, {
+    drawText(ctx, '[CURRAL CENTRAL]', this.curral.x, this.curral.y - 10, {
       font: 'bold 12px monospace',
       color: '#facc15',
       align: 'center'
     });
 
-    // Fazendeiro (Xilogravura da Maya)
+    // Fazendeiro
     drawFazendeiro(ctx, this.fazendeiro.x, this.fazendeiro.y, this.fazendeiro.width, this.fazendeiro.height);
 
-    // Moitas no Terreno (Xilogravura da Maya)
+    // Moitas, Cactos e Frutas
     for (const bush of this.bushes) {
-      drawMoita(ctx, bush.x, bush.y, bush.radius, {
-        hasItem: !bush.isSearched,
-        searched: bush.isSearched
-      });
+      if (bush.type === 'cacto') {
+        drawMoitaCactoEspinhos(ctx, bush.x, bush.y, bush.radius);
+      } else if (bush.type === 'fruta') {
+        drawMoitaFrutaRegional(ctx, bush.x, bush.y, bush.radius, { searched: bush.isSearched });
+      } else {
+        drawMoita(ctx, bush.x, bush.y, bush.radius, {
+          hasItem: (bush.type === 'corda' && !this.hasRope) || (bush.type === 'candeeiro' && !this.hasLantern),
+          searched: bush.isSearched
+        });
+      }
 
-      drawText(ctx, bush.hidingGoatId ? '🌿 [RUGIDO]' : '🌿', bush.x, bush.y - 12, {
-        font: 'bold 10px monospace',
-        color: '#fef08a',
-        align: 'center'
-      });
+      if (bush.hidingGoatId) {
+        drawText(ctx, '🌿 [RUGIDO]', bush.x, bush.y - 14, {
+          font: 'bold 10px monospace',
+          color: '#fef08a',
+          align: 'center'
+        });
+      }
     }
 
-    // Bodes (Xilogravura da Maya)
+    // Bodes
     for (const g of this.goats) {
       if (g.hiddenInBushId) continue;
 
@@ -622,14 +757,14 @@ export class Stage1ChupaCabraScene implements IScene {
       }
     }
 
-    // Chupa-Cabra (Xilogravura da Maya)
+    // Chupa-Cabra
     if (this.chupaCabra.active) {
       drawChupaCabra(ctx, this.chupaCabra.x, this.chupaCabra.y, this.chupaCabra.width, this.chupaCabra.height, {
         time: this.animTime
       });
     }
 
-    // Efeito Visual de Som
+    // Onda Sonora de Grito / Aboio
     if ((this.isAboioActive || this.isGritoActive) && this.soundWaveRadius > 0) {
       ctx.save();
       ctx.beginPath();
@@ -649,16 +784,16 @@ export class Stage1ChupaCabraScene implements IScene {
       ctx.restore();
     }
 
-    // Herói Coisinha (Xilogravura da Maya)
+    // Herói Coisinha
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
       time: this.animTime
     });
 
-    ctx.restore(); // Restaura Câmera para renderizar HUD estático fixo na tela
+    ctx.restore(); // Restaura Câmera para renderizar HUD estático
 
-    // HUD Superior Fixo
+    // HUD Superior
     const rescuedCount = this.goats.filter((g) => g.isRescued).length;
     drawText(ctx, `🐐 FASE 1: O ATAQUE DO CHUPA-CABRA | Bodes Salvos: ${rescuedCount} / 4`, 480, 18, {
       font: 'bold 15px monospace',
@@ -666,46 +801,29 @@ export class Stage1ChupaCabraScene implements IScene {
       color: '#f7d070'
     });
 
+    // Indicador de Vida do Herói (3 Corações / Pontos)
+    ctx.save();
+    ctx.fillStyle = '#1e293b';
+    ctx.fillRect(30, 10, 105, 30);
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(30, 10, 105, 30);
+
+    for (let h = 0; h < this.maxHeroHp; h++) {
+      ctx.font = '16px monospace';
+      ctx.fillText(h < this.heroHp ? '❤️' : '🖤', 42 + h * 30, 31);
+    }
+    ctx.restore();
+
     drawText(ctx, this.message, 480, 510, {
       font: '12px monospace',
       align: 'center',
       color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'
     });
 
-    // Banner de Sucesso ou Falha
-    if (this.stateStatus === 'SUCCESS') {
-      ctx.fillStyle = 'rgba(22, 101, 52, 0.92)';
-      ctx.fillRect(240, 200, 480, 100);
-      ctx.strokeStyle = '#4ade80';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(240, 200, 480, 100);
-      drawText(ctx, '🎉 SUCESSO! 🪓 CARIMBO MÁGICO CONQUISTADO!', 480, 225, {
-        font: 'bold 16px monospace',
-        color: '#bbf7d0',
-        align: 'center'
-      });
-      drawText(ctx, 'Retornando vitorioso ao Estúdio de Xilogravura...', 480, 255, {
-        font: '12px monospace',
-        color: '#f0fdf4',
-        align: 'center'
-      });
-    } else if (this.stateStatus === 'FAILED') {
-      ctx.fillStyle = 'rgba(127, 29, 29, 0.95)';
-      ctx.fillRect(240, 200, 480, 100);
-      ctx.strokeStyle = '#f87171';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(240, 200, 480, 100);
-      drawText(ctx, '💀 DERROTA: O CHUPA-CABRA DEVOROU O BODE!', 480, 225, {
-        font: 'bold 16px monospace',
-        color: '#fecaca',
-        align: 'center'
-      });
-      drawText(ctx, 'Retornando ao Estúdio para nova tentativa...', 480, 255, {
-        font: '12px monospace',
-        color: '#fff',
-        align: 'center'
-      });
-    }
+    // Diálogos & Modais Narrativos por Cima
+    this.dialogs.render(ctx, 960, 540);
+    this.narrative.render(ctx, 960, 540);
   }
 
   public destroy(): void {}

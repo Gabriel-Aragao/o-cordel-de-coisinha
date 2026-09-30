@@ -18,13 +18,15 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ---
 
-## 🎭 Sistema Canônico de Diálogos & Telas de Apresentação
+## 🎭 Sistema Canônico de Diálogos & Controles
 
 1. **Diálogo de Censura na 1ª Interação com NPCs:**
    - Ao conversar pela primeira vez com qualquer NPC (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**), o NPC pergunta seu nome. O herói responde `"meu nome é @#$!*&%#!"` acompanhado de um som cômico de erro/censura. O NPC responde: `"Entendi foi nada!"`.
    - Nas próximas falas, os NPCs chamam-no exclusivamente de **"Coisinha"** e oferecem dicas contextuais para vencer cada fase.
-2. **Telas de Abertura & Encerramento:** Cada fase possui tela introdutória com a narrativa do cordel e tela de vitória exibindo o **Item Místico** resgatado.
-3. **Controles Universais:** O comando de **Grito** (`Espaço`) e **Interação** (`E`) funcionam em todas as cenas do jogo.
+   - **Avanço no Release (`keyUp`) da tecla `E`:** Cada mensagem avança estritamente ao soltar a tecla, sem autofire acelerado.
+2. **Obtenção da Corda & Candeeiro:** Encontrados exclusivamente vasculhando moitas na caatinga.
+3. **Telas de Abertura & Encerramento:** Cada fase possui tela introdutória com a narrativa do cordel e tela de vitória exibindo o **Item Místico** resgatado.
+4. **Controles Universais:** O comando de **Grito** (`Espaço`) e **Interação** (`E`) funcionam em todas as cenas do jogo.
 
 ---
 
@@ -47,49 +49,42 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🗺️ As 4 Fases & Mecânicas de Gameplay
 
-### 🐐 1. O Ataque do Chupa-Cabra (Pastoreio, Cactos, Frutas & Moitas)
+### 🐐 1. O Ataque do Chupa-Cabra (Moitas Homogêneas, Cactos & Frutas)
 * **Objetivo:** Salvar **4 bodes** e trancá-los no curral central antes que o Chupa-Cabra drene sua vida.
 * **Mecânicas Principais:**
-  - **Mapa Amplo & Câmera:** Cenário expandido com câmera que acompanha o jogador.
-  - **Moitas com Cactos & Frutas:** Cactos causam dano e fazem o herói gritar de dor involuntariamente; Frutas regionais (Umbu/Mandacaru) recuperam a vida. Moitas também escondem a **Corda** e o **Candeeiro**.
-  - **Grito dos Bodes:** Bodes atacados pelo Chupa-Cabra berram de pavor, assustando outros bodes soltos ou em arbustos.
-  - **Vida dos Bodes:** Cada bode possui barra de HP individual. Se 1 bode morrer ➔ **Falha**.
+  - **Moitas Idênticas:** Todas as moitas possuem visual exterior homogêneo de xilogravura. O conteúdo (Cactos, Frutas, Bodes, Corda ou Candeeiro) só é revelado ao interagir.
+  - **Cactos vs. Frutas:** Cactos causam dano (-1 HP) e grito involuntário de dor; Frutas recuperam vida.
+  - **Grito dos Bodes:** Bodes atacados berram de pavor, assustando e dispersando bodes vizinhos.
+  - **Vida dos Bodes:** Morte de 1 bode ➔ **Falha**.
 * **Recompensa (Sucesso):** 🪓 **Carimbo Mágico**.
 
-### 🌿 2. A Fazenda da Cumade Fulozinha (Topologia Fechada de Lotes)
-* **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**. (Não existe Lote 3c).
+### 🌿 2. A Fazenda da Cumade Fulozinha (Labirintos Complexos & Portões)
+* **Objetivo:** Encontrar o fumo de rolo na moita do **Lote 1b** e entregá-lo como oferenda à Cumade Fulozinha no **Lote 3b**.
 * **Mecânicas Principais:**
-  - **Paredes Perimétricas:** Cada lote é fechado ao redor, com aberturas estritas nas conexões oficiais:
-    * Lote 0 ➔ dir Lote 2a (Pedra da botija na saída).
-    * Lote 2a ➔ cima Lote 1a, baixo Lote 3a, dir Lote 2b.
-    * Lote 1a ➔ dir Lote 1b.
-    * Lote 3a ➔ dir Lote 3b.
-    * Lote 2b ➔ cima Lote 1b, baixo Lote 3b.
-  - **Portões Internos com Colisão:** Portões dinâmicos bloqueiam quando fechados e liberam quando abertos com o assobio.
+  - **Paredes Perimétricas Sólidas:** Conexões abertas estritamente nos trajetos canônicos.
+  - **Labirintos Internos com Portões Alternantes:** Portões dinâmicos bloqueiam rigidamente quando fechados e liberam passagem quando abertos.
+  - **Física da Cumade:** A Fulô **NÃO atravessa paredes**, movendo-se apenas por corredores livres e portões abertos.
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
-### 🦉 3. A Pena da Rasga-Mortalha (2 Violeiros, 5 Casas em Arco & 4 Mesas)
-* **Objetivo:** Ouvir as sextilhas dos 2 violeiros, empurrar os moradores bêbados, transportar bebidas e fumos, e conduzir os animais até as 5 casas corretas em arco.
+### 🦉 3. A Pena da Rasga-Mortalha (Espaço Amplo, Violeiros & Ciclo de Mesas)
+* **Objetivo:** Ouvir os 2 violeiros, empurrar moradores bêbados, transportar bebidas e fumos e conduzir os animais até as 5 casas em arco.
 * **Mecânicas Principais:**
-  - **2 Violeiros no Canto Inferior Esquerdo:** Violeiro 1 declama 4 estrofes; Violeiro 2 declama as 5 estrofes restantes sob interação.
-  - **5 Casas em Arco:** Posicionadas na parte superior sob o voo da ave.
-  - **4 Mesas Interativas:**
-    1. *Moradores Bêbados:* Falam a profissão ao levantar e devem ser empurrados até a casa.
-    2. *Bebidas:* Pegar e levar à casa.
-    3. *Fumos:* Pegar e depositar na casa.
-    4. *Animais:* Laçar com Corda ou tanger até a casa (só saem se o herói gritar).
+  - **2 Violeiros (Canto Inferior Esquerdo):** Violeiro 1 declama 4 estrofes; Violeiro 2 declama as 5 estrofes finais.
+  - **Mesas & Curral Ampliados:** Maior área para manobras do personagem.
+  - **Transporte de Bebidas/Fumos:** Ao pegar da mesa, o item some dela. Soltar fora da casa retorna o item à mesa; soltar dentro da casa fixa o item nela.
+  - **Fixação de Bêbados e Animais:** Parar de conduzir antes da casa retorna à mesa/curral; uma vez dentro da casa, não saem mais.
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
-### 🏺 4. A Botija de Mané Monteiro (Lote da Igreja, Stealth Noturno & Caça Global)
-* **Objetivo:** Iniciar no **Lote da Igreja** (santuário à direita do 1b onde a Cumade não entra), cruzar a fazenda até o Lote 0, desenterrar a botija e retornar à Igreja.
+### 🏺 4. A Botija de Mané Monteiro (Escuridão, Candeeiro & Santuário)
+* **Objetivo:** Iniciar na Igreja (santuário seguro à direita do 1b), navegar pela fazenda no escuro até o Lote 0, desenterrar a botija e retornar à Igreja.
 * **Mecânicas Principais:**
-  - **Conexão Especial:** Abertura da porteira do Lote 1b para a Igreja (ativa apenas na Fase 4).
-  - **Caça Global da Cumade:** Nos lotes da fazenda a entidade persegue livremente.
-  - **Escuridão & Candeeiro:** Visão restrita ao círculo dinâmico de luz.
+  - **Escuridão Total & Candeeiro:** Mapa escuro; raio de visão curto sem o Candeeiro e ampliado com o Candeeiro encontrado em moita.
+  - **Portões Alternantes & Inversão de Controles:** Mantidos integralmente.
+  - **Física da Fulô:** Respeita paredes sólidas e não entra no Santuário da Igreja.
 * **Recompensa (Sucesso):** 🖋️ **Tinta Encantada**.
 
 ### 🏆 Encerramento & Vitória
-Somente após reunir os **4 itens místicos**, o jogador interage com a prensa, digita seu **Nickname** e estampa a capa do seu cordel:  
+Somente após reunir os **4 itens místicos**, o jogador interage com a prensa, digita seu **Nickname** e estampa a capa oficial:  
 > **"O Cordel de [Nickname]: O Herói do Sertão"**
 
 ---

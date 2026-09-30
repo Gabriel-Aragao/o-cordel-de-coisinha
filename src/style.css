@@ -1,0 +1,178 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: #12100e;
+  color: #f4ebd9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  padding: 12px;
+  gap: 8px;
+}
+
+#game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: #231c15;
+  border: 2px solid #5a3e26;
+  border-radius: 8px;
+  padding: 8px 16px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-left h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f7d070;
+  letter-spacing: 0.5px;
+}
+
+.badge {
+  background: #8b3a1a;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: #d6ba94;
+  font-family: monospace;
+}
+
+#canvas-container {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  background: #000;
+  border: 3px solid #8b5a2b;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+
+#game-footer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: #231c15;
+  border: 2px solid #5a3e26;
+  border-radius: 8px;
+  padding: 10px 16px;
+  gap: 8px;
+}
+
+.hud-inventory {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.inv-title {
+  font-weight: 700;
+  color: #f7d070;
+}
+
+.inv-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.inv-badge.locked {
+  background: #382c21;
+  color: #8c7358;
+  border: 1px dashed #5a3e26;
+  opacity: 0.7;
+}
+
+.inv-badge.unlocked {
+  background: #2b6e3f;
+  color: #bbf7d0;
+  border: 1px solid #4ade80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+}
+
+.hud-controls {
+  font-size: 0.85rem;
+  color: #c4ab85;
+}
+
+.hud-controls strong {
+  color: #f7d070;
+}
+
+.debug-scene-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid #423020;
+  padding-top: 8px;
+}
+
+.debug-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #9d8164;
+}
+
+.btn-debug {
+  background: #3d2b1f;
+  border: 1px solid #735031;
+  color: #e2d2ba;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-debug:hover {
+  background: #5e3f28;
+  color: #fff;
+  border-color: #d4a373;
+}
+
+.btn-debug.active {
+  background: #8b3a1a;
+  border-color: #f7d070;
+  color: #fff;
+  font-weight: 700;
+}

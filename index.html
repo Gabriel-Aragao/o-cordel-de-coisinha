@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>O Cordel de Coisinha: O Herói do Sertão — MVP</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header id="game-header">
+        <div class="header-left">
+          <h1>📜 O Cordel de Coisinha</h1>
+          <span class="badge">MVP GameJam</span>
+        </div>
+        <div class="header-right">
+          <span id="fps-display">FPS: --</span>
+          <span id="scene-display">Cena: --</span>
+        </div>
+      </header>
+
+      <main id="canvas-container">
+        <canvas id="game-canvas" width="960" height="540"></canvas>
+      </main>
+
+      <footer id="game-footer">
+        <div class="hud-inventory">
+          <span class="inv-title">Elementos Místicos:</span>
+          <span id="item-carimbo" class="inv-badge locked">🪓 Carimbo</span>
+          <span id="item-folha" class="inv-badge locked">📄 Folha</span>
+          <span id="item-pena" class="inv-badge locked">🪶 Pena</span>
+          <span id="item-tinta" class="inv-badge locked">🖋️ Tinta</span>
+        </div>
+        <div class="hud-controls">
+          <span>🎮 Controles: <strong>WASD / Setas</strong> (Mover) | <strong>Espaço</strong> (Ação / Aboio) | <strong>E / Enter</strong> (Interagir)</span>
+        </div>
+        <div class="debug-scene-bar">
+          <span class="debug-label">Navegação Rápida (Debug):</span>
+          <button id="btn-scene-studio" class="btn-debug">🏠 Estúdio</button>
+          <button id="btn-scene-stage1" class="btn-debug">🐐 Fase 1</button>
+          <button id="btn-scene-stage2" class="btn-debug">🌿 Fase 2</button>
+          <button id="btn-scene-stage3" class="btn-debug">🦉 Fase 3</button>
+          <button id="btn-scene-stage4" class="btn-debug">🏺 Fase 4</button>
+          <button id="btn-scene-victory" class="btn-debug">🏆 Vitória</button>
+        </div>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

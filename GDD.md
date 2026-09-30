@@ -15,7 +15,13 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
-### 1.2 Estrutura Macro do Jogo
+### 1.2 Regra de Transição: Sucesso ou Falha (Sem Portais)
+* **Sem portais manuais de volta nas fases.**
+* O retorno ao Estúdio ocorre exclusivamente por dois gatilhos de State Machine:
+  1. **Sucesso:** Atingimento do objetivo da fase ➔ Conquista do item místico ➔ Retorno comemorativo ao Estúdio.
+  2. **Falha:** Condição de derrota (morte de um bode, colisão sem fumo na Cumade, erro no enigma) ➔ Retorno ao Estúdio sem o item para nova tentativa.
+
+### 1.3 Estrutura Macro do Jogo
 ```
                     ┌───────────────────────────────┐
                     │   HUB: ESTÚDIO DE XILOGRAVURA │
@@ -45,82 +51,77 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ---
 
 ### 🐐 FASE 1: O Ataque do Chupa-Cabra
-* **Ambiente:** Caatinga aberta ao entardecer com cercas de arame e curral central.
-* **Objetivo:** Encontrar 4 bodes dispersos e conduzi-los em segurança ao curral antes que o Chupa-Cabra os ataque.
-* **Entidades & Comportamentos:**
-  - **Coisinha (Jogador):** Movimentação 8 direções + Ação de Aboiar (segurar barra de espaço/botão).
-  - **Bodes (4):** Movimento autônomo errante. Ao ouvir o aboio sem corda, fogem na direção contrária. Com a corda, seguem o jogador em fila.
-  - **Chupa-Cabra:** Surge pelas bordas da tela em intervalos e persegue o bode mais próximo. Se o jogador aboiar próximo a ele, a criatura se assusta e recua para fora da tela.
-* **Itens:**
-  - 🪢 **Corda de Amarrar:** Permite prender e conduzir os bodes diretamente.
-  - 🏮 **Candeeiro:** Aumenta o raio de visão na penumbra.
-* **Condição de Vitória:** 4 bodes no curral ➔ Fazendeiro entrega o **Carimbo Mágico**.
+* **Ambiente & Câmera:** Cenário amplo de caatinga com rolagem de tela (*camera follow*) centralizada no jogador.
+* **Moitas:** Vegetação densa espalhada pelo mapa.
+  - Bodes podem estar escondidos dentro das moitas.
+  - Ao interagir com uma moita (`E` / Ação), o jogador vasculha o arbusto. A **Corda** e o **Candeeiro** estão escondidos em moitas.
+* **Mecânicas de Som:**
+  - **Aboiar (Toque Curto):** Se o bode estiver na moita, faz o bode sair e o afasta levemente.
+  - **Gritar (Segurar Botão):** Assusta o bode, fazendo-o disparar em fuga para procurar uma nova moita, além de espantar o Chupa-Cabra.
+* **Chupa-Cabra & Barra de Vida dos Bodes:**
+  - Bode fora da moita atrai o Chupa-Cabra.
+  - Cada um dos 4 bodes possui **Barra de HP** visível. O Chupa-Cabra drena HP ao atacar.
+  - **Falha:** Se 1 bode morrer (HP = 0) ➔ Retorno imediato ao estúdio.
+  - **Sucesso:** Salvar e conduzir os 4 bodes ao curral central ➔ Fazendeiro entrega o **🪓 Carimbo Mágico** ➔ Retorno vitorioso ao estúdio.
 
 ---
 
 ### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
-* **Ambiente:** Labirinto de 7 lotes interconectados com vegetação fechada e porteiras de madeira.
-* **Topologia do Mapa (7 Lotes):**
+* **Ambiente & Topologia (6 Lotes em Telas Individuais — Sem Lote 3c):**
+  - Cada lote é exibido como uma tela individual fechada com seu próprio labirinto interno.
+  - **Portões Internos:** Abrem e fecham periodicamente com os assobios.
+  - **Porteiras de Borda:** Portagens de transição entre lotes adjacentes estão **sempre abertas**.
+  - **Moitas:** Presentes em todos os lotes.
   ```
-  [1a]   [1b]
-    |      |
-  [2a] - [2b]
-    |
-  [Lote 0] (Início)
-    |
-  [3a] (Fumo) - [3b] - [3c] (Cumade Fulozinha)
+  [Lote 1a]                [Lote 1b] (Fumo na Moita)
+      |                        |
+  [Lote 2a] (Pedra) ------ [Lote 2b]
+      |                        |
+  [Lote 0] (Início)        [Lote 3b] (Cumade Fulozinha)
+      |
+  [Lote 3a]
   ```
-* **Mecânicas Especiais:**
-  - **Assobios Mágicos:** Em intervalos rítmicos, um assobio ecoa pela mata. Assobios alternam paredes abertas/fechadas e invertem temporariamente os controles do jogador (cima ⇄ baixo ou esquerda ⇄ direita por 4 segundos).
-  - **A Pedra no Chão:** Pista secreta no Lote 0 onde o jogador tropeça em uma pedra grande (marcação da botija para a Fase 4).
-* **Itens:**
-  - 🍂 **Fumo de Rolo:** Localizado no Lote 3a.
-* **Condição de Vitória:** Entregar o fumo à Cumade Fulozinha no Lote 3c ➔ Ela entrega a **Página Rasgada**. (Se alcançá-la sem fumo: dano/expulsão).
+* **Lote 0 (Entrada):** Tela inicial com porteira à direita. A **Pedra da Botija** está situada na saída para o Lote 2a.
+* **Lote 1b:** O **Fumo de Rolo** está escondido dentro de uma moita.
+* **Lote 3b:** Morada da Cumade Fulozinha. Ao entrar no Lote 3b, ela inicia perseguição ativa pelo labirinto e intensifica os assobios (inversão de controles: cima ⇄ baixo ou esq ⇄ dir).
+* **Desfecho de Colisão com a Cumade:**
+  - **Com o Fumo:** Ela aceita o agrado e entrega a **📄 Página / Folha Rasgada** ➔ **Sucesso** (retorno ao estúdio).
+  - **Sem o Fumo:** Ataque de cipó ➔ **Falha** (retorno ao estúdio).
 
 ---
 
 ### 🦉 FASE 3: A Pena da Rasga-Mortalha
-* **Ambiente:** Rua com 5 casas coloridas do vilarejo sertanejo (Azul, Amarela, Vermelha, Verde, Branca).
-* **Objetivo:** Descobrir em qual casa a Pena da Rasga-Mortalha caiu através de um **Enigma de Einstein no Sertão**.
-* **Matriz de Dedução (5 Atributos x 5 Casas):**
-  1. Cor da Casa (Azul, Amarela, Vermelha, Verde, Branca)
-  2. Ofício do Morador (Ferreiro, Beato, Vaqueiro, Sanfoneiro, Xilógrafo)
-  3. Bebida Típica (Garapa, Café, Cachaça, Água de Pote, Chá de Boldo)
-  4. Animal de Estimação (Galo de Campina, Bode, Calango, Cachorro, Tatu)
-  5. Tipo de Fumo (Fumo de Rolo, Cigarro de Palha, Cachimbo, Rapé, Desfiado)
-* **Mecânica de Jogo:**
-  - O jogador lê cartazes de cordel espalhados pela praça contendo as pistas lógicas.
-  - Interface interativa de dedução (tabela de marcação estilo puzzle).
-* **Condição de Vitória:** Selecionar a casa correta ➔ Recolher a **Pena Encantada**.
+* **Ambiente:** Vilarejo sertanejo com 5 casas coloridas (Amarela, Azul, Vermelha, Verde, Branca).
+* **Mecânica de Puzzle (Arrastar Itens):**
+  - Vários itens soltos no cenário representando as características do enigma de Einstein.
+  - O jogador lê as 9 estrofes em cordel de @cascudo e deve **arrastar cada item para a sua casa correspondente**, completando toda a matriz lógica da vila.
+* **Desfecho:**
+  - **Confirmação com Erro:** Agouro da ave ➔ **Falha** (retorno ao estúdio).
+  - **Confirmação Correta:** A Casa 4 (Verde / Ferrador do Tatu) é revelada, o jogador interage com a casa e recebe a **🪶 Pena Encantada** ➔ **Sucesso** (retorno ao estúdio).
 
 ---
 
 ### 🏺 FASE 4: A Botija de Mané Monteiro
-* **Ambiente:** A mesma Fazenda da Cumade Fulozinha, porém em noite profunda e chuvosa.
-* **Objetivo:** Entrar pela porteira do Lote 1b, navegar no escuro até a pedra no Lote 0, cavar a botija e levá-la de volta à Paróquia.
+* **Ambiente:** Mesma topologia dos 6 lotes da Fazenda da Cumade Fulozinha em plena noite escura.
 * **Mecânicas Especiais:**
-  - **Visão Limitada:** Escuridão severa. O Candeeiro (obtido na Fase 1) ilumina um círculo dinâmico de 120px ao redor do herói.
-  - **Cumade Furiosa (Stealth):** Sem o fumo, a Cumade Fulozinha patrulha o labirinto em alta velocidade. O jogador precisa esgueirar-se pelas sombras e evitar cruzar sua linha de visão.
-  - **Peso da Botija:** Carregar a botija reduz a velocidade de movimento em 25%.
-* **Condição de Vitória:** Entregar a botija ao Beato na Paróquia ➔ Receber o frasco de **Tinta Encantada**.
+  - **Caça Global da Cumade:** A entidade agora **atravessa livremente entre todos os lotes**.
+  - **Sem Fumo:** Se a Cumade colidir com o jogador ➔ **Falha** (retorno ao estúdio).
+  - **Escuridão & Candeeiro:** Visão restrita ao círculo dinâmico de luz do Candeeiro.
+  - **Desenterrar a Botija:** O jogador entra pelo Lote 1b, viaja até o Lote 0, desenterra o ouro sob a pedra (penalidade de -25% de velocidade pelo peso) e escapa até a Paróquia.
+* **Desfecho:**
+  - Entregar a botija ao Beato na Paróquia ➔ Concessão da **🖋️ Tinta Encantada** ➔ **Sucesso** (retorno ao estúdio).
 
 ---
 
-### 🏆 FASE FINAL: O Estúdio de Xilogravura & O Grande Encerramento
-1. O jogador retorna ao estúdio com os 4 cordéis e os 4 instrumentos.
-2. Posiciona os 4 cordéis no varal com os pregadores.
-3. Insere a Folha na prensa, derrama a Tinta, assina com a Pena e grava com o Carimbo.
-4. Caixa de texto interativa: o jogador digita seu **Nickname**.
-5. A prensa executa a animação de prensagem com efeito sonoro de impacto.
-6. A porta mágica se abre em um feixe de luz.
-7. **Tela Final de Vitória:** Capa de cordel personalizada em xilogravura:  
-   > **"O Cordel de [Nickname]: O Herói do Sertão"**
+### 🏆 FASE FINAL: A Prensa do Destino & Vitória
+1. **Desbloqueio:** A mesa de prensagem só aceita interação após a conquista dos **4 itens místicos**.
+2. **Personalização:** O jogador digita seu **Nickname**.
+3. **Prensagem:** Animação com estampagem xilográfica e abertura da porta mística.
+4. **Capa Oficial:** Exibição da capa personalizada *"O Cordel de [Nickname]: O Herói do Sertão"*.
 
 ---
 
 ## 3. Diretrizes de Desenvolvimento do MVP (Fase 1 de Execução)
-
-Para garantir validação ágil e testes imediatos de jogabilidade:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -130,15 +131,17 @@ Para garantir validação ágil e testes imediatos de jogabilidade:
 │ Bodes                    │ Círculos Brancos: `[BODE]`       │
 │ Chupa-Cabra              │ Triângulo Vermelho: `[CHUPA]`    │
 │ Cumade Fulozinha         │ Círculo Amarelo: `[FULÔ]`        │
+│ Moitas                   │ Círculos Verdes: `[MOITA]`       │
 │ Casas do Vilarejo        │ Retângulos Coloridos `[CASA 1..5]│
 │ Botija                   │ Quadrado Dourado `[BOTIJA]`      │
 │ Fumo de Rolo             │ Quadrado Marrom `[FUMO]`         │
 └──────────────────────────┴──────────────────────────────────┘
 ```
 
-* **Prioridade 1:** Montar o Game Loop reativo (movimentação, colisões e troca de cenas/fases).
-* **Prioridade 2:** Implementar as 4 lógicas de vitória de cada fase no estado global.
-* **Prioridade 3:** Validação com QA (@glitch) antes de aplicar sprites e áudio.
+* **Prioridade 1:** Câmera dinâmica na Fase 1 e lógica de HP dos bodes.
+* **Prioridade 2:** FSM de lotes individuais na Fase 2 e perseguição global na Fase 4.
+* **Prioridade 3:** Drag-and-drop de itens no puzzle da Fase 3.
+* **Prioridade 4:** Validação de QA com @glitch.
 
 ---
-*GDD Aprovado por @gunpei e @domaragao para a Tungão GameJam 2024.*
+*GDD Revisado e Aprovado por @gunpei e @domaragao para a Tungão GameJam 2024.*

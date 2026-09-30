@@ -45,7 +45,7 @@ export class GameEngine implements IGameEngine {
       throw new Error('Não foi possível obter o contexto 2D do Canvas.');
     }
     this.ctx = context;
-    this.inputManager = new InputManager();
+    this.inputManager = new InputManager(this.canvas);
 
     this.registerScenes();
   }
@@ -111,7 +111,7 @@ export class GameEngine implements IGameEngine {
     this.frameCount++;
     this.fpsTimer += dt;
     if (this.fpsTimer >= 0.5) {
-      this.fps = Math.round((this.frameCount / this.fpsTimer));
+      this.fps = Math.round(this.frameCount / this.fpsTimer);
       this.frameCount = 0;
       this.fpsTimer = 0;
       if (this.onStateChange) {
@@ -119,7 +119,8 @@ export class GameEngine implements IGameEngine {
       }
     }
 
-    // Input snapshot
+    // Input update e snapshot
+    this.inputManager.update(dt);
     const input: InputState = this.inputManager.getState();
 
     // Update da cena ativa

@@ -1,418 +1,356 @@
 import { IScene, IGameEngine, InputState, Entity, SceneId } from '../types';
-import { renderEntity, drawText } from '../../renderer/shapes';
+import { drawText } from '../../renderer/shapes';
 
-interface House extends Entity {
+interface HouseSlot {
   index: number;
   corName: string;
+  colorHex: string;
   morador: string;
   bebida: string;
   fumo: string;
   animal: string;
-  hasPena: boolean;
-}
-
-interface CordelStanza {
-  title: string;
-  lines: string[];
 }
 
 export class Stage3RasgaMortalhaScene implements IScene {
   public id: SceneId = 'STAGE_3_RASGAMORTALHA';
   public name = 'Fase 3: A Pena da Rasga-Mortalha';
 
-  private player: Entity = {
-    id: 'hero',
-    x: 80,
-    y: 430,
-    width: 30,
-    height: 30,
-    color: '#3b82f6',
-    label: '[HEROI]',
-    shape: 'rect',
-    speed: 220
-  };
-
   private owl: Entity = {
     id: 'owl',
     x: 100,
-    y: 70,
+    y: 50,
     width: 36,
     height: 24,
     color: '#a855f7',
     label: '[RASGA-MORTALHA]',
     shape: 'triangle',
-    speed: 140
+    speed: 130
   };
 
-  private returnPortal: Entity = {
-    id: 'portal',
-    x: 50,
-    y: 490,
-    width: 80,
-    height: 32,
-    color: '#475569',
-    label: '[ESTÚDIO]',
-    shape: 'rect'
-  };
-
-  private houses: House[] = [
-    {
-      id: 'house_1',
-      index: 1,
-      x: 140,
-      y: 220,
-      width: 120,
-      height: 120,
-      color: '#eab308',
-      corName: 'Amarela',
-      morador: 'Sanfoneiro',
-      bebida: 'Água de Pote',
-      fumo: 'Cachimbo de Barro',
-      animal: 'Galo de Campina',
-      label: '[CASA 1 - AMARELA]',
-      shape: 'rect',
-      hasPena: false
-    },
-    {
-      id: 'house_2',
-      index: 2,
-      x: 300,
-      y: 220,
-      width: 120,
-      height: 120,
-      color: '#2563eb',
-      corName: 'Azul',
-      morador: 'Vaqueiro',
-      bebida: 'Aluá de Milho',
-      fumo: 'Rapé de Imburana',
-      animal: 'Cavalo',
-      label: '[CASA 2 - AZUL]',
-      shape: 'rect',
-      hasPena: false
-    },
-    {
-      id: 'house_3',
-      index: 3,
-      x: 460,
-      y: 220,
-      width: 120,
-      height: 120,
-      color: '#dc2626',
-      corName: 'Vermelha',
-      morador: 'Rezadeira',
-      bebida: 'Café c/ Rapadura',
-      fumo: 'Fumo de Palha',
-      animal: 'Bode',
-      label: '[CASA 3 - VERMELHA]',
-      shape: 'rect',
-      hasPena: false
-    },
-    {
-      id: 'house_4',
-      index: 4,
-      x: 620,
-      y: 220,
-      width: 120,
-      height: 120,
-      color: '#16a34a',
-      corName: 'Verde',
-      morador: 'Ferrador',
-      bebida: 'Cachaça',
-      fumo: 'Fumo de Rolo',
-      animal: 'TATU 🏆',
-      label: '[CASA 4 - VERDE]',
-      shape: 'rect',
-      hasPena: true
-    },
-    {
-      id: 'house_5',
-      index: 5,
-      x: 780,
-      y: 220,
-      width: 120,
-      height: 120,
-      color: '#f8fafc',
-      corName: 'Branca',
-      morador: 'Xilógrafo',
-      bebida: 'Garapa',
-      fumo: 'Cachimbo de Angico',
-      animal: 'Jumento',
-      label: '[CASA 5 - BRANCA]',
-      shape: 'rect',
-      hasPena: false
-    }
-  ];
-
-  private stanzas: CordelStanza[] = [
-    {
-      title: 'Estrofe I — A Vila da Meia-Noite',
-      lines: [
-        'Na vila da meia-noite, onde a coruja piava,',
-        'Cinco casas em fileira o luar iluminava:',
-        'Cada qual com sua cor, seu dono e o que criava.'
-      ]
-    },
-    {
-      title: 'Estrofe II — O Sanfoneiro e a Casa Azul',
-      lines: [
-        'Ouvindo o som do folfole, logo na primeira casa',
-        'Mora o velho Sanfoneiro que a tristeza ali atrasa;',
-        'E vizinho a sua porta a casa Azul se asasa.'
-      ]
-    },
-    {
-      title: 'Estrofe III — A Rezadeira e o Café no Meio',
-      lines: [
-        'A beata Rezadeira habita a casa Vermelha,',
-        'Com devoção e preceito, acendendo sua centelha;',
-        'E bebe Café amargo quem mora bem lá no meio.'
-      ]
-    },
-    {
-      title: 'Estrofe IV — A Casa Verde e a Cachaça',
-      lines: [
-        'A casa de cor de relva, toda Verde e caiada,',
-        'Fica à esquerda da Branca, na mesma beira de estrada;',
-        'E o dono da casa Verde bebe Cachaça aprumada.'
-      ]
-    },
-    {
-      title: 'Estrofe V — A Amarela e o Aluá do Vaqueiro',
-      lines: [
-        'O dono da Amarela pita Cachimbo de Barro;',
-        'O Vaqueiro bebe Aluá sem pressa e sem esparro;',
-        'Na caatinga ele não cansa, nem no sol nem no pigarro.'
-      ]
-    },
-    {
-      title: 'Estrofe VI — O Bode e o Cavalo Vizinho',
-      lines: [
-        'Quem pita Fumo de Palha tem um Bode no cercado;',
-        'O dono do bom Cavalo mora colado, ao lado',
-        'De quem no Cachimbo pisa o barro bem queimado.'
-      ]
-    },
-    {
-      title: 'Estrofe VII — O Ferrador e o Fumo de Rolo',
-      lines: [
-        'Quem no Cachimbo de Angico bebe Garapa bem doce,',
-        'Pra ter força no trabalho como se o mundo fosse;',
-        'E o Ferrador de renome pita Fumo de Rolo lento.'
-      ]
-    },
-    {
-      title: 'Estrofe VIII — O Xilógrafo e a Água de Pote',
-      lines: [
-        'O Xilógrafo famoso cria um Jumento ensinado;',
-        'Quem aspira o pó do Rapé mora bem encostado',
-        'Naquele que bebe Água do fundo do Pote areado.'
-      ]
-    },
-    {
-      title: 'Estrofe IX — O Galo e a Pergunta Final',
-      lines: [
-        'O homem do bom Rapé fica vizinho ao cantador',
-        'Que cria Galo de Campina com carinho e com amor...',
-        'Diga agora, forasteiro: Quem do TATU é o senhor? ➔ A PENA ESTÁ AQUI!'
-      ]
-    }
-  ];
-
-  private currentStanza: number = 0;
-  private selectedHouse: House | null = null;
-  private message: string = 'Leia as sextilhas de cordel com [Espaço] e aperte [E / Enter] na casa certa!';
-  private victoryTriggered: boolean = false;
   private owlDirection: number = 1;
 
-  public init(engine: IGameEngine): void {
-    this.player.x = 80;
-    this.player.y = 430;
-    this.currentStanza = 0;
-    this.selectedHouse = null;
-    this.victoryTriggered = engine.inventory.pena;
+  // As 5 Casas Sertanejas
+  private houses: HouseSlot[] = [];
 
-    if (this.victoryTriggered) {
-      this.message = '✓ Enigma Resolvido! A 🪶 Pena Encantada foi recolhida na Casa 4 (Verde / Ferrador).';
+  // Categorias de Seleção
+  private moradores = ['(Vazio)', 'Vaqueiro', 'Rendeira', 'Cantador', 'Ferrador', 'Rezadeira'];
+  private bebidas = ['(Vazio)', 'Água', 'Garapa', 'Cachaça', 'Umbu', 'Café'];
+  private fumos = ['(Vazio)', 'Paieiro', 'Palha', 'Desfiado', 'Arapiraca', 'Trevo'];
+  private animais = ['(Vazio)', 'Bode', 'Galo', 'Tatu', 'Cavalo', 'Canário'];
+
+  private selectedHouseIndex: number = 0;
+  private selectedRow: number = 0; // 0: morador, 1: bebida, 2: fumo, 3: animal
+
+  private message: string = 'Preencha os dados das 5 casas sertanejas com base nas dicas e clique em Validar Dedução!';
+  private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
+  private endTimer: number = 0;
+
+  // Dicas de Cordel
+  private stanzas = [
+    '1. O Vaqueiro mora na Casa Amarela e bebe Água de pote.',
+    '2. A Rendeira mora na Casa Azul e cria o Galo.',
+    '3. O Cantador mora na Casa Vermelha e bebe Cachaça.',
+    '4. A Casa Verde fica ao lado da Branca e seu dono bebe Umbu.',
+    '5. O Ferrador cria o Cavalo e fuma Arapiraca.',
+    '6. A Rezadeira mora na Casa Branca e toma Café.',
+    '7. O dono da Casa 1 cria o Bode e fuma Paieiro.',
+    '8. Quem fuma Palha mora na Casa Azul e bebe Garapa.',
+    '9. O Cantador fuma Desfiado e cria o Tatu.',
+    '10. A Rezadeira fuma Trevo e cria o Canário.',
+    '11. A Casa 4 (Verde / Ferrador) guarda a 🪶 PENA ENCANTADA!'
+  ];
+
+  public init(engine: IGameEngine): void {
+    this.stateStatus = 'PLAYING';
+    this.endTimer = 0;
+    this.selectedHouseIndex = 0;
+    this.selectedRow = 0;
+
+    // Inicializa as 5 Casas vazias ou pré-carregadas para o jogador
+    this.houses = [
+      { index: 1, corName: 'Amarela', colorHex: '#eab308', morador: 'Vaqueiro', bebida: 'Água', fumo: 'Paieiro', animal: 'Bode' },
+      { index: 2, corName: 'Azul', colorHex: '#2563eb', morador: 'Rendeira', bebida: 'Garapa', fumo: 'Palha', animal: 'Galo' },
+      { index: 3, corName: 'Vermelha', colorHex: '#dc2626', morador: 'Cantador', bebida: 'Cachaça', fumo: 'Desfiado', animal: 'Tatu' },
+      { index: 4, corName: 'Verde', colorHex: '#16a34a', morador: 'Ferrador', bebida: 'Umbu', fumo: 'Arapiraca', animal: 'Cavalo' },
+      { index: 5, corName: 'Branca', colorHex: '#f8fafc', morador: 'Rezadeira', bebida: 'Café', fumo: 'Trevo', animal: 'Canário' }
+    ];
+
+    if (engine.inventory.pena) {
+      this.message = '✓ Enigma Resolvido! A 🪶 Pena Encantada já foi conquistada na Casa 4.';
     }
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
-    // 1. Movimento do Jogador
-    let dx = 0;
-    let dy = 0;
-
-    if (input.left) dx -= 1;
-    if (input.right) dx += 1;
-    if (input.up) dy -= 1;
-    if (input.down) dy += 1;
-
-    if (dx !== 0 && dy !== 0) {
-      const len = Math.sqrt(dx * dx + dy * dy);
-      dx /= len;
-      dy /= len;
-    }
-
-    const speed = this.player.speed || 220;
-    this.player.x += dx * speed * dt;
-    this.player.y += dy * speed * dt;
-
-    this.player.x = Math.max(30, Math.min(930, this.player.x));
-    this.player.y = Math.max(300, Math.min(500, this.player.y));
-
-    // 2. Voo da Rasga-Mortalha no céu
-    this.owl.x += this.owlDirection * (this.owl.speed || 140) * dt;
-    if (this.owl.x > 880) {
-      this.owlDirection = -1;
-    } else if (this.owl.x < 80) {
-      this.owlDirection = 1;
-    }
-
-    // 3. Alternar Estrofes de Cordel (Espaço)
-    if (input.action) {
-      this.currentStanza = (this.currentStanza + 1) % this.stanzas.length;
-    }
-
-    // 4. Identifica a Casa mais próxima
-    let nearest: House | null = null;
-    for (const h of this.houses) {
-      if (Math.hypot(this.player.x - h.x, this.player.y - (h.y + 60)) < 75) {
-        nearest = h;
-        break;
+    if (this.stateStatus !== 'PLAYING') {
+      this.endTimer += dt;
+      if (this.endTimer >= 2.5) {
+        engine.switchScene('STUDIO');
       }
+      return;
     }
-    this.selectedHouse = nearest;
 
-    // 5. Investigar Casa (E / Enter)
-    if (input.interact && this.selectedHouse) {
-      if (this.selectedHouse.hasPena) {
-        if (!this.victoryTriggered) {
-          this.victoryTriggered = true;
-          engine.unlockItem('pena');
-          this.message = '🎉 DEDUÇÃO EXATA! O Ferrador (Casa Verde) cria o Tatu e entrega a 🪶 Pena Encantada!';
+    // Voo da coruja Rasga-Mortalha
+    this.owl.x += this.owlDirection * (this.owl.speed || 130) * dt;
+    if (this.owl.x > 880) this.owlDirection = -1;
+    if (this.owl.x < 80) this.owlDirection = 1;
+
+    // Navegação no Teclado (Setas / WASD)
+    if (input.left) {
+      this.selectedHouseIndex = Math.max(0, this.selectedHouseIndex - 1);
+    } else if (input.right) {
+      this.selectedHouseIndex = Math.min(4, this.selectedHouseIndex + 1);
+    }
+
+    if (input.up) {
+      this.selectedRow = Math.max(0, this.selectedRow - 1);
+    } else if (input.down) {
+      this.selectedRow = Math.min(3, this.selectedRow + 1);
+    }
+
+    // Suporte ao Clique / Mouse
+    if (input.mouse.clicked) {
+      const mx = input.mouse.x;
+      const my = input.mouse.y;
+
+      // Checa se clicou nas casas
+      for (let i = 0; i < this.houses.length; i++) {
+        const hx = 70 + i * 170;
+        const hy = 160;
+        const hw = 150;
+        const hh = 230;
+
+        if (mx >= hx && mx <= hx + hw && my >= hy && my <= hy + hh) {
+          this.selectedHouseIndex = i;
+          const relativeY = my - hy;
+          if (relativeY >= 40 && relativeY < 85) {
+            this.selectedRow = 0;
+            this.cycleAttribute(i, 0);
+          } else if (relativeY >= 85 && relativeY < 130) {
+            this.selectedRow = 1;
+            this.cycleAttribute(i, 1);
+          } else if (relativeY >= 130 && relativeY < 175) {
+            this.selectedRow = 2;
+            this.cycleAttribute(i, 2);
+          } else if (relativeY >= 175) {
+            this.selectedRow = 3;
+            this.cycleAttribute(i, 3);
+          }
         }
-      } else {
-        this.message = `🔍 Casa ${this.selectedHouse.index} (${this.selectedHouse.corName}): ${this.selectedHouse.morador} cria ${this.selectedHouse.animal}. A pena não caiu aqui!`;
+      }
+
+      // Checa clique no Botão de Validar Dedução
+      if (mx >= 330 && mx <= 630 && my >= 430 && my <= 485) {
+        this.validateSolution(engine);
       }
     }
 
-    // 6. Portal de Retorno ao Estúdio
-    if (
-      Math.abs(this.player.x - this.returnPortal.x) < (this.player.width + this.returnPortal.width) / 2 &&
-      Math.abs(this.player.y - this.returnPortal.y) < (this.player.height + this.returnPortal.height) / 2
-    ) {
-      engine.switchScene('STUDIO');
+    // Ação com Teclado (Espaço / Enter para alternar atributo ou validar)
+    if (input.action || input.interact) {
+      this.cycleAttribute(this.selectedHouseIndex, this.selectedRow);
+    }
+  }
+
+  private cycleAttribute(houseIdx: number, row: number): void {
+    const house = this.houses[houseIdx];
+    if (row === 0) {
+      const idx = this.moradores.indexOf(house.morador);
+      house.morador = this.moradores[(idx + 1) % this.moradores.length];
+    } else if (row === 1) {
+      const idx = this.bebidas.indexOf(house.bebida);
+      house.bebida = this.bebidas[(idx + 1) % this.bebidas.length];
+    } else if (row === 2) {
+      const idx = this.fumos.indexOf(house.fumo);
+      house.fumo = this.fumos[(idx + 1) % this.fumos.length];
+    } else if (row === 3) {
+      const idx = this.animais.indexOf(house.animal);
+      house.animal = this.animais[(idx + 1) % this.animais.length];
+    }
+  }
+
+  private validateSolution(engine: IGameEngine): void {
+    // Validação Canônica da Matriz
+    const h1 = this.houses[0];
+    const h2 = this.houses[1];
+    const h3 = this.houses[2];
+    const h4 = this.houses[3];
+    const h5 = this.houses[4];
+
+    const isH1Valid = h1.morador === 'Vaqueiro' && h1.bebida === 'Água' && h1.fumo === 'Paieiro' && h1.animal === 'Bode';
+    const isH2Valid = h2.morador === 'Rendeira' && h2.bebida === 'Garapa' && h2.fumo === 'Palha' && h2.animal === 'Galo';
+    const isH3Valid = h3.morador === 'Cantador' && h3.bebida === 'Cachaça' && h3.fumo === 'Desfiado' && h3.animal === 'Tatu';
+    const isH4Valid = h4.morador === 'Ferrador' && h4.bebida === 'Umbu' && h4.fumo === 'Arapiraca' && h4.animal === 'Cavalo';
+    const isH5Valid = h5.morador === 'Rezadeira' && h5.bebida === 'Café' && h5.fumo === 'Trevo' && h5.animal === 'Canário';
+
+    if (isH1Valid && isH2Valid && isH3Valid && isH4Valid && isH5Valid) {
+      // SUCESSO!
+      this.stateStatus = 'SUCCESS';
+      engine.unlockItem('pena');
+      this.message = '🎉 DEDUÇÃO EXATA! O Ferrador da Casa Verde entregou a 🪶 Pena Encantada!';
+    } else {
+      // FALHA!
+      this.stateStatus = 'FAILED';
+      this.message = '💀 O PIADO DA RASGA-MORTALHA ECOOU! A dedução está incorreta!';
     }
   }
 
   public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
-    // Fundo Céu Noturno do Sertão
-    ctx.fillStyle = '#060a14';
+    // Fundo Noturno Sertanejo
+    ctx.fillStyle = '#050814';
     ctx.fillRect(0, 0, 960, 540);
 
     // Lua Cheia de Xilogravura
     ctx.fillStyle = '#fef08a';
     ctx.beginPath();
-    ctx.arc(880, 60, 26, 0, Math.PI * 2);
+    ctx.arc(890, 50, 24, 0, Math.PI * 2);
     ctx.fill();
 
-    // Voo da Ave Espectral Rasga-Mortalha
-    renderEntity(ctx, this.owl);
-
-    // Faíscas Místicas sobre a Casa 4 se concluído ou destacando a ave
-    if (this.victoryTriggered) {
-      drawText(ctx, '✨ 🪶 PENA ENCONTRADA! ✨', 620, 110, {
-        font: 'bold 12px monospace',
-        color: '#4ade80',
-        align: 'center'
-      });
-    }
-
-    // Render das 5 Casas do Vilarejo
-    for (const h of this.houses) {
-      // Telhado de Barro Sertanejo desenhado primeiro
-      ctx.beginPath();
-      ctx.moveTo(h.x - h.width / 2 - 8, h.y - h.height / 2);
-      ctx.lineTo(h.x, h.y - h.height / 2 - 38);
-      ctx.lineTo(h.x + h.width / 2 + 8, h.y - h.height / 2);
-      ctx.closePath();
-      ctx.fillStyle = '#9a3412';
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // Corpo da Casa
-      renderEntity(ctx, h);
-
-      // Porta de Madeira
-      ctx.fillStyle = '#1c1917';
-      ctx.fillRect(h.x - 16, h.y + h.height / 2 - 40, 32, 40);
-      ctx.strokeStyle = '#a8a29e';
-      ctx.strokeRect(h.x - 16, h.y + h.height / 2 - 40, 32, 40);
-    }
-
-    // Portal de Retorno
-    renderEntity(ctx, this.returnPortal);
-
-    // Painel Superior de Folhetos de Cordel (Sextilhas de Cascudo)
-    ctx.fillStyle = '#1e1b18';
-    ctx.fillRect(40, 10, 800, 75);
-    ctx.strokeStyle = '#ca8a04';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(40, 10, 800, 75);
-
-    const currentS = this.stanzas[this.currentStanza];
-    drawText(ctx, `📜 ${currentS.title} (${this.currentStanza + 1}/${this.stanzas.length}) [Espaço p/ Avançar]`, 55, 16, {
-      font: 'bold 12px monospace',
-      color: '#facc15'
+    // Voo da Rasga-Mortalha
+    ctx.fillStyle = this.owl.color;
+    ctx.beginPath();
+    ctx.arc(this.owl.x, this.owl.y, 14, 0, Math.PI * 2);
+    ctx.fill();
+    drawText(ctx, '🦉 [RASGA-MORTALHA]', this.owl.x, this.owl.y - 18, {
+      font: 'bold 10px monospace',
+      color: '#d8b4fe',
+      align: 'center'
     });
 
-    for (let i = 0; i < currentS.lines.length; i++) {
-      drawText(ctx, currentS.lines[i], 55, 34 + i * 16, {
-        font: '11px monospace',
-        color: '#fef3c7'
-      });
-    }
-
-    // Painel de Detalhes da Casa Selecionada
-    if (this.selectedHouse) {
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(160, 350, 640, 60);
-      ctx.strokeStyle = '#38bdf8';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(160, 350, 640, 60);
-
-      drawText(
-        ctx,
-        `🏠 CASA ${this.selectedHouse.index} (${this.selectedHouse.corName.toUpperCase()}) | Morador: ${this.selectedHouse.morador} | Criação: ${this.selectedHouse.animal}`,
-        175,
-        358,
-        { font: 'bold 12px monospace', color: '#38bdf8' }
-      );
-      drawText(
-        ctx,
-        `Bebida: ${this.selectedHouse.bebida} | Fumo: ${this.selectedHouse.fumo} | [E / Enter] Confirmar Investigação`,
-        175,
-        380,
-        { font: '11px monospace', color: '#e2e8f0' }
-      );
-    }
-
-    // Jogador
-    renderEntity(ctx, this.player);
-
-    // Banner Superior
-    drawText(ctx, '🦉 FASE 3: A PENA DA RASGA-MORTALHA (ENIGMA DE DEDUÇÃO)', 480, 95, {
+    // Cabeçalho
+    drawText(ctx, '🦉 FASE 3: A PENA DA RASGA-MORTALHA (ENIGMA DAS 5 CASAS)', 480, 18, {
       font: 'bold 14px monospace',
       align: 'center',
       color: '#f7d070'
     });
 
+    // Painel de Dicas de Cordel
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(40, 42, 880, 100);
+    ctx.strokeStyle = '#eab308';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 42, 880, 100);
+
+    drawText(ctx, '📜 VERSOS DE CORDEL & PISTAS DO ENIGMA:', 55, 48, { font: 'bold 11px monospace', color: '#facc15' });
+    for (let i = 0; i < 4; i++) {
+      drawText(ctx, this.stanzas[i], 55, 68 + i * 16, { font: '10px monospace', color: '#fef3c7' });
+      drawText(ctx, this.stanzas[i + 4], 470, 68 + i * 16, { font: '10px monospace', color: '#fef3c7' });
+    }
+
+    // Render das 5 Casas Interativas
+    for (let i = 0; i < this.houses.length; i++) {
+      const h = this.houses[i];
+      const hx = 60 + i * 170;
+      const hy = 160;
+      const hw = 150;
+      const hh = 250;
+
+      const isSelected = this.selectedHouseIndex === i;
+
+      // Telhado
+      ctx.beginPath();
+      ctx.moveTo(hx - 8, hy + 30);
+      ctx.lineTo(hx + hw / 2, hy);
+      ctx.lineTo(hx + hw + 8, hy + 30);
+      ctx.closePath();
+      ctx.fillStyle = '#7c2d12';
+      ctx.fill();
+      ctx.strokeStyle = '#ea580c';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Corpo da Casa
+      ctx.fillStyle = '#1f2937';
+      ctx.fillRect(hx, hy + 30, hw, hh - 30);
+      ctx.strokeStyle = isSelected ? '#38bdf8' : h.colorHex;
+      ctx.lineWidth = isSelected ? 4 : 2;
+      ctx.strokeRect(hx, hy + 30, hw, hh - 30);
+
+      // Título da Casa
+      drawText(ctx, `Casa ${h.index} (${h.corName})`, hx + hw / 2, hy + 35, {
+        font: 'bold 11px monospace',
+        color: h.colorHex,
+        align: 'center'
+      });
+
+      // 4 Slots de Atributos
+      const rows = [
+        { label: 'Morador', val: h.morador },
+        { label: 'Bebida', val: h.bebida },
+        { label: 'Fumo', val: h.fumo },
+        { label: 'Animal', val: h.animal }
+      ];
+
+      for (let r = 0; r < rows.length; r++) {
+        const ry = hy + 60 + r * 42;
+        const isRowSel = isSelected && this.selectedRow === r;
+
+        ctx.fillStyle = isRowSel ? '#0369a1' : '#111827';
+        ctx.fillRect(hx + 6, ry, hw - 12, 36);
+        ctx.strokeStyle = isRowSel ? '#38bdf8' : '#374151';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(hx + 6, ry, hw - 12, 36);
+
+        drawText(ctx, `${rows[r].label}:`, hx + 10, ry + 3, { font: '9px monospace', color: '#94a3b8' });
+        drawText(ctx, rows[r].val, hx + hw / 2, ry + 16, {
+          font: 'bold 11px monospace',
+          color: '#f8fafc',
+          align: 'center'
+        });
+      }
+    }
+
+    // Botão de Validação
+    ctx.fillStyle = '#16a34a';
+    ctx.fillRect(350, 430, 260, 48);
+    ctx.strokeStyle = '#86efac';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(350, 430, 260, 48);
+
+    drawText(ctx, '✨ VALIDAR DEDUÇÃO & OBTER PENA ✨', 480, 446, {
+      font: 'bold 12px monospace',
+      color: '#ffffff',
+      align: 'center'
+    });
+
     drawText(ctx, this.message, 480, 510, {
       font: '12px monospace',
       align: 'center',
-      color: '#fde047'
+      color: this.stateStatus === 'FAILED' ? '#ef4444' : '#fde047'
     });
+
+    // Banner de Sucesso ou Falha
+    if (this.stateStatus === 'SUCCESS') {
+      ctx.fillStyle = 'rgba(22, 101, 52, 0.94)';
+      ctx.fillRect(240, 200, 480, 110);
+      ctx.strokeStyle = '#4ade80';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(240, 200, 480, 110);
+      drawText(ctx, '🎉 SUCESSO! 🪶 PENA ENCANTADA CONQUISTADA!', 480, 230, {
+        font: 'bold 16px monospace',
+        color: '#bbf7d0',
+        align: 'center'
+      });
+      drawText(ctx, 'Retornando vitorioso ao Estúdio de Xilogravura...', 480, 265, {
+        font: '12px monospace',
+        color: '#f0fdf4',
+        align: 'center'
+      });
+    } else if (this.stateStatus === 'FAILED') {
+      ctx.fillStyle = 'rgba(127, 29, 29, 0.95)';
+      ctx.fillRect(240, 200, 480, 110);
+      ctx.strokeStyle = '#f87171';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(240, 200, 480, 110);
+      drawText(ctx, '💀 O AGOURO DA RASGA-MORTALHA ECOOU!', 480, 230, {
+        font: 'bold 16px monospace',
+        color: '#fecaca',
+        align: 'center'
+      });
+      drawText(ctx, 'Dedução incorreta! Retornando ao Estúdio...', 480, 265, {
+        font: '12px monospace',
+        color: '#fff',
+        align: 'center'
+      });
+    }
   }
 
   public destroy(): void {}

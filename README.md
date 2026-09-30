@@ -20,7 +20,7 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🎭 Sistema Canônico de Diálogos & Controles
 
-1. **Painel de Diálogos Estritamente Sob Demanda:** A caixa de diálogo e notificações só são renderizadas quando houver fala ativa ou toast. Em estado idle, **o bloco inteiro é 100% ocultado**, garantindo tela cheia e visão desobstruída do mapa, itens e salas.
+1. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Todas as mensagens, diálogos e toasts são exibidos fora do canvas de jogo, em um painel dedicado logo abaixo da tela. Nada é desenhado sobre a área do canvas, mantendo 100% da visualização das salas, fases e itens desobstruída.
 2. **Ciclo de Vida e Desbloqueio dos Diálogos:** Ao terminar a última fala, o diálogo fecha imediatamente com a tecla `E`, consumindo o input e liberando a movimentação do personagem sem deixá-lo travado.
 3. **Diálogo de Censura na 1ª Interação com NPCs:**
    - Ao conversar pela primeira vez com qualquer NPC (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**), o NPC pergunta seu nome. O herói responde `"meu nome é @#$!*&%#!"` acompanhado de um som cômico de erro/censura. O NPC responde: `"Entendi foi nada!"`.

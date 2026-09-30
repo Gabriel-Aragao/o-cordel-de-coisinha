@@ -14,11 +14,11 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ## 🎭 Sistema Global de Diálogos & Interface Unificada
 
-### 1. Painel Dedicado Abaixo da Tela de Jogo (Sem Sobreposição):
-* **Área Exclusiva Abaixo do Canvas de Jogo:** Todas as mensagens de informação, diálogos de NPCs, toasts e dicas são exibidas em um **painel dedicado posicionado estritamente abaixo da tela de jogo**, evitando qualquer sobreposição com itens da sala, personagens ou elementos de gameplay.
-* **Fila Sequencial Sem Sobreposição:** As mensagens não se sobrepõem visualmente umas às outras; são enfileiradas e exibidas de forma clara e legível uma a uma.
-* **Sem Textos Estáticos de Citação Obstruindo a Tela:** Qualquer bloco estático de texto no painel ou na tela (como citações) é **completamente removido**, mantendo a visibilidade 100% limpa.
-* **Estética de Xilogravura:** O painel inferior adota a moldura de madeira entalhada em cordel, fundo em textura de papel kraft e tipografia xilográfica de alto contraste com indicador de avanço `[E]`.
+### 1. Painel de Diálogo Sob Demanda (Zero Bloco Idle / Sem Obstrução):
+* **Renderização Estritamente Sob Demanda:** O painel/caixa de diálogo é renderizado **apenas quando houver um diálogo ou toast ativo**. Quando em estado ocioso (idle), **o bloco inteiro do painel é completamente ocultado**, permitindo visibilidade 100% desobstruída de todo o mapa, itens, cenários e personagens.
+* **Fila Sequencial Sem Sobreposição:** Quando ativo, as mensagens não se sobrepõem visualmente umas às outras; são exibidas sequencialmente de forma limpa no painel.
+* **Sem Blocos ou Caixas Estáticas:** Nenhum retângulo, faixa ou moldura vazia permanece na tela durante o gameplay ocioso.
+* **Estética de Xilogravura:** Ao aparecer, adota a moldura de madeira entalhada em cordel, fundo em textura de papel kraft e tipografia xilográfica de alto contraste com indicador de avanço `[E]`.
 
 ### 2. Ciclo de Vida e Desbloqueio dos Diálogos:
 * **Encerramento Fluido e Desbloqueio Imediato:** Ao atingir a última fala de um diálogo e soltar a tecla `E` / `Enter`, a caixa de diálogo **fecha imediatamente e desaparece**, liberando a movimentação e os controles do herói sem travamento.

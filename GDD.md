@@ -69,20 +69,19 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ### 🌿 FASE 2: A Fazenda da Cumade Fulozinha
 * **Ambiente & Topologia (6 Lotes em Telas Individuais — Sem Lote 3c):**
   - Cada lote é exibido como uma tela individual fechada com seu próprio labirinto interno.
-  - **Portões Internos:** Abrem e fecham periodicamente com os assobios.
+  - **Portões Internos com Bloqueio Real:** Portões abrem e fecham periodicamente com os assobios. Quando abertos, permitem passagem; quando fechados, bloqueiam rigidamente o movimento.
   - **Porteiras de Borda:** Portagens de transição entre lotes adjacentes estão **sempre abertas**.
-  - **Moitas:** Presentes em todos os lotes.
+  - **Moitas:** Presentes em todos os lotes; o **Fumo de Rolo** está escondido em uma moita no **Lote 1b**.
   ```
   [Lote 1a]                [Lote 1b] (Fumo na Moita)
       |                        |
-  [Lote 2a] (Pedra) ------ [Lote 2b]
+  [Lote 2a] -------------- [Lote 2b]
       |                        |
-  [Lote 0] (Início)        [Lote 3b] (Cumade Fulozinha)
+  [Lote 0] (Início/Pedra)  [Lote 3b] (Cumade Fulozinha)
       |
   [Lote 3a]
   ```
-* **Lote 0 (Entrada):** Tela inicial com porteira à direita. A **Pedra da Botija** está situada na saída para o Lote 2a.
-* **Lote 1b:** O **Fumo de Rolo** está escondido dentro de uma moita.
+* **Lote 0 (Entrada):** Tela inicial com porteira à direita. A **Pedra da Botija** está situada **exclusivamente na saída do Lote 0** para o Lote 2a.
 * **Lote 3b:** Morada da Cumade Fulozinha. Ao entrar no Lote 3b, ela inicia perseguição ativa pelo labirinto e intensifica os assobios (inversão de controles: cima ⇄ baixo ou esq ⇄ dir).
 * **Desfecho de Colisão com a Cumade:**
   - **Com o Fumo:** Ela aceita o agrado e entrega a **📄 Página / Folha Rasgada** ➔ **Sucesso** (retorno ao estúdio).
@@ -92,9 +91,10 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ### 🦉 FASE 3: A Pena da Rasga-Mortalha
 * **Ambiente:** Vilarejo sertanejo com 5 casas coloridas (Amarela, Azul, Vermelha, Verde, Branca).
-* **Mecânica de Puzzle (Arrastar Itens):**
-  - Vários itens soltos no cenário representando as características do enigma de Einstein.
-  - O jogador lê as 9 estrofes em cordel de @cascudo e deve **arrastar cada item para a sua casa correspondente**, completando toda a matriz lógica da vila.
+* **Paginação de Pistas em Cordel:**
+  - As **9 estrofes poéticas** aparecem **uma a uma na tela**, avançando ou retrocedendo de acordo com o clique do jogador.
+* **Mecânica de Puzzle (Drag-and-Drop):**
+  - O jogador lê as estrofes e deve **arrastar cada item solto para a sua casa correspondente**, completando toda a matriz lógica da vila antes de investigar.
 * **Desfecho:**
   - **Confirmação com Erro:** Agouro da ave ➔ **Falha** (retorno ao estúdio).
   - **Confirmação Correta:** A Casa 4 (Verde / Ferrador do Tatu) é revelada, o jogador interage com a casa e recebe a **🪶 Pena Encantada** ➔ **Sucesso** (retorno ao estúdio).
@@ -102,14 +102,23 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ---
 
 ### 🏺 FASE 4: A Botija de Mané Monteiro
-* **Ambiente:** Mesma topologia dos 6 lotes da Fazenda da Cumade Fulozinha em plena noite escura.
-* **Mecânicas Especiais:**
-  - **Caça Global da Cumade:** A entidade agora **atravessa livremente entre todos os lotes**.
+* **Ambiente:** Topologia da Fazenda com a adição do **Novo Lote da Igreja** à direita do Lote 1b.
+  ```
+  [Lote 1a]                [Lote 1b] -------------- [Lote Igreja] (Início & Santuário)
+      |                        |
+  [Lote 2a] -------------- [Lote 2b]
+      |                        |
+  [Lote 0] (Pedra/Botija)  [Lote 3b]
+      |
+  [Lote 3a]
+  ```
+* **Santuário Seguro da Igreja:** A Cumade Fulozinha **NÃO CONSEGUE ENTRAR** no Lote da Igreja.
+* **Início da Fase:** O jogador **inicia dentro da Igreja** e acessa o Lote 1b pela porteira à esquerda.
+* **Caça Global da Cumade:** Nos demais lotes da fazenda, a criatura **atravessa livremente entre todos os lotes**.
   - **Sem Fumo:** Se a Cumade colidir com o jogador ➔ **Falha** (retorno ao estúdio).
-  - **Escuridão & Candeeiro:** Visão restrita ao círculo dinâmico de luz do Candeeiro.
-  - **Desenterrar a Botija:** O jogador entra pelo Lote 1b, viaja até o Lote 0, desenterra o ouro sob a pedra (penalidade de -25% de velocidade pelo peso) e escapa até a Paróquia.
-* **Desfecho:**
-  - Entregar a botija ao Beato na Paróquia ➔ Concessão da **🖋️ Tinta Encantada** ➔ **Sucesso** (retorno ao estúdio).
+* **Escuridão & Candeeiro:** Visão restrita ao círculo dinâmico de luz do Candeeiro.
+* **Desenterrar a Botija:** No Lote 0 sob a pedra (penalidade de -25% de velocidade pelo peso do ouro) e retorno até a Igreja.
+* **Desfecho:** Entregar a botija ao Beato no Lote da Igreja ➔ Concessão da **🖋️ Tinta Encantada** ➔ **Sucesso** (retorno ao estúdio).
 
 ---
 
@@ -133,15 +142,11 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 │ Cumade Fulozinha         │ Círculo Amarelo: `[FULÔ]`        │
 │ Moitas                   │ Círculos Verdes: `[MOITA]`       │
 │ Casas do Vilarejo        │ Retângulos Coloridos `[CASA 1..5]│
+│ Igreja                   │ Retângulo Sagrado `[IGREJA]`     │
 │ Botija                   │ Quadrado Dourado `[BOTIJA]`      │
 │ Fumo de Rolo             │ Quadrado Marrom `[FUMO]`         │
 └──────────────────────────┴──────────────────────────────────┘
 ```
-
-* **Prioridade 1:** Câmera dinâmica na Fase 1 e lógica de HP dos bodes.
-* **Prioridade 2:** FSM de lotes individuais na Fase 2 e perseguição global na Fase 4.
-* **Prioridade 3:** Drag-and-drop de itens no puzzle da Fase 3.
-* **Prioridade 4:** Validação de QA com @glitch.
 
 ---
 *GDD Revisado e Aprovado por @gunpei e @domaragao para a Tungão GameJam 2024.*

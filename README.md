@@ -72,14 +72,16 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Derrota por Vidas (3 Vidas):** Se o HP zerar ➔ Retorno ao Estúdio (Falha).
 * **Recompensa (Sucesso):** 📄 **Página / Folha Rasgada**.
 
-### 🦉 3. A Pena da Rasga-Mortalha (Casas com Telas Interiores & Captura 'E')
-* **Objetivo:** Ouvir os 2 violeiros, capturar os elementos com `E`, entrar fisicamente nas 5 casas e depositar cada item, morador e animal no interior correto.
+### 🦉 3. A Pena da Rasga-Mortalha (Casas Interiores, Palco Central & Timer)
+* **Objetivo:** Ouvir os 2 violeiros no palco central, capturar os elementos com `E`, entrar fisicamente nas 5 casas e depositar cada item, morador e animal no interior correto dentro de 5 minutos.
 * **Mecânicas Principais:**
+  - **Palco Central & Quadros em Arco:** Violeiros no centro da praça e 4 quadros ampliados na base.
+  - **Emojis Corretos dos Animais & Café:** Bode (🐐), Galo (🐓), Tatu (🦔), Cavalo (🐎), Canário (🐤) e Café nítido.
   - **Captura Universal (`E`):** Bebidas, fumos, moradores e animais são capturados e soltos com a tecla `E`.
   - **Telas Interiores das Casas:** Entrar pela porta transporta o herói para o interior daquela casa para depositar com `E`.
-  - **Saída Segura Anti-Loop:** Spawn bem abaixo da porta ao sair e cooldown de transição para evitar reentradas automáticas.
-  - **Remoção & Grito de Reset:** Capturar com `E` remove 1 item; Gritar (`Espaço`) dentro da casa expulsa todos os itens de volta para as mesas.
-  - **Soltar Fora:** Soltar fora de casas retorna os itens às mesas de origem.
+  - **Timer de 5 Minutos (300s):** Se o tempo esgotar, a Rasga-Mortalha espalha mau agouro na vila e redireciona ao estúdio.
+  - **Grito da Rasga-Mortalha (a cada 30s):** Som característico emitido a cada 30 segundos.
+  - **Folheto de Cordel de Vitória:** Exibido em tela cheia ao completar as 5 casas, entregando a Pena Encantada.
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
 ### 🏺 4. A Botija de Mané Monteiro (Escuridão, Candeeiro & Santuário)

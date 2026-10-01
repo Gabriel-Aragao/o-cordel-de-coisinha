@@ -441,6 +441,13 @@ export class Stage4BotijaScene implements IScene {
     this.bellTimer = 0;
     this.animTime = 0;
 
+    // Reset de 100% das moitas em todos os lotes da Fase 4
+    for (const lotKey in this.lots) {
+      for (const b of this.lots[lotKey as LotId].bushes) {
+        b.isSearched = false;
+      }
+    }
+
     engine.sound.playSinoBadalo();
 
     // Apresentação da Fase (Folheto de Cordel)
@@ -1182,8 +1189,8 @@ export class Stage4BotijaScene implements IScene {
       });
     } else {
       // Escuridão Profunda da Noite Sertaneja
-      drawChaoTerraBatida(ctx, 0, 0, 960, 540);
-      drawMolduraCordel(ctx, 8, 8, 944, 524, { borderWeight: 3 });
+      drawChaoTerraBatida(ctx, 0, 0, 960, 580);
+      drawMolduraCordel(ctx, 8, 8, 944, 564, { borderWeight: 3 });
     }
 
     // Paredes do Lote
@@ -1400,5 +1407,11 @@ export class Stage4BotijaScene implements IScene {
     return this.message;
   }
 
-  public destroy(): void { }
+  public destroy(): void {
+    for (const lotKey in this.lots) {
+      for (const b of this.lots[lotKey as LotId].bushes) {
+        b.isSearched = false;
+      }
+    }
+  }
 }

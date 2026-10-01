@@ -958,5 +958,9 @@ export class Stage1ChupaCabraScene implements IScene {
     return this.message;
   }
 
-  public destroy(): void { }
+  public destroy(): void {
+    for (const b of this.bushes) {
+      b.isSearched = false;
+    }
+  }
 }

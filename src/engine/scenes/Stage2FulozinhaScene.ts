@@ -354,6 +354,13 @@ export class Stage2FulozinhaScene implements IScene {
     this.stepTimer = 0;
     this.animTime = 0;
 
+    // Reset do estado de todas as moitas em todos os lotes
+    for (const lotKey in this.lots) {
+      for (const b of this.lots[lotKey as LotId].bushes) {
+        b.isSearched = false;
+      }
+    }
+
     // Apresentação da Fase (Folheto de Cordel)
     this.narrative.showIntro({
       phaseNumber: 2,
@@ -924,5 +931,11 @@ export class Stage2FulozinhaScene implements IScene {
     return this.message;
   }
 
-  public destroy(): void { }
+  public destroy(): void {
+    for (const lotKey in this.lots) {
+      for (const b of this.lots[lotKey as LotId].bushes) {
+        b.isSearched = false;
+      }
+    }
+  }
 }

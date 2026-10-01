@@ -123,32 +123,32 @@ export class Stage3RasgaMortalhaScene implements IScene {
     // Bodega (x: 135, y: 460), Bebidas (x: 365, y: 480), Fumos (x: 595, y: 480), Curral (x: 825, y: 460)
     this.allItems = [
       // 5 Moradores (Bodega dos Moradores: x: 135, y: 460)
-      { id: 'v_vaqueiro', type: 'morador', name: 'Vaqueiro', icon: '🤠', color: '#eab308', x: 55, y: 465, originX: 55, originY: 465 },
-      { id: 'v_rendeira', type: 'morador', name: 'Rendeira', icon: '👒', color: '#38bdf8', x: 95, y: 465, originX: 95, originY: 465 },
-      { id: 'v_cantador', type: 'morador', name: 'Cantador', icon: '🪕', color: '#f87171', x: 135, y: 465, originX: 135, originY: 465 },
-      { id: 'v_ferrador', type: 'morador', name: 'Ferrador', icon: '🔨', color: '#4ade80', x: 175, y: 465, originX: 175, originY: 465 },
-      { id: 'v_rezadeira', type: 'morador', name: 'Rezadeira', icon: '📿', color: '#f1f5f9', x: 215, y: 465, originX: 215, originY: 465 },
+      { id: 'v_vaqueiro', type: 'morador', name: 'Vaqueiro', icon: '🤠', color: '#eab308', x: 55, y: 425, originX: 55, originY: 425 },
+      { id: 'v_rendeira', type: 'morador', name: 'Rendeira', icon: '👒', color: '#38bdf8', x: 95, y: 435, originX: 95, originY: 435 },
+      { id: 'v_cantador', type: 'morador', name: 'Cantador', icon: '🪕', color: '#f87171', x: 135, y: 445, originX: 135, originY: 445 },
+      { id: 'v_ferrador', type: 'morador', name: 'Ferrador', icon: '🔨', color: '#4ade80', x: 175, y: 435, originX: 175, originY: 435 },
+      { id: 'v_rezadeira', type: 'morador', name: 'Rezadeira', icon: '📿', color: '#f1f5f9', x: 215, y: 425, originX: 215, originY: 425 },
 
       // 5 Bebidas (Mesa de Bebidas: x: 365, y: 485)
-      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', color: '#38bdf8', x: 295, y: 490, originX: 295, originY: 490 },
-      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', color: '#facc15', x: 330, y: 490, originX: 330, originY: 490 },
-      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', color: '#f87171', x: 365, y: 490, originX: 365, originY: 490 },
-      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', color: '#4ade80', x: 400, y: 490, originX: 400, originY: 490 },
-      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', color: '#78350f', x: 435, y: 490, originX: 435, originY: 490 },
+      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', color: '#38bdf8', x: 295, y: 450, originX: 295, originY: 450 },
+      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', color: '#facc15', x: 330, y: 460, originX: 330, originY: 460 },
+      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', color: '#f87171', x: 365, y: 470, originX: 365, originY: 470 },
+      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', color: '#4ade80', x: 400, y: 460, originX: 400, originY: 460 },
+      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', color: '#78350f', x: 435, y: 450, originX: 435, originY: 450 },
 
       // 5 Fumos (Mesa de Fumos: x: 595, y: 485)
-      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', color: '#d97706', x: 525, y: 490, originX: 525, originY: 490 },
-      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', color: '#eab308', x: 560, y: 490, originX: 560, originY: 490 },
-      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', color: '#dc2626', x: 595, y: 490, originX: 595, originY: 490 },
-      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', color: '#16a34a', x: 630, y: 490, originX: 630, originY: 490 },
-      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', color: '#22c55e', x: 665, y: 490, originX: 665, originY: 490 },
+      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', color: '#d97706', x: 525, y: 450, originX: 525, originY: 450 },
+      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', color: '#eab308', x: 560, y: 460, originX: 560, originY: 460 },
+      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', color: '#dc2626', x: 595, y: 470, originX: 595, originY: 470 },
+      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', color: '#16a34a', x: 630, y: 460, originX: 630, originY: 460 },
+      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', color: '#22c55e', x: 665, y: 450, originX: 665, originY: 450 },
 
       // 5 Animais (Curral de Animais: x: 825, y: 460)
-      { id: 'a_bode', type: 'animal', name: 'Bode', icon: '🐐', color: '#cbd5e1', x: 745, y: 465, originX: 745, originY: 465 },
-      { id: 'a_galo', type: 'animal', name: 'Galo', icon: '🐓', color: '#ef4444', x: 785, y: 465, originX: 785, originY: 465 },
-      { id: 'a_tatu', type: 'animal', name: 'Tatu', icon: '🦔', color: '#a16207', x: 825, y: 465, originX: 825, originY: 465 },
-      { id: 'a_cavalo', type: 'animal', name: 'Cavalo', icon: '🐎', color: '#92400e', x: 865, y: 465, originX: 865, originY: 465 },
-      { id: 'a_canario', type: 'animal', name: 'Canário', icon: '🐤', color: '#facc15', x: 905, y: 465, originX: 905, originY: 465 }
+      { id: 'a_bode', type: 'animal', name: 'Bode', icon: '🐐', color: '#cbd5e1', x: 745, y: 425, originX: 745, originY: 425 },
+      { id: 'a_galo', type: 'animal', name: 'Galo', icon: '🐓', color: '#ef4444', x: 785, y: 435, originX: 785, originY: 435 },
+      { id: 'a_tatu', type: 'animal', name: 'Tatu', icon: '🦔', color: '#a16207', x: 825, y: 445, originX: 825, originY: 445 },
+      { id: 'a_cavalo', type: 'animal', name: 'Cavalo', icon: '🐎', color: '#92400e', x: 865, y: 435, originX: 865, originY: 435 },
+      { id: 'a_canario', type: 'animal', name: 'Canário', icon: '🐤', color: '#facc15', x: 905, y: 425, originX: 905, originY: 425 }
     ];
 
     this.narrative.showIntro({
@@ -593,7 +593,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
       const minutes = Math.floor(this.stageTimer / 60);
       const seconds = Math.floor(this.stageTimer % 60);
       const timeStr = `⏳ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
+
       ctx.save();
       ctx.fillStyle = '#1e1b18';
       ctx.fillRect(840, 15, 100, 32);
@@ -653,10 +653,10 @@ export class Stage3RasgaMortalhaScene implements IScene {
     drawText(ctx, '🪕 Violeiro 2 [E]', 520, 288, { font: 'bold 9px monospace', align: 'center', color: '#93c5fd' });
 
     // 4 Mesas / Áreas Interativas Ampliadas em Arco na Base da Praça
-    drawMesaMontagemXilo(ctx, 140, 440, 180, 70, 'BODEGA DOS MORADORES', '🍻', { colorAccent: '#27272a' });
-    drawMesaMontagemXilo(ctx, 360, 465, 180, 70, 'BEBIDAS & CAFÉ', '🍶', { colorAccent: '#27272a' });
-    drawMesaMontagemXilo(ctx, 600, 465, 180, 70, 'FUMOS REGIONAIS', '🍂', { colorAccent: '#27272a' });
-    drawMesaMontagemXilo(ctx, 820, 440, 180, 70, 'CURRAL DE ANIMAIS', '🐐', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 140, 440, 220, 100, 'BODEGA DOS MORADORES', '🍻', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 370, 465, 200, 100, 'BEBIDAS & CAFÉ', '🍶', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 590, 465, 200, 100, 'FUMOS REGIONAIS', '🍂', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 820, 440, 220, 100, 'CURRAL DE ANIMAIS', '🐐', { colorAccent: '#27272a' });
 
     for (const it of this.allItems) {
       if (it.assignedHouseIdx === undefined && (!this.carriedItem || this.carriedItem.id !== it.id)) {
@@ -711,7 +711,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     const minutes = Math.floor(this.stageTimer / 60);
     const seconds = Math.floor(this.stageTimer % 60);
     const timeStr = `⏳ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
+
     ctx.save();
     ctx.fillStyle = '#1e1b18';
     ctx.fillRect(840, 15, 100, 32);
@@ -729,5 +729,5 @@ export class Stage3RasgaMortalhaScene implements IScene {
     this.narrative.render(ctx, 960, 580);
   }
 
-  public destroy(): void {}
+  public destroy(): void { }
 }

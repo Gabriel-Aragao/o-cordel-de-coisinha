@@ -2566,3 +2566,164 @@ export function drawPlacaAviso(
   ctx.restore();
 }
 
+/**
+ * 🎵 ONDA SONORA DE ASSOBIO EM XILOGRAVURA (CUMADE FULOZINHA)
+ */
+export function drawOndaAssobioXilo(
+  ctx: CanvasRenderingContext2D,
+  originX: number,
+  originY: number,
+  radius: number,
+  options: { isClose?: boolean; time?: number; intensity?: number } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+  const isClose = options.isClose ?? false;
+  const intensity = options.intensity ?? 1;
+
+  const colorPrimary = isClose ? '#facc15' : '#38bdf8';
+  const colorSecondary = isClose ? '#ea580c' : '#0284c7';
+
+  // Ondas concêntricas entalhadas
+  for (let i = 0; i < 3; i++) {
+    const r = (radius + i * 22 + Math.sin(t * 8 + i) * 6) * intensity;
+    if (r <= 0) continue;
+
+    const alpha = Math.max(0, 1 - (r / 350));
+    ctx.strokeStyle = i % 2 === 0 ? colorPrimary : colorSecondary;
+    ctx.globalAlpha = alpha * 0.8;
+    ctx.lineWidth = 2.5;
+
+    ctx.beginPath();
+    ctx.arc(originX, originY, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Hachuras radiais de som
+    ctx.lineWidth = 1.5;
+    for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+      const sx = originX + Math.cos(angle + t) * (r - 6);
+      const sy = originY + Math.sin(angle + t) * (r - 6);
+      const ex = originX + Math.cos(angle + t) * (r + 6);
+      const ey = originY + Math.sin(angle + t) * (r + 6);
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      ctx.lineTo(ex, ey);
+      ctx.stroke();
+    }
+  }
+
+  // Notas / Ecos Místicos no ar
+  ctx.fillStyle = colorPrimary;
+  ctx.font = 'bold 14px monospace';
+  ctx.textAlign = 'center';
+  ctx.globalAlpha = 0.85;
+  for (let a = 0; a < 4; a++) {
+    const angle = a * (Math.PI / 2) + t * 2;
+    const nx = originX + Math.cos(angle) * (radius * 0.8);
+    const ny = originY + Math.sin(angle) * (radius * 0.8);
+    ctx.fillText('≋ ♫', nx, ny);
+  }
+
+  ctx.restore();
+}
+
+/**
+ * 🍃 BRUMA & FOLHAS DE SUMIÇO / REAPARECIMENTO DA FULÔ
+ */
+export function drawBrumaFuloXilo(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+  options: { time?: number; progress?: number; isSpawn?: boolean } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+  const progress = options.progress ?? 1;
+
+  const currentRadius = radius * progress;
+
+  // Bruma mágica de fundo
+  const grad = ctx.createRadialGradient(x, y, 0, x, y, currentRadius);
+  grad.addColorStop(0, 'rgba(21, 128, 61, 0.45)');
+  grad.addColorStop(0.6, 'rgba(217, 119, 6, 0.25)');
+  grad.addColorStop(1, 'rgba(10, 8, 6, 0)');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(x, y, currentRadius, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Partículas de folhas rodopiantes
+  const leafCount = 10;
+  for (let i = 0; i < leafCount; i++) {
+    const angle = (i / leafCount) * Math.PI * 2 + t * 4;
+    const dist = (currentRadius * 0.4) + Math.sin(t * 6 + i) * (currentRadius * 0.35);
+    const lx = x + Math.cos(angle) * dist;
+    const ly = y + Math.sin(angle) * dist;
+
+    ctx.save();
+    ctx.translate(lx, ly);
+    ctx.rotate(angle + Math.PI / 2);
+
+    ctx.fillStyle = i % 2 === 0 ? XILO_COLORS.greenAccent : XILO_COLORS.goldAccent;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 6, 3, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = XILO_COLORS.black;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+/**
+ * 🌪️ INDICADOR HUD DE CONTROLES INVERTIDOS (ASSOBIO DA FULÔ)
+ */
+export function drawIndicadorControlesInvertidosXilo(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  options: { time?: number; durationTotal?: number; timeLeft?: number } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+  const pulse = Math.sin(t * 10) * 2;
+  const timeLeft = options.timeLeft ?? 0;
+  const w = 340;
+  const h = 42;
+
+  // Sombra
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+  ctx.fillRect(x - w / 2 + 4, y - h / 2 + 5, w, h);
+
+  // Placa de Alerta em Xilogravura
+  ctx.fillStyle = '#450a0a';
+  ctx.fillRect(x - w / 2, y - h / 2, w, h);
+  ctx.strokeStyle = '#dc2626';
+  ctx.lineWidth = 2.5;
+  ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+
+  // Moldura interna dourada
+  ctx.strokeStyle = '#facc15';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - w / 2 + 3, y - h / 2 + 3, w - 6, h - 6);
+
+  // Texto de Alerta
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 12px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`🌪️ CONTROLES INVERTIDOS! (${timeLeft.toFixed(1)}s) 🌪️`, x, y - 6 + pulse * 0.2);
+
+  // Setas invertidas
+  ctx.fillStyle = '#f87171';
+  ctx.font = 'bold 10px monospace';
+  ctx.fillText('⬆=BAIXO  ⬇=CIMA  ⬅=DIREITA  ➡=ESQUERDA', x, y + 10);
+
+  ctx.restore();
+}
+

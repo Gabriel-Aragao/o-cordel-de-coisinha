@@ -9,7 +9,10 @@ import {
   drawMoitaFrutaRegional,
   drawMoitaCactoEspinhos,
   drawChaoTerraBatida,
-  drawMolduraCordel
+  drawMolduraCordel,
+  drawOndaAssobioXilo,
+  drawBrumaFuloXilo,
+  drawIndicadorControlesInvertidosXilo
 } from '../../renderer/xilogravura';
 import { NarrativeModalManager } from '../narrative';
 
@@ -86,9 +89,12 @@ export class Stage4BotijaScene implements IScene {
   };
 
   // A Fulô NUNCA entra na Igreja
-  private fuloCurrentLot: LotId = '2b';
-  private fuloLotChangeTimer: number = 4.0;
+  private fuloState: 'PURSUIT' | 'VANISHED' | 'SANCTUARY_WAIT' = 'SANCTUARY_WAIT';
+  private fuloTimer: number = 0; // 5s perseguição / 3s invisível
+  private isControlsInverted: boolean = false;
   private whistleTimer: number = 6.0;
+  private whistleDuration: number = 0;
+  private whistleWaveRadius: number = 0;
 
   private pedraItem: Entity = {
     id: 'pedra',
@@ -140,8 +146,56 @@ export class Stage4BotijaScene implements IScene {
   // Sistema Narrativo de Cordel
   private narrative: NarrativeModalManager = new NarrativeModalManager();
 
-  // Ciclo de patrulha da Fulô (exclui a Igreja)
-  private lotSequence: LotId[] = ['0', '2a', '1a', '2b', '1b', '3b', '3a'];
+  private spawnFuloInLot(lotId: LotId, engine: IGameEngine): void {
+    if (lotId === 'igreja') {
+      this.fuloState = 'SANCTUARY_WAIT';
+      this.fuloTimer = 0;
+      return;
+    }
+
+    const lotData = this.lots[lotId];
+    // Encontra uma posição válida a >= 140px do jogador e sem sobrepor paredes
+    let bestX = 480;
+    let bestY = 270;
+
+    for (let attempts = 0; attempts < 30; attempts++) {
+      const candidateX = 80 + Math.random() * 800;
+      const candidateY = 80 + Math.random() * 420;
+      const distToPlayer = Math.hypot(this.player.x - candidateX, this.player.y - candidateY);
+
+      if (distToPlayer < 140) continue;
+
+      let collidesWithWall = false;
+      const halfW = this.fulozinha.width / 2;
+      const halfH = this.fulozinha.height / 2;
+
+      for (const w of lotData.walls) {
+        if (
+          candidateX + halfW > w.x - w.w / 2 &&
+          candidateX - halfW < w.x + w.w / 2 &&
+          candidateY + halfH > w.y - w.h / 2 &&
+          candidateY - halfH < w.y + w.h / 2
+        ) {
+          collidesWithWall = true;
+          break;
+        }
+      }
+
+      if (!collidesWithWall) {
+        bestX = candidateX;
+        bestY = candidateY;
+        break;
+      }
+    }
+
+    this.fulozinha.x = bestX;
+    this.fulozinha.y = bestY;
+    this.fuloState = 'PURSUIT';
+    this.fuloTimer = 5.0; // 5 segundos de perseguição ativa
+    engine.sound.playCumadeAssobio(1.3);
+    engine.juice.shake.addTrauma(0.25);
+    engine.juice.particles.emit('leaf', this.fulozinha.x, this.fulozinha.y, { count: 16, speed: 60 });
+  }
 
   // Definição dos 8 Lotes com Paredes Perimétricas Sólidas, Barreiras Espaçosas e Portões Alternantes
   private lots: Record<LotId, LotData> = {
@@ -371,9 +425,12 @@ export class Stage4BotijaScene implements IScene {
     this.hurtCooldown = 0;
     this.invulnerableTimer = 0;
     this.tripCooldown = 0;
-    this.fuloCurrentLot = '2b';
-    this.fuloLotChangeTimer = 4.0;
+    this.fuloState = 'SANCTUARY_WAIT';
+    this.fuloTimer = 0;
+    this.isControlsInverted = false;
     this.whistleTimer = 6.0;
+    this.whistleDuration = 0;
+    this.whistleWaveRadius = 0;
     this.hasBotija = false;
     this.hasLantern = false;
     this.digProgress = 0;
@@ -436,12 +493,17 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 1. Assobios e Alternância de Portões Internos
+    // 1. Assobios, Inversão de Controles e Alternância de Portões Internos
     this.whistleTimer -= dt;
     if (this.whistleTimer <= 0) {
-      this.whistleTimer = 5.5;
-      engine.sound.playCumadeAssobio(1.1);
-      engine.juice.shake.addTrauma(0.2);
+      this.whistleTimer = 7.0;
+      this.isControlsInverted = true;
+      this.whistleDuration = 4.0;
+      this.whistleWaveRadius = 15;
+      this.message = '🎶 ASSOBIO NA MATA! Os portões alternaram e os controles foram invertidos!';
+      engine.sound.playCumadeAssobio(1.2);
+      engine.juice.shake.addTrauma(0.3);
+      engine.juice.particles.emit('note', 480, 200, { count: 8, speed: 45 });
 
       for (const lotKey in this.lots) {
         for (const g of this.lots[lotKey as LotId].gates) {
@@ -450,114 +512,134 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 2. Patrulha da Fulô (exclusivamente fora da Igreja)
-    this.fuloLotChangeTimer -= dt;
-    if (this.fuloLotChangeTimer <= 0) {
-      this.fuloLotChangeTimer = 4.5;
-      const nextIdx = (this.lotSequence.indexOf(this.fuloCurrentLot) + 1) % this.lotSequence.length;
-      this.fuloCurrentLot = this.lotSequence[nextIdx];
-      this.fulozinha.x = 100 + Math.random() * 760;
-      this.fulozinha.y = 100 + Math.random() * 340;
-
-      if (this.fuloCurrentLot === this.currentLot && !inSanctuary) {
-        engine.sound.playCumadeAssobio(1.3);
-        engine.juice.shake.addTrauma(0.25);
+    if (this.isControlsInverted) {
+      this.whistleDuration -= dt;
+      this.whistleWaveRadius += 350 * dt;
+      if (this.whistleDuration <= 0) {
+        this.isControlsInverted = false;
+        this.whistleWaveRadius = 0;
+        this.message = '🌿 O assobio cessou. Controles normais.';
       }
     }
 
-    // Física e Perseguição da Fulô em Fúria: NÃO ATRAVESSA PAREDES!
-    if (this.currentLot !== 'igreja' && this.fuloCurrentLot === this.currentLot) {
-      const angle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-      const fuloSpeed = this.fulozinha.speed || 160;
-      const fuloHalfW = this.fulozinha.width / 2;
-      const fuloHalfH = this.fulozinha.height / 2;
-      const currentLotData = this.lots[this.currentLot];
+    // 2. FSM da Cumade Fulozinha em Ciclos (5s Persegue / 3s Invisível)
+    if (inSanctuary) {
+      this.fuloState = 'SANCTUARY_WAIT';
+      this.fuloTimer = 0;
+    } else {
+      if (this.fuloState === 'SANCTUARY_WAIT') {
+        // Ao sair do Santuário para a caatinga, spawna a Fulô
+        this.spawnFuloInLot(this.currentLot, engine);
+      } else if (this.fuloState === 'PURSUIT') {
+        this.fuloTimer -= dt;
 
-      // Teste de Colisão da Fulô no eixo X
-      const fuloTargetX = this.fulozinha.x + Math.cos(angle) * fuloSpeed * dt;
-      let fuloBlockedX = false;
-      for (const w of currentLotData.walls) {
-        if (
-          fuloTargetX + fuloHalfW > w.x - w.w / 2 &&
-          fuloTargetX - fuloHalfW < w.x + w.w / 2 &&
-          this.fulozinha.y + fuloHalfH > w.y - w.h / 2 &&
-          this.fulozinha.y - fuloHalfH < w.y + w.h / 2
-        ) {
-          fuloBlockedX = true;
-          break;
-        }
-      }
-      for (const g of currentLotData.gates) {
-        if (!g.isOpen) {
+        // Perseguição ativa respeitando paredes sólidas e portões fechados
+        const angle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
+        const fuloSpeed = this.fulozinha.speed || 160;
+        const fuloHalfW = this.fulozinha.width / 2;
+        const fuloHalfH = this.fulozinha.height / 2;
+        const currentLotData = this.lots[this.currentLot];
+
+        // Teste de Colisão da Fulô no eixo X
+        const fuloTargetX = this.fulozinha.x + Math.cos(angle) * fuloSpeed * dt;
+        let fuloBlockedX = false;
+        for (const w of currentLotData.walls) {
           if (
-            fuloTargetX + fuloHalfW > g.x - g.w / 2 &&
-            fuloTargetX - fuloHalfW < g.x + g.w / 2 &&
-            this.fulozinha.y + fuloHalfH > g.y - g.h / 2 &&
-            this.fulozinha.y - fuloHalfH < g.y + g.h / 2
+            fuloTargetX + fuloHalfW > w.x - w.w / 2 &&
+            fuloTargetX - fuloHalfW < w.x + w.w / 2 &&
+            this.fulozinha.y + fuloHalfH > w.y - w.h / 2 &&
+            this.fulozinha.y - fuloHalfH < w.y + w.h / 2
           ) {
             fuloBlockedX = true;
             break;
           }
         }
-      }
-      if (!fuloBlockedX) {
-        this.fulozinha.x = fuloTargetX;
-      }
-
-      // Teste de Colisão da Fulô no eixo Y
-      const fuloTargetY = this.fulozinha.y + Math.sin(angle) * fuloSpeed * dt;
-      let fuloBlockedY = false;
-      for (const w of currentLotData.walls) {
-        if (
-          this.fulozinha.x + fuloHalfW > w.x - w.w / 2 &&
-          this.fulozinha.x - fuloHalfW < w.x + w.w / 2 &&
-          fuloTargetY + fuloHalfH > w.y - w.h / 2 &&
-          fuloTargetY - fuloHalfH < w.y + w.h / 2
-        ) {
-          fuloBlockedY = true;
-          break;
+        for (const g of currentLotData.gates) {
+          if (!g.isOpen) {
+            if (
+              fuloTargetX + fuloHalfW > g.x - g.w / 2 &&
+              fuloTargetX - fuloHalfW < g.x + g.w / 2 &&
+              this.fulozinha.y + fuloHalfH > g.y - g.h / 2 &&
+              this.fulozinha.y - fuloHalfH < g.y + g.h / 2
+            ) {
+              fuloBlockedX = true;
+              break;
+            }
+          }
         }
-      }
-      for (const g of currentLotData.gates) {
-        if (!g.isOpen) {
+        if (!fuloBlockedX) {
+          this.fulozinha.x = fuloTargetX;
+        }
+
+        // Teste de Colisão da Fulô no eixo Y
+        const fuloTargetY = this.fulozinha.y + Math.sin(angle) * fuloSpeed * dt;
+        let fuloBlockedY = false;
+        for (const w of currentLotData.walls) {
           if (
-            this.fulozinha.x + fuloHalfW > g.x - g.w / 2 &&
-            this.fulozinha.x - fuloHalfW < g.x + g.w / 2 &&
-            fuloTargetY + fuloHalfH > g.y - g.h / 2 &&
-            fuloTargetY - fuloHalfH < g.y + g.h / 2
+            this.fulozinha.x + fuloHalfW > w.x - w.w / 2 &&
+            this.fulozinha.x - fuloHalfW < w.x + w.w / 2 &&
+            fuloTargetY + fuloHalfH > w.y - w.h / 2 &&
+            fuloTargetY - fuloHalfH < w.y + w.h / 2
           ) {
             fuloBlockedY = true;
             break;
           }
         }
-      }
-      if (!fuloBlockedY) {
-        this.fulozinha.y = fuloTargetY;
-      }
+        for (const g of currentLotData.gates) {
+          if (!g.isOpen) {
+            if (
+              this.fulozinha.x + fuloHalfW > g.x - g.w / 2 &&
+              this.fulozinha.x - fuloHalfW < g.x + g.w / 2 &&
+              fuloTargetY + fuloHalfH > g.y - g.h / 2 &&
+              fuloTargetY - fuloHalfH < g.y + g.h / 2
+            ) {
+              fuloBlockedY = true;
+              break;
+            }
+          }
+        }
+        if (!fuloBlockedY) {
+          this.fulozinha.y = fuloTargetY;
+        }
 
-      // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + knockback + invulnerabilidade de 5.0s)
-      const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
-      if (distToHero < 34 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
-        this.hurtCooldown = 1.5;
-        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
-        this.heroHp = Math.max(0, this.heroHp - 1);
-        this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
-        engine.sound.playChicote();
-        engine.sound.playGrito();
-        engine.juice.shake.addTrauma(0.5);
-        engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 50 });
+        // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + knockback + 5.0s invulnerabilidade)
+        const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
+        if (distToHero < 34 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
+          this.hurtCooldown = 1.5;
+          this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+          this.heroHp = Math.max(0, this.heroHp - 1);
+          this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
+          engine.sound.playChicote();
+          engine.sound.playGrito();
+          engine.juice.shake.addTrauma(0.5);
+          engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 50 });
 
-        // Knockback empurra o herói para longe da Fulô
-        const knockAngle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-        this.player.x += Math.cos(knockAngle) * 55;
-        this.player.y += Math.sin(knockAngle) * 55;
+          // Knockback empurra o herói para longe da Fulô
+          const knockAngle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
+          this.player.x += Math.cos(knockAngle) * 55;
+          this.player.y += Math.sin(knockAngle) * 55;
 
-        if (this.heroHp <= 0) {
-          this.stateStatus = 'FAILED';
-          this.message = '💀 VOCÊ NÃO RESISTIU AOS ATAQUES DA CUMADE FULOZINHA!';
-          engine.sound.playDefeatJingle();
-          setTimeout(() => engine.switchScene('STUDIO'), 1800);
-          return;
+          if (this.heroHp <= 0) {
+            this.stateStatus = 'FAILED';
+            this.message = '💀 VOCÊ NÃO RESISTIU AOS ATAQUES DA CUMADE FULOZINHA!';
+            engine.sound.playDefeatJingle();
+            setTimeout(() => engine.switchScene('STUDIO'), 1800);
+            return;
+          }
+        }
+
+        // Transição para VANISHED após 5s
+        if (this.fuloTimer <= 0) {
+          this.fuloState = 'VANISHED';
+          this.fuloTimer = 3.0; // 3 segundos de invisibilidade/desaparecimento
+          engine.sound.playUIClick();
+          engine.juice.particles.emit('leaf', this.fulozinha.x, this.fulozinha.y, { count: 18, speed: 50 });
+        }
+      } else if (this.fuloState === 'VANISHED') {
+        this.fuloTimer -= dt;
+        if (this.fuloTimer <= 0) {
+          // Reaparece em outro local do lote atual
+          this.spawnFuloInLot(this.currentLot, engine);
         }
       }
     }
@@ -620,23 +702,28 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // 4. Movimento do Jogador com Colisão Rígida
+    // 4. Movimento do Jogador com Inversão de Controles e Colisão Rígida
     let dx = 0;
     let dy = 0;
 
-    if (input.left) {
+    const left = this.isControlsInverted ? input.right : input.left;
+    const right = this.isControlsInverted ? input.left : input.right;
+    const up = this.isControlsInverted ? input.down : input.up;
+    const down = this.isControlsInverted ? input.up : input.down;
+
+    if (left) {
       dx -= 1;
       this.facing = 'left';
     }
-    if (input.right) {
+    if (right) {
       dx += 1;
       this.facing = 'right';
     }
-    if (input.up) {
+    if (up) {
       dy -= 1;
       this.facing = 'up';
     }
-    if (input.down) {
+    if (down) {
       dy += 1;
       this.facing = 'down';
     }
@@ -728,6 +815,8 @@ export class Stage4BotijaScene implements IScene {
     }
 
     // 5. Transições entre Telas pelas Conexões Oficiais
+    const prevLot = this.currentLot;
+
     if (this.player.x > 936) {
       if (this.currentLot === '1b') {
         this.currentLot = 'igreja';
@@ -797,6 +886,16 @@ export class Stage4BotijaScene implements IScene {
       } else if (this.currentLot === '2b') {
         this.currentLot = '3b';
         this.player.y = 40;
+      }
+    }
+
+    // Se mudou de lote e não está no santuário da Igreja, reposiciona a Fulô no novo lote
+    if (this.currentLot !== prevLot) {
+      if (this.currentLot === 'igreja') {
+        this.fuloState = 'SANCTUARY_WAIT';
+        this.fuloTimer = 0;
+      } else {
+        this.spawnFuloInLot(this.currentLot, engine);
       }
     }
 
@@ -1060,8 +1159,8 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Fulô Furiosa (fora da Igreja)
-    if (!lot.isSanctuary && this.fuloCurrentLot === this.currentLot) {
+    // Fulô Furiosa (fora da Igreja e quando em perseguição)
+    if (!lot.isSanctuary && this.fuloState === 'PURSUIT') {
       ctx.save();
       ctx.beginPath();
       ctx.arc(this.fulozinha.x, this.fulozinha.y, 80, 0, Math.PI * 2);
@@ -1170,6 +1269,18 @@ export class Stage4BotijaScene implements IScene {
       color: '#f7d070'
     });
 
+    // Efeito Visual de Assobio e Inversão de Controles
+    if (this.isControlsInverted) {
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.15)';
+      ctx.fillRect(0, 0, 960, 580);
+
+      drawText(ctx, '⚡ ASSOBIO DA FULÔ: CONTROLES INVERTIDOS! ⚡', 480, 50, {
+        font: 'bold 15px monospace',
+        align: 'center',
+        color: '#f87171'
+      });
+    }
+
     // Indicador de 3 Vidas no HUD Superior Esquerdo
     ctx.save();
     ctx.fillStyle = '#1e293b';
@@ -1183,6 +1294,29 @@ export class Stage4BotijaScene implements IScene {
       ctx.fillText(h < this.heroHp ? '❤️' : '🖤', 42 + h * 30, 31);
     }
     ctx.restore();
+
+    // Feedback Visual de Onda Sonora de Assobio em Xilogravura
+    if (this.whistleDuration > 0 || this.whistleWaveRadius > 0) {
+      drawOndaAssobioXilo(ctx, this.fulozinha.x, this.fulozinha.y, this.whistleWaveRadius || 40, {
+        time: this.animTime
+      });
+    }
+
+    // Feedback Visual de Bruma e Folhas ao Sumir/Reaparecer
+    if (this.fuloState === 'VANISHED') {
+      drawBrumaFuloXilo(ctx, this.fulozinha.x, this.fulozinha.y, 45, {
+        time: this.animTime,
+        progress: Math.min(1, this.fuloTimer / 1.5)
+      });
+    }
+
+    // Indicador HUD de Controles Invertidos
+    if (this.isControlsInverted) {
+      drawIndicadorControlesInvertidosXilo(ctx, 480, 520, {
+        time: this.animTime,
+        timeLeft: this.whistleDuration
+      });
+    }
 
     // Modais Narrativos (preenchendo 100% da tela 960x580)
     this.narrative.render(ctx, 960, 580);

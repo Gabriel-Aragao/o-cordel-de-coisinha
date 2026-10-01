@@ -8,12 +8,7 @@ import {
   drawMolduraCordel,
   drawInteriorCasaXilo,
   drawPalcoVioleirosXilo,
-  drawMesaMontagemXilo,
-  drawBode,
-  drawGalinha,
-  drawPorco,
-  drawJumento,
-  drawCachorro
+  drawMesaMontagemXilo
 } from '../../renderer/xilogravura';
 import { NarrativeModalManager } from '../narrative';
 
@@ -548,19 +543,15 @@ export class Stage3RasgaMortalhaScene implements IScene {
           if (it.type === 'morador') {
             drawMoradorBebado(ctx, it.interiorX, it.interiorY, 36, 48, { colorTint: it.color });
           } else if (it.type === 'animal') {
-            if (it.id === 'a_bode') {
-              drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
-            } else if (it.id === 'a_galinha') {
-              drawGalinha(ctx, it.interiorX, it.interiorY, 36, 36);
-            } else if (it.id === 'a_porco') {
-              drawPorco(ctx, it.interiorX, it.interiorY, 42, 34);
-            } else if (it.id === 'a_jumento') {
-              drawJumento(ctx, it.interiorX, it.interiorY, 44, 38);
-            } else if (it.id === 'a_cachorro') {
-              drawCachorro(ctx, it.interiorX, it.interiorY, 40, 34);
-            } else {
-              drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
-            }
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(it.interiorX - 20, it.interiorY - 20, 40, 40);
+            ctx.strokeStyle = '#ea580c';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(it.interiorX - 20, it.interiorY - 20, 40, 40);
+            ctx.font = '24px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(it.icon, it.interiorX, it.interiorY);
           } else {
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(it.interiorX - 18, it.interiorY - 18, 36, 36);
@@ -598,7 +589,26 @@ export class Stage3RasgaMortalhaScene implements IScene {
         ctx.restore();
       }
 
-      // Notificar gerenciador global de mensagens na base
+      // HUD de Tempo Restante no Interior da Casa
+      const minutes = Math.floor(this.stageTimer / 60);
+      const seconds = Math.floor(this.stageTimer % 60);
+      const timeStr = `⏳ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      ctx.save();
+      ctx.fillStyle = '#1e1b18';
+      ctx.fillRect(840, 15, 100, 32);
+      ctx.strokeStyle = this.stageTimer <= 60 ? '#ef4444' : '#d4af37';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(840, 15, 100, 32);
+      drawText(ctx, timeStr, 890, 24, {
+        font: 'bold 13px monospace',
+        align: 'center',
+        color: this.stageTimer <= 60 ? '#f87171' : '#fef08a'
+      });
+      ctx.restore();
+
+      // Renderizar o folheto de vitória/narrativa mesmo dentro da casa!
+      this.narrative.render(ctx, 960, 580);
       return;
     }
 
@@ -654,19 +664,17 @@ export class Stage3RasgaMortalhaScene implements IScene {
         if (it.type === 'morador') {
           drawMoradorBebado(ctx, it.x, it.y + 8, 28, 38, { colorTint: it.color });
         } else if (it.type === 'animal') {
-          if (it.id === 'a_bode') {
-            drawBode(ctx, it.x, it.y + 8, 30, 26);
-          } else if (it.id === 'a_galinha') {
-            drawGalinha(ctx, it.x, it.y + 8, 28, 28);
-          } else if (it.id === 'a_porco') {
-            drawPorco(ctx, it.x, it.y + 8, 32, 26);
-          } else if (it.id === 'a_jumento') {
-            drawJumento(ctx, it.x, it.y + 8, 34, 28);
-          } else if (it.id === 'a_cachorro') {
-            drawCachorro(ctx, it.x, it.y + 8, 30, 26);
-          } else {
-            drawBode(ctx, it.x, it.y + 8, 30, 26);
-          }
+          ctx.save();
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(it.x - 18, it.y - 12, 36, 36);
+          ctx.strokeStyle = '#ea580c';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(it.x - 18, it.y - 12, 36, 36);
+          ctx.font = '22px monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(it.icon, it.x, it.y + 6);
+          ctx.restore();
         } else {
           ctx.font = '18px monospace';
           ctx.textAlign = 'center';
@@ -698,6 +706,24 @@ export class Stage3RasgaMortalhaScene implements IScene {
       align: 'center',
       color: '#f7d070'
     });
+
+    // HUD de Tempo Restante na Praça
+    const minutes = Math.floor(this.stageTimer / 60);
+    const seconds = Math.floor(this.stageTimer % 60);
+    const timeStr = `⏳ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    ctx.save();
+    ctx.fillStyle = '#1e1b18';
+    ctx.fillRect(840, 15, 100, 32);
+    ctx.strokeStyle = this.stageTimer <= 60 ? '#ef4444' : '#d4af37';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(840, 15, 100, 32);
+    drawText(ctx, timeStr, 890, 24, {
+      font: 'bold 13px monospace',
+      align: 'center',
+      color: this.stageTimer <= 60 ? '#f87171' : '#fef08a'
+    });
+    ctx.restore();
 
     // Modais Narrativos (preenchendo 100% da tela 960x580)
     this.narrative.render(ctx, 960, 580);

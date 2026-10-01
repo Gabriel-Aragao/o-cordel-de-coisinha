@@ -79,6 +79,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private houses: HouseData[] = [];
   private allItems: VillageEntityItem[] = [];
   private carriedItem?: VillageEntityItem;
+  private doorCooldown: number = 0;
 
   private message: string = 'Ouça os Violeiros [E], pegue os itens com [E] e entre nas casas para organizá-las!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
@@ -91,6 +92,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     this.player.x = 480;
     this.player.y = 310;
     this.carriedItem = undefined;
+    this.doorCooldown = 0;
     this.stateStatus = 'PLAYING';
     this.animTime = 0;
     this.stepTimer = 0;
@@ -163,6 +165,10 @@ export class Stage3RasgaMortalhaScene implements IScene {
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
 
+    if (this.doorCooldown > 0) {
+      this.doorCooldown = Math.max(0, this.doorCooldown - dt);
+    }
+
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
       this.narrative.update(dt, input, engine);
       return;
@@ -228,12 +234,13 @@ export class Stage3RasgaMortalhaScene implements IScene {
       this.player.x = Math.max(90, Math.min(870, this.player.x));
       this.player.y = Math.max(90, Math.min(490, this.player.y));
 
-      // Saída pela porta inferior da casa
-      if (this.player.y >= 470 && (this.player.x > 420 && this.player.x < 540)) {
+      // Saída pela porta inferior da casa (com cooldown e spawn afastado)
+      if (this.doorCooldown <= 0 && this.player.y >= 475 && (this.player.x > 420 && this.player.x < 540)) {
         const exitHouse = this.houses.find(h => h.index === this.currentInteriorHouseIdx);
         this.currentInteriorHouseIdx = null;
+        this.doorCooldown = 0.6; // Cooldown de 0.6s para evitar reentrada imediata
         this.player.x = exitHouse ? exitHouse.x : 480;
-        this.player.y = exitHouse ? exitHouse.y + 70 : 250;
+        this.player.y = exitHouse ? exitHouse.y + 110 : 270; // 110px abaixo da casa, fora do raio de 45px
         this.message = '🚪 Você saiu para a praça da vila.';
         engine.sound.playUIClick();
         return;
@@ -391,14 +398,17 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
     }
 
-    for (const h of this.houses) {
-      if (Math.hypot(this.player.x - h.x, this.player.y - (h.y + 40)) < 45) {
-        this.currentInteriorHouseIdx = h.index;
-        this.player.x = 480;
-        this.player.y = 440;
-        this.message = `🏠 Entrou na Casa ${h.index} (${h.corName}). Solte itens com [E] ou Grite [Espaço] para resetar!`;
-        engine.sound.playUIClick();
-        return;
+    if (this.doorCooldown <= 0) {
+      for (const h of this.houses) {
+        if (Math.hypot(this.player.x - h.x, this.player.y - (h.y + 40)) < 45) {
+          this.currentInteriorHouseIdx = h.index;
+          this.doorCooldown = 0.6; // Cooldown ao entrar na casa
+          this.player.x = 480;
+          this.player.y = 400; // Posicionado a 400px, bem longe de y >= 475px
+          this.message = `🏠 Entrou na Casa ${h.index} (${h.corName}). Solte itens com [E] ou Grite [Espaço] para resetar!`;
+          engine.sound.playUIClick();
+          return;
+        }
       }
     }
 

@@ -72,6 +72,21 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Santuário da Igreja & Candeeiro:** Área sagrada livre da Fulô; Candeeiro no Lote 1b expande a visão na escuridão para 320px com diálogo bloqueante.
 * **Recompensa:** Desenterrar a botija no Lote 0 e levar ao Beato ➔ 🖋️ **Tinta Encantada**.
 
+### 5. Dinâmica de Abertura e Encerramento do Jogo:
+* **Folheto de Abertura (Ao Iniciar o Jogo no Estúdio):**
+  - Ao carregar o jogo pela primeira vez, é exibido um folheto de cordel de boas-vindas com a história:
+    > *"Bem vindo, forasteiro. Por algum motivo, sabe-se lá Deus como, tu veio parar em um estúdio de xilogravura malassombrado. Agora tu so consegue sair daqui quando contar tua história. Então ,Coisinha, como é teu nome mesmo?"*
+  - O jogador confirma com `[E]` / `[Enter]` para iniciar a exploração dos contos.
+* **Folheto Pré-Encerramento ("Grita teu nome"):**
+  - Após reunir os 4 itens místicos e acionar a Prensa do Destino, antes da tela de vitória, abre-se um folheto de cordel pré-encerramento perguntando:
+    > *"Como é têu nome mesmo, Coisinha?"*
+  - Contém um campo de texto estilizado e o botão/ação **"Grita teu nome"** (ou confirmação por `[Enter]`).
+  - O nome informado é gravado na engine e utilizado na capa final do cordel.
+* **Remoção do Input "Herói:" do Cabeçalho:**
+  - O campo de input fixo de cabeçalho foi 100% removido da interface, já que a definição do nome ocorre no momento dramático do pré-encerramento.
+* **Capa Final de Vitória:**
+  - Exibe com orgulho: **"O CORDEL DE [NOME DIGITADO]: O HERÓI DO SERTÃO"** com os 4 selos de xilogravura e o herói entalhado na madeira.
+
 ### 6. Clímax & Estúdio de Impressão:
 
 ### 4. Controles Universais:

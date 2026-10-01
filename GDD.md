@@ -17,6 +17,8 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ### 1.2 Sistema Global de Diálogos, Layout & Controles
 * **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Caixas de diálogo, falas de NPCs e mensagens de gameplay são exibidas fora do canvas de jogo, em um painel inferior dedicado. Nada é desenhado sobre a área do canvas, deixando 100% da tela do jogo visível para navegação e exploração dos itens e cenários.
+* **Debounce de Falas & Supressão de Toasts:** Debounce de 0.3s por linha no avanço de diálogos impedindo pulos rápidos de estrofes intermediárias; silenciamento de orientações em segundo plano durante conversas.
+* **Escala Vertical Total:** Folhetos de início/fim de fase e cenários cobrem 100% dos 600px de altura vertical do canvas.
 * **Ciclo de Fechamento de Diálogo:** Conclusão da última fala libera instantaneamente o movimento do herói sem travamento ou loop infinito de interação.
 * **Diálogo de Censura na 1ª Interação com NPCs:**
   - Primeira conversa com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**):

@@ -539,7 +539,7 @@ export class Stage4BotijaScene implements IScene {
       const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
       if (distToHero < 34 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 1.5;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
         engine.sound.playChicote();
@@ -810,7 +810,7 @@ export class Stage4BotijaScene implements IScene {
       // Efeito de Tropeço Cômico com Dano de 1 Vida (-1 HP) ao cruzar a pedra no corredor (5s de i-frames)
       if (distToPedra < 26 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 2.0;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         const tripPhrases = [
           '🗣️ "Coisinha, tropeçou!"',
@@ -883,7 +883,7 @@ export class Stage4BotijaScene implements IScene {
       if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         bush.isSearched = true; // 1. Auto-revelação da moita
         this.hurtCooldown = 1.2;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -935,7 +935,7 @@ export class Stage4BotijaScene implements IScene {
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
           } else if (bush.type === 'cacto') {
             if (this.invulnerableTimer <= 0) {
-              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5s
               this.heroHp = Math.max(0, this.heroHp - 1);
               engine.sound.playHurtCacto();
               engine.sound.playGrito();

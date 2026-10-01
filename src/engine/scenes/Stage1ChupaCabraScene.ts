@@ -396,7 +396,7 @@ export class Stage1ChupaCabraScene implements IScene {
       if (bush.type === 'cacto' && distHeroBush < bush.radius + 14 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         bush.isSearched = true; // 1. Auto-revelação da moita de espinhos
         this.hurtCooldown = 1.2;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(1, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -463,7 +463,7 @@ export class Stage1ChupaCabraScene implements IScene {
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 12, speed: 45 });
           } else if (bush.type === 'cacto') {
             if (this.invulnerableTimer <= 0) {
-              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5s
               this.heroHp = Math.max(1, this.heroHp - 1);
               engine.sound.playHurtCacto();
               engine.sound.playGrito();
@@ -958,5 +958,5 @@ export class Stage1ChupaCabraScene implements IScene {
     return this.message;
   }
 
-  public destroy(): void {}
+  public destroy(): void { }
 }

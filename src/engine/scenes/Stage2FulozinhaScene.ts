@@ -614,7 +614,7 @@ export class Stage2FulozinhaScene implements IScene {
       if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         bush.isSearched = true; // 1. Auto-revelação da moita
         this.hurtCooldown = 1.2;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -668,7 +668,7 @@ export class Stage2FulozinhaScene implements IScene {
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
           } else if (bush.type === 'cacto') {
             if (this.invulnerableTimer <= 0) {
-              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5s
               this.heroHp = Math.max(0, this.heroHp - 1);
               engine.sound.playHurtCacto();
               engine.sound.playGrito();
@@ -696,7 +696,7 @@ export class Stage2FulozinhaScene implements IScene {
       // Tropeço com Dano de 1 Vida (-1 HP) (com 5s de i-frames)
       if (distToPedra < 26 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 2.0;
-        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+        this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playUIClick();
         engine.sound.playGrito();
@@ -770,7 +770,7 @@ export class Stage2FulozinhaScene implements IScene {
         } else if (this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
           // Ataque de cadarço da Fulô: -1 HP + knockback + invulnerabilidade de 5.0s
           this.hurtCooldown = 1.5;
-          this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+          this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
           this.heroHp = Math.max(0, this.heroHp - 1);
           this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
           engine.sound.playChicote();

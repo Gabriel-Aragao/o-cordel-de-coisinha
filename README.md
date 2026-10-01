@@ -20,9 +20,9 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🎭 Sistema Canônico de Diálogos & Controles
 
-1. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Todas as mensagens, diálogos e toasts são exibidos fora do canvas de jogo, em um painel dedicado logo abaixo da tela. Nada é desenhado sobre a área do canvas, mantendo 100% da visualização das salas, fases e itens desobstruída.
-2. **Ritmo de Diálogo e Debounce de Linhas:** Proteção de 0.3s entre falas no release de `E` para leitura calma de estrofes sem pulos de mensagens intermediárias. Supressão de toasts em segundo plano durante conversas.
-3. **Escala Vertical Total (960x600):** Folhetos de início/fim de fase e todos os cenários (incluindo Fase 3) preenchem 100% da altura do canvas sem barras vazias.
+1. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Todas as conversas diretas com NPCs são exibidas fora do canvas de jogo, em um painel dedicado logo abaixo da tela. Mensagens e orientações de fundo foram removidas para foco total na narrativa.
+2. **Ritmo de Diálogo e Debounce de Linhas:** Proteção de 0.3s entre falas no release de `E` para leitura calma de estrofes sem pulos de mensagens intermediárias.
+3. **Escala Vertical Integral (960x580):** Canvas, folhetos de início/fim de fase e todos os cenários (incluindo Fase 3) operam na resolução integral de 960x580px.
 4. **Ciclo de Vida e Desbloqueio dos Diálogos:** Ao terminar a última fala, o diálogo fecha imediatamente com a tecla `E`, consumindo o input e liberando a movimentação do personagem sem deixá-lo travado.
 3. **Diálogo de Censura na 1ª Interação com NPCs:**
    - Ao conversar pela primeira vez com qualquer NPC (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**), o NPC pergunta seu nome. O herói responde `"meu nome é @#$!*&%#!"` acompanhado de um som cômico de erro/censura. O NPC responde: `"Entendi foi nada!"`.

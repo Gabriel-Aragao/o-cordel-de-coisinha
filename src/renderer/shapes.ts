@@ -48,6 +48,7 @@ export function renderEntity(ctx: CanvasRenderingContext2D, entity: Entity, time
     drawCoisinha(ctx, entity.x, entity.y, entity.width || 36, entity.height || 48, {
       time,
       isMoving: false,
+      isInvulnerable: (entity as any).isInvulnerable || ((entity as any).invulnerableTimer && (entity as any).invulnerableTimer > 0),
     });
   } else if (id.includes('violeiro') || label.includes('violeiro') || label.includes('repentista')) {
     drawVioleiro(ctx, entity.x, entity.y, entity.width || 44, entity.height || 50, {

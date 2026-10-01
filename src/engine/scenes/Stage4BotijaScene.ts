@@ -1095,11 +1095,12 @@ export class Stage4BotijaScene implements IScene {
       ctx.restore();
     }
 
-    // Jogador Coisinha
+    // Jogador Coisinha (com efeito de piscar durante invulnerabilidade)
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
-      time: this.animTime
+      time: this.animTime,
+      invulnerableTimer: this.hurtCooldown
     });
 
     if (this.hasBotija) {

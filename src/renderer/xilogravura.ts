@@ -17,6 +17,8 @@ export interface XiloRenderOptions {
   alpha?: number;
   colorTint?: string;
   shadow?: boolean;
+  isInvulnerable?: boolean;
+  invulnerableTimer?: number;
 }
 
 // Cores canônicas da xilogravura
@@ -64,6 +66,14 @@ export function drawCoisinha(
   const bob = options.isMoving ? Math.sin(t * 12) * 2 : Math.sin(t * 3) * 0.8;
   const w = width;
   const h = height;
+
+  // Efeito de piscar durante invulnerabilidade (5s i-frames)
+  if (options.isInvulnerable || (options.invulnerableTimer && options.invulnerableTimer > 0)) {
+    const isBlinking = Math.floor(t * 14) % 2 === 0;
+    ctx.globalAlpha = isBlinking ? 0.35 : 0.95;
+  } else if (options.alpha !== undefined) {
+    ctx.globalAlpha = options.alpha;
+  }
 
   // Sombra no chão
   ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';

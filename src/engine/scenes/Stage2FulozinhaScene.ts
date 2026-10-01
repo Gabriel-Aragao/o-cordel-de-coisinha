@@ -56,6 +56,7 @@ export class Stage2FulozinhaScene implements IScene {
   private heroHp: number = 3;
   private maxHeroHp: number = 3;
   private hurtCooldown: number = 0;
+  private invulnerableTimer: number = 0;
 
   private player: Entity = {
     id: 'hero',
@@ -339,6 +340,7 @@ export class Stage2FulozinhaScene implements IScene {
     this.player.y = 270;
     this.heroHp = 3;
     this.hurtCooldown = 0;
+    this.invulnerableTimer = 0;
     this.fulozinha.x = 750;
     this.fulozinha.y = 270;
     this.hasFumo = false;
@@ -851,11 +853,12 @@ export class Stage2FulozinhaScene implements IScene {
       });
     }
 
-    // Herói Coisinha
+    // Herói Coisinha (com efeito de piscar durante invulnerabilidade)
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
-      time: this.animTime
+      time: this.animTime,
+      invulnerableTimer: this.invulnerableTimer
     });
 
     // HUD Superior

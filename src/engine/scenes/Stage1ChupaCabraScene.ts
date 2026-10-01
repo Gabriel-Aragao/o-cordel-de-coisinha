@@ -50,6 +50,7 @@ export class Stage1ChupaCabraScene implements IScene {
   private heroHp: number = 3;
   private maxHeroHp: number = 3;
   private hurtCooldown: number = 0;
+  private invulnerableTimer: number = 0;
 
   private player: Entity = {
     id: 'hero',
@@ -128,6 +129,7 @@ export class Stage1ChupaCabraScene implements IScene {
     this.player.y = 780;
     this.heroHp = 3;
     this.hurtCooldown = 0;
+    this.invulnerableTimer = 0;
     this.hasRope = false;
     this.hasLantern = false;
     this.isAboioActive = false;
@@ -263,6 +265,7 @@ export class Stage1ChupaCabraScene implements IScene {
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
     if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
+    if (this.invulnerableTimer > 0) this.invulnerableTimer -= dt;
 
     // Atualiza Diálogos e Modais Narrativos
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
@@ -389,9 +392,11 @@ export class Stage1ChupaCabraScene implements IScene {
     for (const bush of this.bushes) {
       const distHeroBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
 
-      // Colisão física com cactos causa dano involuntário
-      if (bush.type === 'cacto' && distHeroBush < bush.radius + 14 && this.hurtCooldown <= 0) {
+      // Colisão física com cactos causa dano involuntário (e revela a moita permanentemente)
+      if (bush.type === 'cacto' && distHeroBush < bush.radius + 14 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
+        bush.isSearched = true; // 1. Auto-revelação da moita de espinhos
         this.hurtCooldown = 1.2;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(1, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -412,11 +417,41 @@ export class Stage1ChupaCabraScene implements IScene {
             this.message = '🪢 CORDA ENCONTRADA! Agora você laça os bodes ao se aproximar!';
             engine.sound.playPickup();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+            // 3. Diálogo bloqueante ao obter a corda
+            engine.messages.startDialog(
+              'item_corda',
+              'Corda Trançada',
+              '🪢',
+              [
+                {
+                  speaker: 'Coisinha',
+                  avatarIcon: '🪢',
+                  text: '🪢 "Uma corda resistente de couro cru! Com ela posso laçar e conduzir os 4 bodes para o curral com segurança!"'
+                }
+              ],
+              undefined,
+              engine
+            );
           } else if (bush.type === 'candeeiro' && !this.hasLantern) {
             this.hasLantern = true;
             this.message = '🏮 CANDEEIRO ENCONTRADO! Iluminação expandida na caatinga!';
             engine.sound.playPickup();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+            // 3. Diálogo bloqueante ao obter o candeeiro
+            engine.messages.startDialog(
+              'item_candeeiro',
+              'Candeeiro Místico',
+              '🏮',
+              [
+                {
+                  speaker: 'Coisinha',
+                  avatarIcon: '🏮',
+                  text: '🏮 "O candeeiro aceso dissipa a escuridão da caatinga e revela o caminho por entre as moitas!"'
+                }
+              ],
+              undefined,
+              engine
+            );
           } else if (bush.type === 'fruta') {
             if (this.heroHp < this.maxHeroHp) {
               this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
@@ -427,11 +462,14 @@ export class Stage1ChupaCabraScene implements IScene {
             engine.sound.playFruitEat();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 12, speed: 45 });
           } else if (bush.type === 'cacto') {
-            this.heroHp = Math.max(1, this.heroHp - 1);
-            engine.sound.playHurtCacto();
-            engine.sound.playGrito();
-            engine.juice.shake.addTrauma(0.5);
-            this.triggerSoundWave(320, true, engine);
+            if (this.invulnerableTimer <= 0) {
+              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.heroHp = Math.max(1, this.heroHp - 1);
+              engine.sound.playHurtCacto();
+              engine.sound.playGrito();
+              engine.juice.shake.addTrauma(0.5);
+              this.triggerSoundWave(320, true, engine);
+            }
           } else {
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 40 });
           }
@@ -876,12 +914,17 @@ export class Stage1ChupaCabraScene implements IScene {
       ctx.restore();
     }
 
-    // Herói Coisinha
+    // Herói Coisinha (com modulação de alpha durante os 5s de invulnerabilidade)
+    ctx.save();
+    if (this.invulnerableTimer > 0) {
+      ctx.globalAlpha = Math.sin(this.animTime * 24) > 0 ? 0.35 : 0.9;
+    }
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
       time: this.animTime
     });
+    ctx.restore();
 
     ctx.restore(); // Restaura Câmera para renderizar HUD estático
 

@@ -21,7 +21,9 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Fila Sequencial Sem Conflito:** Mensagens são enfileiradas e exibidas uma a uma de forma limpa.
 * **Estética de Xilogravura:** O painel conta com moldura e tipografia xilográfica, distintivo do locutor com cores temáticas e indicador de avanço `[Solte E para Avançar]`.
 
-### 2. Ciclo de Vida e Desbloqueio dos Diálogos:
+### 2. Ciclo de Vida, Ritmo e Desbloqueio dos Diálogos:
+* **Controle de Ritmo e Prevenção de Pulo de Falas:** Cada fala intermediária exige um release intencional da tecla `E` / `Enter` com **debounce mínimo de 0.3s entre linhas**, garantindo que o jogador consiga ler com calma todas as estrofes e diálogos sem pulos acelerados acidentais.
+* **Isolamento e Supressão de Toasts:** Enquanto um diálogo estiver em andamento, todas as orientações ou toasts secundários em segundo plano são pausados/limpos, evitando acúmulo ou conflito de textos.
 * **Encerramento Fluido e Desbloqueio Imediato:** Ao atingir a última fala de um diálogo e soltar a tecla `E` / `Enter`, a caixa de diálogo **fecha imediatamente e desaparece**, liberando a movimentação e os controles do herói sem travamento.
 * **Consumo Atômico de Input e Cooldown de Interação:** O fechamento consome o evento de input e impede que o mesmo clique/release reabra instantaneamente a conversa com o mesmo NPC.
 * **Diálogo Canônico de Censura (1ª Interação com NPCs):**
@@ -31,16 +33,12 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
     - **NPC:** *"Entendi foi nada!"*
   - **Todas as falas subsequentes:** O NPC passa a chamar o personagem exclusivamente de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes não apareceram ainda..."*).
   - **Dicas de Gameplay:** Personagens-chave (dono do curral, padre, violeiros) fornecem dicas claras dos objetivos da fase.
-  - **Avanço de Diálogos por Release da Tecla `E`:** Cada mensagem avança estritamente ao soltar (`keyUp` / release) a tecla `E` ou clique único.
 
-### 2. Obtenção de Itens Especiais (Corda & Candeeiro):
-* O herói **inicia sem a Corda e sem o Candeeiro**.
-* A **Corda de Laçar** só é obtida se o jogador encontrá-la vasculhando uma moita.
-* O **Candeeiro** só é obtido se o jogador encontrá-lo vasculhando uma moita.
+### 3. Telas de Apresentação e Encerramento de Fase em Escala Vertical Total:
+* **Preenchimento Vertical Completo:** Os folhetos de introdução e de vitória ocupam toda a extensão vertical da tela de jogo (escala de 600px de altura), sem faixas pretas ou vazios na base/topo.
+* **Backgrounds de Cena em Altura Total:** Todos os cenários (incluindo praça e salas interiores da Fase 3) cobrem integralmente os 960x600 do canvas.
 
-### 3. Telas de Apresentação e Encerramento de Fase:
-* **Entrada na Fase:** Tela de introdução com a narrativa do conto em folheto de cordel.
-* **Conclusão da Fase:** Tela de encerramento celebrando o sucesso, apresentando a narrativa de desfecho e exibindo o **Item Místico** conquistado.
+### 4. Obtenção de Itens Especiais (Corda & Candeeiro):
 
 ### 4. Controles Universais:
 * Os comandos de **Grito** (`Espaço` / Segurar) e **Interação** (`E` / Soltar) funcionam universalmente em **todas as telas e fases do jogo**.

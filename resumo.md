@@ -21,22 +21,23 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Fila Sequencial Sem Conflito:** Mensagens são enfileiradas e exibidas uma a uma de forma limpa.
 * **Estética de Xilogravura:** O painel conta com moldura e tipografia xilográfica, distintivo do locutor com cores temáticas e indicador de avanço `[Solte E para Avançar]`.
 
-### 2. Ciclo de Vida, Ritmo e Desbloqueio dos Diálogos:
+### 2. Ciclo de Vida, Ritmo e Desbloqueio dos Diálogos (Exclusividade de NPCs):
+* **Renderização Exclusiva de Diálogos com NPCs:** Todas as mensagens secundárias, toasts e orientações de cordel de fundo foram removidas de todas as fases e do estúdio. O painel externo exibe **exclusivamente diálogos diretos com NPCs** (com censura inicial, apelido 'Coisinha' e dicas).
 * **Controle de Ritmo e Prevenção de Pulo de Falas:** Cada fala intermediária exige um release intencional da tecla `E` / `Enter` com **debounce mínimo de 0.3s entre linhas**, garantindo que o jogador consiga ler com calma todas as estrofes e diálogos sem pulos acelerados acidentais.
-* **Isolamento e Supressão de Toasts:** Enquanto um diálogo estiver em andamento, todas as orientações ou toasts secundários em segundo plano são pausados/limpos, evitando acúmulo ou conflito de textos.
 * **Encerramento Fluido e Desbloqueio Imediato:** Ao atingir a última fala de um diálogo e soltar a tecla `E` / `Enter`, a caixa de diálogo **fecha imediatamente e desaparece**, liberando a movimentação e os controles do herói sem travamento.
 * **Consumo Atômico de Input e Cooldown de Interação:** O fechamento consome o evento de input e impede que o mesmo clique/release reabra instantaneamente a conversa com o mesmo NPC.
 * **Diálogo Canônico de Censura (1ª Interação com NPCs):**
   - A primeira vez que o jogador interage com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados/Moradores**):
     - **NPC:** *"Opa, forasteiro! Qual é o seu nome?"*
-    - **Jogador:** *"Meu nome é @#$!*&%#!"* *(com som cômico de erro/glitch/censura)*
+    - **Jogador:** *"Meu nome é @#$!*&%#!*" *(com som cômico de erro/glitch/censura)*
     - **NPC:** *"Entendi foi nada!"*
   - **Todas as falas subsequentes:** O NPC passa a chamar o personagem exclusivamente de **"Coisinha"** (ex: *"Então, Coisinha. Meus bodes não apareceram ainda..."*).
   - **Dicas de Gameplay:** Personagens-chave (dono do curral, padre, violeiros) fornecem dicas claras dos objetivos da fase.
 
-### 3. Telas de Apresentação e Encerramento de Fase em Escala Vertical Total:
-* **Preenchimento Vertical Completo:** Os folhetos de introdução e de vitória ocupam toda a extensão vertical da tela de jogo (escala de 600px de altura), sem faixas pretas ou vazios na base/topo.
-* **Backgrounds de Cena em Altura Total:** Todos os cenários (incluindo praça e salas interiores da Fase 3) cobrem integralmente os 960x600 do canvas.
+### 3. Telas de Apresentação, Encerramento e Viewport em Escala Vertical (960x580px):
+* **Escala Vertical Integral (960x580px):** O canvas do jogo e todas as subcenas operam na resolução padrão de **960x580 pixels**.
+* **Preenchimento Vertical Completo:** Os folhetos de introdução e de vitória ocupam toda a extensão vertical da tela de jogo (580px de altura), sem faixas pretas ou vazios na base/topo.
+* **Backgrounds de Cena em Altura Total:** Todos os cenários (incluindo praça e salas interiores da Fase 3) cobrem integralmente os 960x580 do canvas.
 
 ### 4. Obtenção de Itens Especiais (Corda & Candeeiro):
 

@@ -75,6 +75,7 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 * **Mecânicas Principais:**
   - **Captura Universal (`E`):** Bebidas, fumos, moradores e animais são capturados e soltos com a tecla `E`.
   - **Telas Interiores das Casas:** Entrar pela porta transporta o herói para o interior daquela casa para depositar com `E`.
+  - **Saída Segura Anti-Loop:** Spawn bem abaixo da porta ao sair e cooldown de transição para evitar reentradas automáticas.
   - **Remoção & Grito de Reset:** Capturar com `E` remove 1 item; Gritar (`Espaço`) dentro da casa expulsa todos os itens de volta para as mesas.
   - **Soltar Fora:** Soltar fora de casas retorna os itens às mesas de origem.
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.

@@ -81,7 +81,6 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private carriedItem?: VillageEntityItem;
   private doorCooldown: number = 0;
 
-  private message: string = 'Ouça os Violeiros [E], pegue os itens com [E] e entre nas casas para organizá-las!';
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
 
   // Sistema Narrativo de Cordel
@@ -241,7 +240,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
         this.doorCooldown = 0.6; // Cooldown de 0.6s para evitar reentrada imediata
         this.player.x = exitHouse ? exitHouse.x : 480;
         this.player.y = exitHouse ? exitHouse.y + 110 : 270; // 110px abaixo da casa, fora do raio de 45px
-        this.message = '🚪 Você saiu para a praça da vila.';
+        engine.messages.postMessage('🚪 Você saiu para a praça da vila.');
         engine.sound.playUIClick();
         return;
       }
@@ -279,11 +278,11 @@ export class Stage3RasgaMortalhaScene implements IScene {
         house.animal = undefined;
 
         if (resetCount > 0) {
-          this.message = `🗣️ GRITO NA CASA! Os ${resetCount} elementos se assustaram e voltaram para as mesas!`;
+          engine.messages.postMessage(`🗣️ GRITO NA CASA! Os ${resetCount} elementos se assustaram e voltaram para as mesas!`, { isSuccess: true });
           engine.sound.playItemDescobrir();
           engine.juice.particles.emit('dust', 480, 270, { count: 18, speed: 60 });
         } else {
-          this.message = `🗣️ Coisinha soltou um grito no interior da Casa ${house.index}!`;
+          engine.messages.postMessage(`🗣️ Coisinha soltou um grito no interior da Casa ${house.index}!`);
         }
         return;
       }
@@ -301,7 +300,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
           else if (it.type === 'fumo') house.fumo = it.name;
           else if (it.type === 'animal') house.animal = it.name;
 
-          this.message = `📦 ${it.name} foi colocado no chão da Casa ${house.index} (${house.corName})!`;
+          engine.messages.postMessage(`📦 ${it.name} foi colocado no chão da Casa ${house.index} (${house.corName})!`);
           engine.sound.playPickup();
           engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 10, speed: 45 });
           this.carriedItem = undefined;
@@ -319,7 +318,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
               else if (it.type === 'animal') house.animal = undefined;
 
               this.carriedItem = it;
-              this.message = `✋ Você recapturou ${it.name} do interior da Casa ${house.index}!`;
+              engine.messages.postMessage(`✋ Você recapturou ${it.name} do interior da Casa ${house.index}!`);
               engine.sound.playPickup();
               engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 8, speed: 35 });
               return;
@@ -405,7 +404,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
           this.doorCooldown = 0.6; // Cooldown ao entrar na casa
           this.player.x = 480;
           this.player.y = 400; // Posicionado a 400px, bem longe de y >= 475px
-          this.message = `🏠 Entrou na Casa ${h.index} (${h.corName}). Solte itens com [E] ou Grite [Espaço] para resetar!`;
+          engine.messages.postMessage(`🏠 Entrou na Casa ${h.index} (${h.corName}). Solte itens com [E] ou Grite [Espaço] para resetar!`);
           engine.sound.playUIClick();
           return;
         }
@@ -420,7 +419,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
         it.y = it.originY;
         it.interiorX = undefined;
         it.interiorY = undefined;
-        this.message = `↩️ ${it.name} foi solto fora de uma casa e retornou à sua mesa de origem!`;
+        engine.messages.postMessage(`↩️ ${it.name} foi solto fora de uma casa e retornou à sua mesa de origem!`);
         engine.sound.playPickup();
         engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 8, speed: 30 });
         this.carriedItem = undefined;
@@ -431,7 +430,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
         if (it.assignedHouseIdx === undefined) {
           if (Math.hypot(this.player.x - it.x, this.player.y - it.y) < 45) {
             this.carriedItem = it;
-            this.message = `✋ Você pegou: ${it.name} (${it.icon}). Leve até a casa certa e entre na porta!`;
+            engine.messages.postMessage(`✋ Você pegou: ${it.name} (${it.icon}). Leve até a casa certa e entre na porta!`);
             engine.sound.playPickup();
             engine.juice.particles.emit('sparkle', this.player.x, this.player.y, { count: 8, speed: 35 });
             return;
@@ -482,7 +481,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
     // =========================================================================
     // 1. RENDER DO INTERIOR DA CASA
     // =========================================================================
@@ -536,7 +535,6 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
 
       // Notificar gerenciador global de mensagens na base
-      engine.messages.postMessage(this.message);
       return;
     }
 
@@ -646,11 +644,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
       color: '#f7d070'
     });
 
-    // Notificar gerenciador global de mensagens na base
-    engine.messages.postMessage(this.message);
-
-    // Modais Narrativos
-    this.narrative.render(ctx, 960, 460);
+    // Modais Narrativos (preenchendo 100% da tela)
+    this.narrative.render(ctx, 960, 600);
   }
 
   public destroy(): void {}

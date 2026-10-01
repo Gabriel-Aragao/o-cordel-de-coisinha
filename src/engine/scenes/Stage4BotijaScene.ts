@@ -1145,8 +1145,8 @@ export class Stage4BotijaScene implements IScene {
       isSuccess: this.stateStatus === 'SUCCESS'
     });
 
-    // Modais Narrativos
-    this.narrative.render(ctx, 960, 460);
+    // Modais Narrativos (preenchendo 100% da tela)
+    this.narrative.render(ctx, 960, 600);
   }
 
   public destroy(): void { }

@@ -885,8 +885,8 @@ export class Stage2FulozinhaScene implements IScene {
       isSuccess: this.stateStatus === 'SUCCESS'
     });
 
-    // Modais Narrativos de Apresentação e Conclusão
-    this.narrative.render(ctx, 960, 460);
+    // Modais Narrativos de Apresentação e Conclusão (preenchendo 100% da tela)
+    this.narrative.render(ctx, 960, 600);
   }
 
   public destroy(): void { }

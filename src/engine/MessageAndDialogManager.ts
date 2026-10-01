@@ -26,6 +26,7 @@ export class MessageAndDialogManager {
   private onDialogComplete?: () => void;
   private introducedNPCs: Set<string> = new Set();
   public dialogCooldown: number = 0;
+  private lineAdvanceCooldown: number = 0; // Debounce de 0.3s por linha de fala
 
   // Fila Atômica Sequencial de Toasts/Mensagens (Anti-Stacking)
   private toastQueue: ToastItem[] = [];
@@ -33,7 +34,8 @@ export class MessageAndDialogManager {
   private lastMessageText: string = '';
 
   /**
-   * Enfileira uma mensagem/toast com garantia anti-stacking e expiração limpa
+   * Enfileira uma mensagem/toast com garantia anti-stacking e expiração limpa.
+   * Se houver diálogo ativo, a mensagem é ignorada para evitar acúmulo de segundo plano.
    */
   public postMessage(
     message: string,
@@ -44,6 +46,7 @@ export class MessageAndDialogManager {
       duration?: number;
     } = {}
   ): void {
+    if (this.isDialogActive) return; // Suprime toasts enquanto o jogador conversa com NPCs
     if (!message || message === this.lastMessageText) return;
     this.lastMessageText = message;
 
@@ -83,9 +86,11 @@ export class MessageAndDialogManager {
     engine?: IGameEngine
   ): void {
     if (this.dialogCooldown > 0) return;
+    this.clearToast(); // Limpa e suprime toasts pendentes ao iniciar conversa
     this.currentNPCId = npcId;
     this.onDialogComplete = onComplete;
     this.currentLineIdx = 0;
+    this.lineAdvanceCooldown = 0.3; // Debounce inicial para leitura calma da primeira fala
     this.isDialogActive = true;
 
     if (!this.introducedNPCs.has(npcId)) {
@@ -129,9 +134,12 @@ export class MessageAndDialogManager {
   }
 
   public update(dt: number, input: InputState, engine: IGameEngine): void {
-    // 0. Atualizar Cooldown de Diálogo
+    // 0. Atualizar Cooldowns de Diálogo e Debounce por Linha
     if (this.dialogCooldown > 0) {
       this.dialogCooldown = Math.max(0, this.dialogCooldown - dt);
+    }
+    if (this.lineAdvanceCooldown > 0) {
+      this.lineAdvanceCooldown = Math.max(0, this.lineAdvanceCooldown - dt);
     }
 
     // 1. Atualizar Toasts (Tempo e Fila Atômica)
@@ -145,10 +153,10 @@ export class MessageAndDialogManager {
       }
     }
 
-    // 2. Atualizar Diálogo e Consumir Input para Evitar Reabertura em Loop
+    // 2. Atualizar Diálogo e Consumir Input com Debounce de 0.3s por Linha
     if (this.isDialogActive) {
-      if (input.interactReleased || input.interactJustPressed) {
-        // Consumir input no mesmo frame
+      if ((input.interactReleased || input.interactJustPressed) && this.lineAdvanceCooldown <= 0) {
+        // Consumir input no mesmo frame e aplicar debounce de 0.3s
         input.interactReleased = false;
         input.interactJustPressed = false;
         this.advanceDialog(engine);
@@ -160,9 +168,11 @@ export class MessageAndDialogManager {
     if (!this.isDialogActive) return;
 
     this.currentLineIdx++;
+    this.lineAdvanceCooldown = 0.3; // Debounce de 0.3s para cada nova linha de fala
+
     if (this.currentLineIdx >= this.currentLines.length) {
       this.isDialogActive = false;
-      this.dialogCooldown = 0.25; // 0.25s de cooldown para evitar reabertura imediata
+      this.dialogCooldown = 0.25; // 0.25s de cooldown geral ao fechar
       engine.sound.playUIClick();
       if (this.onDialogComplete) {
         this.onDialogComplete();

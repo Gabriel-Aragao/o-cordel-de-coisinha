@@ -109,7 +109,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
       if (messageText) messageText.textContent = dialogData.text;
       if (messageHint) messageHint.textContent = dialogData.prompt || '[ Solte E para Avançar ]';
-    } else if (toastData) {
+    } else if (toastData && !eng.messages.isDialogActive) {
       if (panel) panel.classList.add('active');
       if (messageSpeaker) {
         messageSpeaker.textContent = toastData.speaker.toUpperCase();

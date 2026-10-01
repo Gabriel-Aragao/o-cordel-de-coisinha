@@ -89,7 +89,7 @@ export class NarrativeModalManager {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 540): void {
+  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 600): void {
     if (this.isIntroActive && this.introConfig) {
       this.renderIntro(ctx, this.introConfig, width, height);
     } else if (this.isOutroActive && this.outroConfig) {
@@ -106,12 +106,12 @@ export class NarrativeModalManager {
     ctx.save();
 
     // Backdrop escuro
-    ctx.fillStyle = 'rgba(10, 8, 6, 0.85)';
+    ctx.fillStyle = 'rgba(10, 8, 6, 0.88)';
     ctx.fillRect(0, 0, width, height);
 
-    // Folheto Central
-    const modalW = 680;
-    const modalH = 440;
+    // Folheto Central com preenchimento vertical integral
+    const modalW = Math.min(800, width - 48);
+    const modalH = Math.min(540, height - 36);
     const modalX = (width - modalW) / 2;
     const modalY = (height - modalH) / 2;
 
@@ -122,63 +122,63 @@ export class NarrativeModalManager {
 
     // Cabeçalho de Cordel
     ctx.fillStyle = XILO_COLORS.black;
-    ctx.font = 'bold 13px "Courier New", monospace';
+    ctx.font = 'bold 14px "Courier New", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(`FOLHETO DE CORDEL — CONTO ${cfg.phaseNumber}`, width / 2, modalY + 36);
+    ctx.fillText(`FOLHETO DE CORDEL — CONTO ${cfg.phaseNumber}`, width / 2, modalY + 38);
 
-    ctx.font = 'bold 20px "Courier New", monospace';
-    ctx.fillText(`"${cfg.title.toUpperCase()}"`, width / 2, modalY + 68);
+    ctx.font = 'bold 22px "Courier New", monospace';
+    ctx.fillText(`"${cfg.title.toUpperCase()}"`, width / 2, modalY + 72);
 
-    ctx.font = 'italic 12px "Courier New", monospace';
+    ctx.font = 'italic 13px "Courier New", monospace';
     ctx.fillStyle = '#78350f';
-    ctx.fillText(cfg.subtitle, width / 2, modalY + 90);
+    ctx.fillText(cfg.subtitle, width / 2, modalY + 96);
 
     // Linha divisória
     ctx.strokeStyle = '#8c6d46';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(modalX + 50, modalY + 105);
-    ctx.lineTo(modalX + modalW - 50, modalY + 105);
+    ctx.moveTo(modalX + 50, modalY + 112);
+    ctx.lineTo(modalX + modalW - 50, modalY + 112);
     ctx.stroke();
 
     // Versos de Cordel
     ctx.fillStyle = XILO_COLORS.black;
-    ctx.font = '13px "Courier New", monospace';
+    ctx.font = '14px "Courier New", monospace';
     ctx.textAlign = 'center';
     for (let i = 0; i < cfg.verses.length; i++) {
-      ctx.fillText(cfg.verses[i], width / 2, modalY + 135 + i * 22);
+      ctx.fillText(cfg.verses[i], width / 2, modalY + 144 + i * 24);
     }
 
     // Caixa de Objetivo
-    const objY = modalY + 270;
+    const objY = modalY + 285;
     ctx.fillStyle = '#1e1b18';
-    ctx.fillRect(modalX + 40, objY, modalW - 80, 75);
+    ctx.fillRect(modalX + 40, objY, modalW - 80, 85);
     ctx.strokeStyle = '#d4af37';
     ctx.lineWidth = 2;
-    ctx.strokeRect(modalX + 40, objY, modalW - 80, 75);
+    ctx.strokeRect(modalX + 40, objY, modalW - 80, 85);
 
     ctx.fillStyle = '#fef08a';
-    ctx.font = 'bold 12px monospace';
+    ctx.font = 'bold 13px monospace';
     ctx.fillText('🎯 MISSÃO DO CORDEL:', width / 2, objY + 24);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '11px monospace';
-    ctx.fillText(cfg.objective, width / 2, objY + 45);
+    ctx.font = '12px monospace';
+    ctx.fillText(cfg.objective, width / 2, objY + 48);
 
     ctx.fillStyle = '#86efac';
-    ctx.fillText(`Recompensa: ${cfg.itemReward.icon} ${cfg.itemReward.name}`, width / 2, objY + 62);
+    ctx.fillText(`Recompensa: ${cfg.itemReward.icon} ${cfg.itemReward.name}`, width / 2, objY + 68);
 
     // Botão de Iniciar
     const pulse = Math.sin(this.animTimer * 5) * 3;
     ctx.fillStyle = '#15803d';
-    ctx.fillRect(width / 2 - 140, modalY + modalH - 55, 280, 36);
+    ctx.fillRect(width / 2 - 160, modalY + modalH - 58, 320, 40);
     ctx.strokeStyle = '#4ade80';
     ctx.lineWidth = 2;
-    ctx.strokeRect(width / 2 - 140, modalY + modalH - 55, 280, 36);
+    ctx.strokeRect(width / 2 - 160, modalY + modalH - 58, 320, 40);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 13px monospace';
-    ctx.fillText('ENTRAR NO CONTO [E / Clique] ▶', width / 2, modalY + modalH - 34 + pulse * 0.3);
+    ctx.font = 'bold 14px monospace';
+    ctx.fillText('ENTRAR NO CONTO [E / Clique] ▶', width / 2, modalY + modalH - 33 + pulse * 0.3);
 
     ctx.restore();
   }
@@ -195,9 +195,9 @@ export class NarrativeModalManager {
     ctx.fillStyle = 'rgba(10, 8, 6, 0.88)';
     ctx.fillRect(0, 0, width, height);
 
-    // Folheto Central de Celebração
-    const modalW = 660;
-    const modalH = 440;
+    // Folheto Central de Celebração com preenchimento vertical integral
+    const modalW = Math.min(780, width - 48);
+    const modalH = Math.min(540, height - 36);
     const modalX = (width - modalW) / 2;
     const modalY = (height - modalH) / 2;
 
@@ -208,52 +208,52 @@ export class NarrativeModalManager {
 
     // Cabeçalho de Vitória
     ctx.fillStyle = '#15803d';
-    ctx.font = 'bold 15px "Courier New", monospace';
+    ctx.font = 'bold 16px "Courier New", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('✨ VITÓRIA & CONSAGRAÇÃO MÍSTICA ✨', width / 2, modalY + 36);
+    ctx.fillText('✨ VITÓRIA & CONSAGRAÇÃO MÍSTICA ✨', width / 2, modalY + 38);
 
     ctx.fillStyle = XILO_COLORS.black;
-    ctx.font = 'bold 19px "Courier New", monospace';
-    ctx.fillText(`"${cfg.title.toUpperCase()}"`, width / 2, modalY + 66);
+    ctx.font = 'bold 21px "Courier New", monospace';
+    ctx.fillText(`"${cfg.title.toUpperCase()}"`, width / 2, modalY + 70);
 
     // Render do Item Místico em Grande Escala
-    const itemCenterY = modalY + 140;
+    const itemCenterY = modalY + 148;
     ctx.fillStyle = '#1e1b18';
-    ctx.fillRect(width / 2 - 45, itemCenterY - 45, 90, 90);
+    ctx.fillRect(width / 2 - 48, itemCenterY - 48, 96, 96);
     ctx.strokeStyle = '#facc15';
     ctx.lineWidth = 3;
-    ctx.strokeRect(width / 2 - 45, itemCenterY - 45, 90, 90);
+    ctx.strokeRect(width / 2 - 48, itemCenterY - 48, 96, 96);
 
     if (cfg.itemReward.id === 'carimbo') {
-      drawItemCarimbo(ctx, width / 2, itemCenterY, 44);
+      drawItemCarimbo(ctx, width / 2, itemCenterY, 48);
     } else if (cfg.itemReward.id === 'folha') {
-      drawItemFolha(ctx, width / 2, itemCenterY, 44);
+      drawItemFolha(ctx, width / 2, itemCenterY, 48);
     } else if (cfg.itemReward.id === 'pena') {
-      drawItemPena(ctx, width / 2, itemCenterY, 44);
+      drawItemPena(ctx, width / 2, itemCenterY, 48);
     } else if (cfg.itemReward.id === 'tinta') {
-      drawItemTinta(ctx, width / 2, itemCenterY, 44);
+      drawItemTinta(ctx, width / 2, itemCenterY, 48);
     }
 
     ctx.fillStyle = '#854d0e';
-    ctx.font = 'bold 14px monospace';
-    ctx.fillText(`${cfg.itemReward.icon} ${cfg.itemReward.name} CONQUISTADO!`, width / 2, modalY + 205);
+    ctx.font = 'bold 15px monospace';
+    ctx.fillText(`${cfg.itemReward.icon} ${cfg.itemReward.name} CONQUISTADO!`, width / 2, modalY + 218);
 
     // Versos de Desfecho
     ctx.fillStyle = XILO_COLORS.black;
-    ctx.font = '13px "Courier New", monospace';
+    ctx.font = '14px "Courier New", monospace';
     for (let i = 0; i < cfg.verses.length; i++) {
-      ctx.fillText(cfg.verses[i], width / 2, modalY + 235 + i * 22);
+      ctx.fillText(cfg.verses[i], width / 2, modalY + 250 + i * 24);
     }
 
     // Botão de Retorno
     ctx.fillStyle = '#15803d';
-    ctx.fillRect(width / 2 - 160, modalY + modalH - 55, 320, 36);
+    ctx.fillRect(width / 2 - 170, modalY + modalH - 58, 340, 40);
     ctx.strokeStyle = '#4ade80';
     ctx.lineWidth = 2;
-    ctx.strokeRect(width / 2 - 160, modalY + modalH - 55, 320, 36);
+    ctx.strokeRect(width / 2 - 170, modalY + modalH - 58, 340, 40);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 13px monospace';
+    ctx.font = 'bold 14px monospace';
     ctx.fillText('RETORNAR AO ESTÚDIO [E / Clique] 🏠', width / 2, modalY + modalH - 33);
 
     ctx.restore();

@@ -16,9 +16,9 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
 ### 1.2 Sistema Global de Diálogos, Layout & Controles
-* **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Caixas de diálogo, falas de NPCs e mensagens de gameplay são exibidas fora do canvas de jogo, em um painel inferior dedicado. Nada é desenhado sobre a área do canvas, deixando 100% da tela do jogo visível para navegação e exploração dos itens e cenários.
-* **Debounce de Falas & Supressão de Toasts:** Debounce de 0.3s por linha no avanço de diálogos impedindo pulos rápidos de estrofes intermediárias; silenciamento de orientações em segundo plano durante conversas.
-* **Escala Vertical Total:** Folhetos de início/fim de fase e cenários cobrem 100% dos 600px de altura vertical do canvas.
+* **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Falas diretas de NPCs e diálogos com censura são exibidos fora do canvas de jogo, em um painel inferior dedicado. Orientações de cordel e toasts de fundo foram removidos de todas as fases e estúdio para foco narrativo puro.
+* **Debounce de Falas:** Debounce de 0.3s por linha no avanço de diálogos impedindo pulos rápidos de estrofes intermediárias.
+* **Escala Vertical Integral (960x580px):** O canvas do jogo, folhetos de início/fim de fase e todos os cenários operam em 960x580px de altura.
 * **Ciclo de Fechamento de Diálogo:** Conclusão da última fala libera instantaneamente o movimento do herói sem travamento ou loop infinito de interação.
 * **Diálogo de Censura na 1ª Interação com NPCs:**
   - Primeira conversa com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**):

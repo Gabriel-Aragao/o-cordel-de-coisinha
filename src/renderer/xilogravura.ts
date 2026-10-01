@@ -2727,3 +2727,219 @@ export function drawIndicadorControlesInvertidosXilo(
   ctx.restore();
 }
 
+/**
+ * 📜 FOLHETO DE ABERTURA DO JOGO (ESTÚDIO DE XILOGRAVURA)
+ */
+export function drawFolhetoAberturaEstudioXilo(
+  ctx: CanvasRenderingContext2D,
+  width: number = 960,
+  height: number = 580,
+  options: { time?: number } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+
+  // Backdrop escuro
+  ctx.fillStyle = 'rgba(10, 8, 6, 0.92)';
+  ctx.fillRect(0, 0, width, height);
+
+  // Folheto Central de Cordel (960x580)
+  const modalW = Math.min(800, width - 48);
+  const modalH = Math.min(520, height - 32);
+  const modalX = (width - modalW) / 2;
+  const modalY = (height - modalH) / 2;
+
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.fillRect(modalX, modalY, modalW, modalH);
+
+  drawMolduraCordel(ctx, modalX, modalY, modalW, modalH, { borderWeight: 4 });
+
+  // Cabeçalho de Cordel
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 14px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('FOLHETO DE CORDEL — O INÍCIO DA JORNADA', width / 2, modalY + 38);
+
+  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.fillText('"O ESTÚDIO DE XILOGRAVURA MALASSOMBRADO"', width / 2, modalY + 72);
+
+  ctx.font = 'italic 13px "Courier New", monospace';
+  ctx.fillStyle = '#78350f';
+  ctx.fillText('Origens, mistérios e o chamado dos folhetos de cordel', width / 2, modalY + 96);
+
+  // Linha divisória
+  ctx.strokeStyle = '#8c6d46';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(modalX + 50, modalY + 112);
+  ctx.lineTo(modalX + modalW - 50, modalY + 112);
+  ctx.stroke();
+
+  // Texto da História de Abertura
+  const verses = [
+    'Bem vindo, forasteiro.',
+    'Por algum motivo, sabe-se lá Deus como,',
+    'tu veio parar em um estúdio de xilogravura malassombrado.',
+    'Agora tu só consegue sair daqui quando contar tua história.',
+    'Então, Coisinha, como é teu nome mesmo?'
+  ];
+
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = '14px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < verses.length; i++) {
+    ctx.fillText(verses[i], width / 2, modalY + 148 + i * 26);
+  }
+
+  // Caixa de Missão
+  const objY = modalY + 300;
+  ctx.fillStyle = '#1e1b18';
+  ctx.fillRect(modalX + 40, objY, modalW - 80, 80);
+  ctx.strokeStyle = '#d4af37';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(modalX + 40, objY, modalW - 80, 80);
+
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 13px monospace';
+  ctx.fillText('🎯 MISSÃO DO CORDEL MESTRE:', width / 2, objY + 24);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '12px monospace';
+  ctx.fillText('Reúna os 4 Elementos Místicos nos contos do chão e acione a Prensa!', width / 2, objY + 48);
+
+  ctx.fillStyle = '#86efac';
+  ctx.fillText('🪓 Carimbo | 📄 Folha | 🪶 Pena | 🖋️ Tinta', width / 2, objY + 68);
+
+  // Botão de Iniciar
+  const pulse = Math.sin(t * 5) * 3;
+  ctx.fillStyle = '#15803d';
+  ctx.fillRect(width / 2 - 160, modalY + modalH - 58, 320, 40);
+  ctx.strokeStyle = '#4ade80';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(width / 2 - 160, modalY + modalH - 58, 320, 40);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 14px monospace';
+  ctx.fillText('ENTRAR NO ESTÚDIO [E / Clique] ▶', width / 2, modalY + modalH - 33 + pulse * 0.3);
+
+  ctx.restore();
+}
+
+/**
+ * 📣 MODAL PRÉ-ENCERRAMENTO ("GRITA TEU NOME") NA PRENSA DO DESTINO
+ */
+export function drawModalPreEncerramentoNomeXilo(
+  ctx: CanvasRenderingContext2D,
+  currentName: string,
+  width: number = 960,
+  height: number = 580,
+  options: { time?: number } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+
+  // Backdrop escuro
+  ctx.fillStyle = 'rgba(10, 8, 6, 0.94)';
+  ctx.fillRect(0, 0, width, height);
+
+  // Folheto Central de Celebração e Nomeação
+  const modalW = Math.min(800, width - 48);
+  const modalH = Math.min(520, height - 32);
+  const modalX = (width - modalW) / 2;
+  const modalY = (height - modalH) / 2;
+
+  ctx.fillStyle = XILO_COLORS.kraftPaper;
+  ctx.fillRect(modalX, modalY, modalW, modalH);
+
+  drawMolduraCordel(ctx, modalX, modalY, modalW, modalH, { borderWeight: 4 });
+
+  // Cabeçalho de Glória
+  ctx.fillStyle = '#15803d';
+  ctx.font = 'bold 15px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('✨ OS 4 INSTRUMENTOS MESTRES REUNIDOS! ✨', width / 2, modalY + 38);
+
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.fillText('A PRENSA DO DESTINO TE CHAMA!', width / 2, modalY + 70);
+
+  // Pergunta Canônica
+  ctx.font = 'italic bold 18px "Courier New", monospace';
+  ctx.fillStyle = '#78350f';
+  ctx.fillText('"Como é teu nome mesmo, Coisinha?"', width / 2, modalY + 115);
+
+  // Caixa / Input Estilizado em Xilogravura
+  const inputW = 460;
+  const inputH = 55;
+  const inputX = width / 2 - inputW / 2;
+  const inputY = modalY + 160;
+
+  ctx.fillStyle = '#1e140d';
+  ctx.fillRect(inputX, inputY, inputW, inputH);
+  ctx.strokeStyle = '#d97706';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(inputX, inputY, inputW, inputH);
+
+  // Moldura interna dourada
+  ctx.strokeStyle = '#fef08a';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(inputX + 3, inputY + 3, inputW - 6, inputH - 6);
+
+  // Texto digitado com cursor piscante
+  const isBlink = Math.floor(t * 3) % 2 === 0;
+  const cursor = isBlink ? '|' : '';
+  const displayName = currentName || '';
+
+  if (displayName) {
+    ctx.fillStyle = '#fef08a';
+    ctx.font = 'bold 22px "Courier New", monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${displayName.toUpperCase()}${cursor}`, width / 2, inputY + inputH / 2);
+  } else {
+    ctx.fillStyle = '#a1a1aa';
+    ctx.font = 'italic 16px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`Digite teu nome de herói...${cursor}`, width / 2, inputY + inputH / 2);
+  }
+
+  // 4 Selos de Xilogravura
+  const icons = ['🪓 Carimbo', '📄 Folha', '🪶 Pena', '🖋️ Tinta'];
+  const iconY = modalY + 250;
+  ctx.font = 'bold 12px monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < icons.length; i++) {
+    const ix = width / 2 - 210 + i * 140;
+    ctx.fillStyle = '#1e1b18';
+    ctx.fillRect(ix - 55, iconY - 14, 110, 28);
+    ctx.strokeStyle = '#15803d';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(ix - 55, iconY - 14, 110, 28);
+
+    ctx.fillStyle = '#86efac';
+    ctx.fillText(icons[i], ix, iconY + 5);
+  }
+
+  // Botão "Grita teu nome"
+  const pulse = Math.sin(t * 6) * 3;
+  const btnW = 340;
+  const btnH = 46;
+  const btnX = width / 2 - btnW / 2;
+  const btnY = modalY + modalH - 70;
+
+  ctx.fillStyle = '#15803d';
+  ctx.fillRect(btnX, btnY, btnW, btnH);
+  ctx.strokeStyle = '#4ade80';
+  ctx.lineWidth = 2.5;
+  ctx.strokeRect(btnX, btnY, btnW, btnH);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 16px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('GRITA TEU NOME 📣 [Enter]', width / 2, btnY + btnH / 2 + pulse * 0.2);
+
+  ctx.restore();
+}
+

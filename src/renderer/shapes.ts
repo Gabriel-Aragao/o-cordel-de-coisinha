@@ -33,6 +33,8 @@ import {
   drawOndaAssobioXilo,
   drawBrumaFuloXilo,
   drawIndicadorControlesInvertidosXilo,
+  drawFolhetoAberturaEstudioXilo,
+  drawModalPreEncerramentoNomeXilo,
   drawInteriorCasaXilo,
   drawCaixaDialogoXilo,
   drawPlacaAviso,
@@ -216,6 +218,8 @@ export {
   drawOndaAssobioXilo,
   drawBrumaFuloXilo,
   drawIndicadorControlesInvertidosXilo,
+  drawFolhetoAberturaEstudioXilo,
+  drawModalPreEncerramentoNomeXilo,
   drawInteriorCasaXilo,
   drawCaixaDialogoXilo,
 };

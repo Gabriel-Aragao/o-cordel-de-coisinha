@@ -15,7 +15,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const itemFolha = document.getElementById('item-folha');
   const itemPena = document.getElementById('item-pena');
   const itemTinta = document.getElementById('item-tinta');
-  const nicknameInput = document.getElementById('player-nickname') as HTMLInputElement;
   const btnUnlockAll = document.getElementById('btn-unlock-all');
   const btnAudioToggle = document.getElementById('btn-audio-toggle') as HTMLButtonElement;
 
@@ -42,14 +41,6 @@ window.addEventListener('DOMContentLoaded', () => {
       if (!isMuted) {
         engine.sound.playUIClick();
       }
-    });
-  }
-
-  // Listener para o Nickname
-  if (nicknameInput) {
-    nicknameInput.addEventListener('input', (e) => {
-      const target = e.target as HTMLInputElement;
-      engine.setPlayerName(target.value);
     });
   }
 

@@ -5,7 +5,9 @@ import {
   drawPrensa,
   drawVaral,
   drawChaoEstudioMadeira,
-  drawMolduraCordel
+  drawMolduraCordel,
+  drawFolhetoAberturaEstudioXilo,
+  drawModalPreEncerramentoNomeXilo
 } from '../../renderer/xilogravura';
 
 interface CordelFloorTrigger {
@@ -22,6 +24,12 @@ interface CordelFloorTrigger {
 export class StudioScene implements IScene {
   public id: SceneId = 'STUDIO';
   public name = 'Estúdio de Xilogravura';
+
+  private static hasShownGameIntro: boolean = false;
+  private isOpeningActive: boolean = false;
+  private isNamingActive: boolean = false;
+  private typedHeroName: string = 'Coisinha';
+  private keydownHandler?: (e: KeyboardEvent) => void;
 
   private player: Entity = {
     id: 'hero',
@@ -59,6 +67,25 @@ export class StudioScene implements IScene {
     this.player.y = 430;
     this.stepTimer = 0;
     this.animTime = 0;
+
+    if (!StudioScene.hasShownGameIntro) {
+      this.isOpeningActive = true;
+      StudioScene.hasShownGameIntro = true;
+    }
+
+    this.typedHeroName = engine.playerName || 'Coisinha';
+
+    this.keydownHandler = (e: KeyboardEvent) => {
+      if (!this.isNamingActive) return;
+      if (e.key === 'Backspace') {
+        this.typedHeroName = this.typedHeroName.slice(0, -1);
+      } else if (e.key === 'Enter') {
+        this.confirmHeroName(engine);
+      } else if (e.key.length === 1 && this.typedHeroName.length < 16) {
+        this.typedHeroName += e.key;
+      }
+    };
+    window.addEventListener('keydown', this.keydownHandler);
 
     this.triggers = [
       {
@@ -107,6 +134,21 @@ export class StudioScene implements IScene {
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
     this.pulseGlow += dt * 4;
+
+    if (this.isOpeningActive) {
+      if (input.interact || input.action || input.mouse.clicked) {
+        this.isOpeningActive = false;
+        engine.sound.playUIClick();
+      }
+      return;
+    }
+
+    if (this.isNamingActive) {
+      if (input.mouse.clicked) {
+        this.confirmHeroName(engine);
+      }
+      return;
+    }
 
     // Movimento do Jogador
     let dx = 0;
@@ -184,11 +226,11 @@ export class StudioScene implements IScene {
     const distToPress = Math.hypot(this.player.x - 180, this.player.y - 130);
     if (distToPress < 75) {
       if (allCompleted) {
-        this.infoMessage = '✨ 4 ITENS REUNIDOS! Aperte [E / Enter] para estampar seu cordel mestre!';
+        this.infoMessage = '✨ 4 ITENS REUNIDOS! Aperte [E / Enter] para estampar teu nome e encerrar o cordel!';
         if (input.interact) {
-          engine.sound.playPrensaImpacto();
-          engine.juice.shake.addTrauma(0.6);
-          engine.switchScene('VICTORY');
+          this.isNamingActive = true;
+          this.typedHeroName = engine.playerName || 'Coisinha';
+          engine.sound.playUIClick();
           return;
         }
       } else {
@@ -211,14 +253,24 @@ export class StudioScene implements IScene {
         Math.abs(this.player.x - this.door.x) < (this.player.width + this.door.width) / 2 &&
         Math.abs(this.player.y - this.door.y) < (this.player.height + this.door.height) / 2
       ) {
-        engine.sound.playPrensaImpacto();
-        engine.switchScene('VICTORY');
+        this.isNamingActive = true;
+        this.typedHeroName = engine.playerName || 'Coisinha';
+        engine.sound.playUIClick();
         return;
       }
     } else {
       this.door.label = '';
       this.door.color = '#8b4513';
     }
+  }
+
+  private confirmHeroName(engine: IGameEngine): void {
+    const finalName = this.typedHeroName.trim() || 'Coisinha';
+    engine.setPlayerName(finalName);
+    this.isNamingActive = false;
+    engine.sound.playPrensaImpacto();
+    engine.juice.shake.addTrauma(0.6);
+    engine.switchScene('VICTORY');
   }
 
   public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
@@ -282,7 +334,21 @@ export class StudioScene implements IScene {
       align: 'center',
       color: '#cbd5e1'
     });
+
+    // 9. Folheto de Abertura Inicial
+    if (this.isOpeningActive) {
+      drawFolhetoAberturaEstudioXilo(ctx, 960, 580, { time: this.animTime });
+    }
+
+    // 10. Modal Pré-Encerramento ("Grita teu nome")
+    if (this.isNamingActive) {
+      drawModalPreEncerramentoNomeXilo(ctx, this.typedHeroName, 960, 580, { time: this.animTime });
+    }
   }
 
-  public destroy(): void { }
+  public destroy(): void {
+    if (this.keydownHandler) {
+      window.removeEventListener('keydown', this.keydownHandler);
+    }
+  }
 }

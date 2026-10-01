@@ -99,8 +99,11 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 * **Recompensa (Sucesso):** 🖋️ **Tinta Encantada**.
 
 ### 🏆 Encerramento & Vitória
-Somente após reunir os **4 itens místicos**, o jogador interage com a prensa, digita seu **Nickname** e estampa a capa oficial:  
-> **"O Cordel de [Nickname]: O Herói do Sertão"**
+1. **Folheto de Abertura:** Ao carregar o jogo, um folheto de cordel narra a chegada misteriosa de Coisinha ao estúdio malassombrado.
+2. **Folheto Pré-Encerramento ("Grita teu nome"):** Após conquistar os 4 itens místicos e prensar, o jogador informa seu nome no folheto pré-encerramento (*"Como é têu nome mesmo, Coisinha?"*).
+3. **Capa Oficial:** A tela final estampa com o nome digitado:  
+> **"O Cordel de [Nome Digitado]: O Herói do Sertão"**
+*(O campo fixo "Herói:" do cabeçalho foi removido).*
 
 ---
 *Documentação oficial mantida pela equipe XIUD para a Tungão GameJam 2024.*

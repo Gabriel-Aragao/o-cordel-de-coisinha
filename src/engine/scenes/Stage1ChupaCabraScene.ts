@@ -143,6 +143,13 @@ export class Stage1ChupaCabraScene implements IScene {
     this.lastActionWasGrito = false;
     this.animTime = 0;
 
+    // Reset explícito de todas as moitas ao reiniciar a fase
+    if (this.bushes && this.bushes.length > 0) {
+      for (const b of this.bushes) {
+        b.isSearched = false;
+      }
+    }
+
     // 16 Moitas espalhadas pelo mapa amplo
     this.bushes = [
       { id: 'b1', x: 600, y: 400, radius: 46, type: 'corda', isSearched: false, hidingGoatId: 'goat_1' },

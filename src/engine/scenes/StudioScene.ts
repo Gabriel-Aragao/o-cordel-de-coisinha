@@ -42,7 +42,7 @@ export class StudioScene implements IScene {
     width: 200,
     height: 40,
     color: '#8b4513',
-    label: '[PORTA MÁGICA - TRANCA]',
+    label: '',
     shape: 'rect'
   };
 
@@ -204,7 +204,7 @@ export class StudioScene implements IScene {
 
     // Porta Mágica
     if (allCompleted) {
-      this.door.label = '[PORTA MÁGICA - DESTRAVADA!]';
+      this.door.label = '';
       this.door.color = '#10b981';
 
       if (
@@ -216,7 +216,7 @@ export class StudioScene implements IScene {
         return;
       }
     } else {
-      this.door.label = '[PORTA MÁGICA - "Só heróis têm a chave"]';
+      this.door.label = '';
       this.door.color = '#8b4513';
     }
   }
@@ -284,5 +284,5 @@ export class StudioScene implements IScene {
     });
   }
 
-  public destroy(): void {}
+  public destroy(): void { }
 }

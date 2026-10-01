@@ -86,12 +86,12 @@ export class Stage2FulozinhaScene implements IScene {
   // Pedra da Botija: Exclusivamente na saída do Lote 0 para o Lote 2a
   private pedraItem: Entity = {
     id: 'pedra',
-    x: 880,
+    x: 840,
     y: 270,
     width: 28,
     height: 28,
     color: '#64748b',
-    label: '[PEDRA DA BOTIJA]',
+    label: '',
     shape: 'rect'
   };
 
@@ -103,7 +103,7 @@ export class Stage2FulozinhaScene implements IScene {
     width: 32,
     height: 32,
     color: '#854d0e',
-    label: 'Estamos em obras! Risco de topada!',
+    label: 'Risco de topada!',
     shape: 'rect'
   };
 

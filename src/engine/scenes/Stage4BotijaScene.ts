@@ -98,12 +98,12 @@ export class Stage4BotijaScene implements IScene {
 
   private pedraItem: Entity = {
     id: 'pedra',
-    x: 880,
+    x: 840,
     y: 270,
     width: 32,
     height: 32,
     color: '#64748b',
-    label: '[PEDRA DA BOTIJA]',
+    label: '',
     shape: 'rect'
   };
 
@@ -1228,7 +1228,7 @@ export class Stage4BotijaScene implements IScene {
 
     // Pedra da Botija (Lote 0 - Sem Legenda Textual)
     if (this.currentLot === '0' && !this.hasBotija) {
-      drawItemBotija(ctx, this.pedraItem.x, this.pedraItem.y, 32);
+      drawItemBotija(ctx, this.pedraItem.x, this.pedraItem.y, 36);
 
       if (this.isDigging) {
         ctx.fillStyle = '#1e293b';

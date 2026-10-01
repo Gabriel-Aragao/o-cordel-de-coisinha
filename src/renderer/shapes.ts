@@ -100,8 +100,8 @@ export function renderEntity(ctx: CanvasRenderingContext2D, entity: Entity, time
     drawItemPena(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) || 32);
   } else if (id.includes('tinta') || label.includes('tinta')) {
     drawItemTinta(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) || 32);
-  } else if (id.includes('botija') || label.includes('botija')) {
-    drawItemBotija(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) || 36);
+  } else if (id.includes('pedra') || label.includes('botija')) {
+    drawItemBotija(ctx, entity.x, entity.y, 36);
   } else if (id.includes('moita') || id.includes('bush') || label.includes('moita')) {
     drawMoita(ctx, entity.x, entity.y, Math.max(entity.width, entity.height) / 2 || 24);
   } else if (id.includes('press') || label.includes('prensa')) {

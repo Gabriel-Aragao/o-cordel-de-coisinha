@@ -644,8 +644,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
       color: '#f7d070'
     });
 
-    // Modais Narrativos (preenchendo 100% da tela)
-    this.narrative.render(ctx, 960, 600);
+    // Modais Narrativos (preenchendo 100% da tela 960x580)
+    this.narrative.render(ctx, 960, 580);
   }
 
   public destroy(): void {}

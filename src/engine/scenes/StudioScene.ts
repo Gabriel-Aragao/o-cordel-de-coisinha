@@ -150,11 +150,11 @@ export class StudioScene implements IScene {
     this.player.x += dx * speed * dt;
     this.player.y += dy * speed * dt;
 
-    // Limites da tela
+    // Limites da tela (960x580)
     const halfW = this.player.width / 2;
     const halfH = this.player.height / 2;
     this.player.x = Math.max(halfW + 30, Math.min(960 - halfW - 30, this.player.x));
-    this.player.y = Math.max(halfH + 30, Math.min(540 - halfH - 30, this.player.y));
+    this.player.y = Math.max(halfH + 30, Math.min(580 - halfH - 30, this.player.y));
 
     // Atualiza status dos triggers
     this.triggers[0].isCompleted = engine.inventory.carimbo;
@@ -222,11 +222,11 @@ export class StudioScene implements IScene {
   }
 
   public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
-    // 1. Piso Rústico de Tábuas de Madeira do Estúdio
-    drawChaoEstudioMadeira(ctx, 0, 0, 960, 540);
+    // 1. Piso Rústico de Tábuas de Madeira do Estúdio (960x580)
+    drawChaoEstudioMadeira(ctx, 0, 0, 960, 580);
 
     // 2. Moldura de Xilogravura do Estúdio
-    drawMolduraCordel(ctx, 10, 10, 940, 520, { borderWeight: 4 });
+    drawMolduraCordel(ctx, 10, 10, 940, 560, { borderWeight: 4 });
 
     // 3. Render dos 4 Cordéis no chão
     for (let i = 0; i < this.triggers.length; i++) {

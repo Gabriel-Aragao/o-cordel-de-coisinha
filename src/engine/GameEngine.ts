@@ -197,8 +197,8 @@ export class GameEngine implements IGameEngine {
 
     this.ctx.restore();
 
-    // RENDERIZAÇÃO ESTREITA DO PAINEL DE DIÁLOGOS E MENSAGENS ABAIXO DO GAMEPLAY (Y: 460 a 600)
-    // Mantém o Viewport do Jogo (0 a 460px) 100% Desobstruído e Sem Sobreposição sobre Itens/Salas
+    // RENDERIZAÇÃO ESTREITA DO PAINEL DE DIÁLOGOS E MENSAGENS (960x580)
+    // Mantém o Viewport do Jogo 100% Desobstruído e Sem Sobreposição sobre Itens/Salas
     this.messages.renderBottomPanel(this.ctx, this.canvas.width, this.canvas.height);
 
     // Transição visual de Cordel por cima

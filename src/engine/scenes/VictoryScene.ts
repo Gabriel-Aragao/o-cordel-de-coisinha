@@ -54,18 +54,18 @@ export class VictoryScene implements IScene {
   }
 
   public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
-    // 1. Fundo Papel Kraft / Folheto de Cordel Envelhecido
+    // 1. Fundo Papel Kraft / Folheto de Cordel Envelhecido (960x580)
     ctx.fillStyle = XILO_COLORS.kraftPaper;
-    ctx.fillRect(0, 0, 960, 540);
+    ctx.fillRect(0, 0, 960, 580);
 
     // Textura sutil de papel artesanal
     ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-    for (let py = 10; py < 530; py += 30) {
+    for (let py = 10; py < 570; py += 30) {
       ctx.fillRect(20, py, 920, 1);
     }
 
     // 2. Moldura Ornamental Clássica de Xilogravura
-    drawMolduraCordel(ctx, 24, 16, 912, 508, { borderWeight: 5 });
+    drawMolduraCordel(ctx, 24, 16, 912, 548, { borderWeight: 5 });
 
     // 3. Cabeçalho do Folheto de Cordel
     ctx.fillStyle = XILO_COLORS.black;

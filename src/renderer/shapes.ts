@@ -207,7 +207,7 @@ export function drawUnifiedToast(
   ctx: CanvasRenderingContext2D,
   message: string,
   width: number = 960,
-  height: number = 540,
+  height: number = 580,
   options: {
     isError?: boolean;
     isSuccess?: boolean;

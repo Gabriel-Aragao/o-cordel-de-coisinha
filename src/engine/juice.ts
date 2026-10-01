@@ -67,7 +67,7 @@ export class CordelTransition {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 540): void {
+  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 580): void {
     if (!this.isActive) return;
 
     ctx.save();

@@ -108,7 +108,7 @@ export class Stage1ChupaCabraScene implements IScene {
   private isAboioActive: boolean = false;
   private isGritoActive: boolean = false;
   private soundWaveRadius: number = 0;
-  private message: string = 'Fale com o Fazendeiro [E], vasculhe as moitas e salve os 4 bodes!';
+  private message: string = '';
 
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
 
@@ -323,7 +323,7 @@ export class Stage1ChupaCabraScene implements IScene {
 
     // Câmera Suave com Lerp
     const targetCamX = Math.max(0, Math.min(this.mapWidth - 960, this.player.x - 480));
-    const targetCamY = Math.max(0, Math.min(this.mapHeight - 540, this.player.y - 270));
+    const targetCamY = Math.max(0, Math.min(this.mapHeight - 580, this.player.y - 290));
     this.camera.x += (targetCamX - this.camera.x) * 6 * dt;
     this.camera.y += (targetCamY - this.camera.y) * 6 * dt;
 
@@ -731,7 +731,7 @@ export class Stage1ChupaCabraScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
     ctx.save();
     ctx.translate(-this.camera.x, -this.camera.y);
 
@@ -907,14 +907,12 @@ export class Stage1ChupaCabraScene implements IScene {
     }
     ctx.restore();
 
-    // Notificar gerenciador global de mensagens na base
-    engine.messages.postMessage(this.message, {
-      isError: this.stateStatus === 'FAILED',
-      isSuccess: this.stateStatus === 'SUCCESS'
-    });
+    // Modais Narrativos de Apresentação e Conclusão (preenchendo 100% da tela 960x580)
+    this.narrative.render(ctx, 960, 580);
+  }
 
-    // Modais Narrativos de Apresentação e Conclusão (preenchendo 100% da tela)
-    this.narrative.render(ctx, 960, 600);
+  public getStatusMessage(): string {
+    return this.message;
   }
 
   public destroy(): void {}

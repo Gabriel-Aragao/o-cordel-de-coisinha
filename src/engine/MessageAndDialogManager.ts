@@ -220,7 +220,7 @@ export class MessageAndDialogManager {
    * Mantém 100% dos pixels do canvas de jogo dedicados ao mapa e itens,
    * sem desenhar absolutamente nada sobre o canvas!
    */
-  public renderBottomPanel(_ctx: CanvasRenderingContext2D, _width: number = 960, _height: number = 540): void {
+  public renderBottomPanel(_ctx: CanvasRenderingContext2D, _width: number = 960, _height: number = 580): void {
     // Zero renderização sobre o canvas! Todos os diálogos e mensagens são sincronizados no DOM (#game-message-panel).
   }
 }

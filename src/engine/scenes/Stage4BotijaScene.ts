@@ -916,7 +916,7 @@ export class Stage4BotijaScene implements IScene {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, engine: IGameEngine): void {
+  public render(ctx: CanvasRenderingContext2D, _engine: IGameEngine): void {
     const lot = this.lots[this.currentLot];
 
     // Fundo
@@ -1138,15 +1138,12 @@ export class Stage4BotijaScene implements IScene {
     }
     ctx.restore();
 
-    // Toast Unificado
-    // Notificar gerenciador global de mensagens na base
-    engine.messages.postMessage(this.message, {
-      isError: this.stateStatus === 'FAILED',
-      isSuccess: this.stateStatus === 'SUCCESS'
-    });
+    // Modais Narrativos (preenchendo 100% da tela 960x580)
+    this.narrative.render(ctx, 960, 580);
+  }
 
-    // Modais Narrativos (preenchendo 100% da tela)
-    this.narrative.render(ctx, 960, 600);
+  public getStatusMessage(): string {
+    return this.message;
   }
 
   public destroy(): void { }

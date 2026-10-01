@@ -4,7 +4,7 @@
 > **Tema:** O Velho Sertão (Tungão GameJam — IFPB Campus Monteiro)  
 > **Gênero:** 2D Top-Down Adventure / Escape Room / Puzzle & Action  
 > **Público-Alvo:** Web / Navegadores (HTML5 / WebGL)  
-> **Autores & Squad:** @domaragao (CTO/PO), @gunpei (PM), @ludens (Game Design), @draper (Direção Criativa), @cascudo (Folclorista), @maya (UI/UX), @alexey (Frontend), @carmack (Tech Lead), @gunther (Level Design), @koji (Áudio), @glitch (QA)
+> **Autores & Squad:** Humanos: Gabriel-Aragao (CTO/PO), andreyrianxl (Game Designer), Jennifer-Rebeca (Game Designer) | Agentes: @gunpei (PM), @ludens (Game Design), @draper (Direção Criativa), @cascudo (Folclorista), @maya (UI/UX), @alexey (Frontend), @carmack (Tech Lead), @gunther (Level Design), @koji (Áudio), @glitch (QA)
 
 ---
 

@@ -51,11 +51,15 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Grito da Rasga-Mortalha (a cada 30s):** A coruja emite seu som característico de tecido rasgando a cada 30 segundos, reforçando a atmosfera tensa de meia-noite.
 * **Folheto de Cordel de Encerramento:** Ao completar os 20 nichos das 5 casas, o folheto de vitória é exibido em tela cheia (tanto no interior da casa quanto na praça), entregando a **Pena Encantada** antes do retorno ao estúdio.
 
-### 4. Mecânicas Globais de Dano, Invulnerabilidade e Movimento:
+### 4. Mecânicas Globais de Dano, Invulnerabilidade, Moitas e Reset de Fases:
+* **Reset Automático de Moitas e Itens ao Sair da Fase:** Ao sair de qualquer fase (por vitória, derrota ou retorno ao estúdio) e ao reiniciar uma fase (`init()` / `destroy()`), todos os estados das moitas são **100% resetados**:
+  - Todas as moitas voltam a ficar não vasculhadas (`isSearched = false`);
+  - Os cactos e espinhos voltam a ficar ocultos sob a aparência homogênea da vegetação;
+  - Todos os itens de moita (**Corda de Laçar**, **Fumo de Rolo**, **Candeeiro**) e frutas voltam a ficar disponíveis para serem descobertos novamente em uma nova tentativa.
 * **Zero Knockback / Zero Teletransporte ao Perder Vida:** Ao sofrer dano (-1 HP por cacto, tropeço na pedra, ataque da Fulô ou Chupa-Cabra) nas Fases 1, 2 e 4, o herói **permanece exatamente na sua posição**, eliminando 100% de knockback, empurrões ou teletransportes que pudessem projetá-lo para dentro de paredes ou quinas.
 * **Invulnerabilidade de 5 Segundos (i-Frames) com Piscar:** Ao perder vida, o herói ganha 5.0 segundos de invulnerabilidade total e pisca continuamente na tela.
 * **Fuga da Cumade Fulozinha por 3 Segundos após Ataque (Fases 2 e 4):** Ao acertar o ataque de cadarços no herói e retirar 1 vida, a Cumade Fulozinha **foge do jogador na direção oposta por 3.0 segundos** (respeitando paredes sólidas) antes de retomar a perseguição, garantindo espaçamento justo e fluido de gameplay.
-* **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de espinhos/cactos e perder 1 vida (-1 HP), ela se revela imediatamente no mapa.
+* **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de espinhos/cactos durante a partida e perder 1 vida (-1 HP), ela se revela imediatamente no mapa.
 * **Diálogo Bloqueante ao Coletar Itens de Moita:** Ao coletar Corda, Fumo ou Candeeiro, abre-se uma caixa de diálogo explicativa pausando o jogo até o fechamento com `[E]`/`[Enter]`.
 
 ### 5. Fase 4 — A Botija de Mané Monteiro (Stealth Noturno, Assobios & Ciclo da Fulô):

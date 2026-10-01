@@ -80,6 +80,7 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 ### 🦉 FASE 3: A Pena da Rasga-Mortalha (Casas Interiores & Captura 'E')
 * **Captura Universal (`E`):** Bebidas, fumos, moradores bêbados e animais são capturados e soltos com a tecla `E` (1 elemento carregado por vez).
 * **Telas Interiores das Casas:** Cruzar a porta de qualquer casa transporta o jogador para a tela do interior daquela casa.
+* **Transição Segura & Anti-Loop:** Ao sair da casa, o herói é posicionado com margem de segurança abaixo da porta (`y + 110px`) com cooldown de transição de 0.6s, eliminando reentradas em loop.
 * **Depósito & Remoção:**
   - Apertar `E` dentro da casa deposita o elemento carregado.
   - Apertar `E` próximo a um elemento já depositado o recaptura.

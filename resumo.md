@@ -58,7 +58,17 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
   - Ao encontrar um item especial em moita (**Corda de Laçar**, **Fumo de Rolo** ou **Candeeiro**), abre-se imediatamente uma **caixa de diálogo explicativa** informando o item conquistado e suas propriedades.
   - O gameplay e a movimentação do personagem ficam pausados/bloqueados, continuando apenas após o jogador pressionar e soltar `[E]` ou `[Enter]` para fechar a caixa de diálogo.
 
-### 5. Clímax & Estúdio de Impressão:
+### 5. Fase 4 — A Botija de Mané Monteiro (Stealth Noturno, Assobios & Ciclo da Fulô):
+* **Inversão de Controles nos Assobios:** Os assobios misteriosos da Cumade Fulozinha na Fase 4 agora alternam os portões e **invertem temporariamente os controles de movimentação** (assim como na Fase 2), desorientando o herói na escuridão.
+* **Ciclo de Perseguição e Desaparecimento da Fulô:**
+  - Em cada lote visitado pelo jogador (exceto o Santuário da Igreja), a Cumade Fulozinha surge em um ponto aleatório do lote.
+  - **Perseguição Implacável (5 segundos):** Persegue o herói ativamente por 5.0 segundos respeitando as paredes sólidas.
+  - **Desaparecimento Místico (3 segundos):** Desaparece completamente por 3.0 segundos (invisível, sem colisão e com partículas de folhas/bruma).
+  - **Reaparição:** Reaparece em outra posição aleatória do lote atual do jogador, reiniciando o ciclo de 5 segundos de caça.
+* **Santuário da Igreja & Candeeiro:** Área sagrada livre da Fulô; Candeeiro no Lote 1b expande a visão na escuridão para 320px com diálogo bloqueante.
+* **Recompensa:** Desenterrar a botija no Lote 0 e levar ao Beato ➔ 🖋️ **Tinta Encantada**.
+
+### 6. Clímax & Estúdio de Impressão:
 
 ### 4. Controles Universais:
 * Os comandos de **Grito** (`Espaço` / Segurar) e **Interação** (`E` / Soltar) funcionam universalmente em **todas as telas e fases do jogo**.

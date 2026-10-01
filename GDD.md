@@ -112,10 +112,11 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ---
 
-### 🏆 FASE FINAL: A Prensa do Destino & Vitória
-1. Destravada com os 4 itens místicos e 4 cordéis pendurados.
-2. Digitação do **Nickname**.
-3. Prensagem e abertura da porta mística com exibição da capa oficial do cordel.
+### 🏆 FASE FINAL: A Prensa do Destino, Nomeação & Vitória
+1. **Abertura do Jogo:** Folheto de cordel inicial no Estúdio apresentando a chegada ao ateliê malassombrado.
+2. **Prensagem:** Destravada exclusivamente com os 4 itens místicos reunidos.
+3. **Folheto Pré-Encerramento:** Modal de cordel *"Como é têu nome mesmo, Coisinha?"* com campo de input e botão *"Grita teu nome"*.
+4. **Capa Oficial do Cordel:** Prensagem e exibição da xilogravura: *"O Cordel de [Nome]: O Herói do Sertão"*. *(Input fixo do cabeçalho removido).*
 
 ---
 *GDD Canônico atualizado para a Onda 4 de Correções.*

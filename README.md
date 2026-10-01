@@ -20,9 +20,12 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🎭 Sistema Canônico de Diálogos & Controles
 
-1. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Todas as conversas diretas com NPCs são exibidas fora do canvas de jogo, em um painel dedicado logo abaixo da tela. Mensagens e orientações de fundo foram removidas para foco total na narrativa.
-2. **Ritmo de Diálogo e Debounce de Linhas:** Proteção de 0.3s entre falas no release de `E` para leitura calma de estrofes sem pulos de mensagens intermediárias.
-3. **Escala Vertical Integral (960x580):** Canvas, folhetos de início/fim de fase e todos os cenários (incluindo Fase 3) operam na resolução integral de 960x580px.
+1. **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de cactos/espinhos e perder vida, a moita se revela visualmente como espinho.
+2. **Invulnerabilidade de 5 Segundos (i-Frames):** Ao perder vida, o herói pisca por 5.0 segundos e fica imune a dano.
+3. **Diálogo Bloqueante de Itens de Moita:** Ao coletar Corda, Fumo ou Candeeiro, uma caixa de diálogo é exibida e o jogo só continua após fechar com `[E]`/`[Enter]`.
+4. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Conversas com NPCs e modais de itens são exibidos fora do canvas.
+5. **Ritmo de Diálogo e Debounce de Linhas:** Proteção de 0.3s entre falas no release de `E`.
+6. **Escala Vertical Integral (960x580):** Canvas e cenários operam na resolução integral de 960x580px.
 4. **Ciclo de Vida e Desbloqueio dos Diálogos:** Ao terminar a última fala, o diálogo fecha imediatamente com a tecla `E`, consumindo o input e liberando a movimentação do personagem sem deixá-lo travado.
 3. **Diálogo de Censura na 1ª Interação com NPCs:**
    - Ao conversar pela primeira vez com qualquer NPC (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**), o NPC pergunta seu nome. O herói responde `"meu nome é @#$!*&%#!"` acompanhado de um som cômico de erro/censura. O NPC responde: `"Entendi foi nada!"`.

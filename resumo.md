@@ -51,7 +51,14 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Grito da Rasga-Mortalha (a cada 30s):** A coruja emite seu som característico de tecido rasgando a cada 30 segundos, reforçando a atmosfera tensa de meia-noite.
 * **Folheto de Cordel de Encerramento:** Ao completar os 20 nichos das 5 casas, o folheto de vitória é exibido em tela cheia (tanto no interior da casa quanto na praça), entregando a **Pena Encantada** antes do retorno ao estúdio.
 
-### 4. Obtenção de Itens Especiais (Corda & Candeeiro):
+### 4. Mecânicas Globais de Moitas, Dano e Obtenção de Itens:
+* **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar ou colidir com uma moita de espinhos/cactos e perder 1 vida (-1 HP), a moita se **revela automaticamente** no mapa com seus espinhos e cactos visíveis, identificando o perigo.
+* **Invulnerabilidade e Efeito de Piscar (5 Segundos de i-Frames):** Sempre que o herói perde uma vida (-1 HP por cacto, tropeço, ataque da Fulô ou Chupa-Cabra), o personagem entra em estado de **invulnerabilidade total por 5.0 segundos**, piscando continuamente na tela durante todo esse tempo e ficando imune a qualquer novo dano.
+* **Diálogo Bloqueante ao Coletar Itens de Moita:**
+  - Ao encontrar um item especial em moita (**Corda de Laçar**, **Fumo de Rolo** ou **Candeeiro**), abre-se imediatamente uma **caixa de diálogo explicativa** informando o item conquistado e suas propriedades.
+  - O gameplay e a movimentação do personagem ficam pausados/bloqueados, continuando apenas após o jogador pressionar e soltar `[E]` ou `[Enter]` para fechar a caixa de diálogo.
+
+### 5. Clímax & Estúdio de Impressão:
 
 ### 4. Controles Universais:
 * Os comandos de **Grito** (`Espaço` / Segurar) e **Interação** (`E` / Soltar) funcionam universalmente em **todas as telas e fases do jogo**.

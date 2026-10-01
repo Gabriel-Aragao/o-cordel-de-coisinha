@@ -16,6 +16,8 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
 ### 1.2 Sistema Global de Diálogos, Dano, Moitas & Controles
+* **Zero Knockback / Zero Teletransporte:** O herói permanece na mesma coordenada física ao receber dano (-1 HP), prevenindo travamentos em paredes.
+* **Fuga da Cumade Fulozinha por 3s após Dano:** Nas Fases 2 e 4, a Fulô recua e foge na direção oposta por 3.0s após acertar o herói antes de retomar a perseguição.
 * **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de cactos/espinhos e sofrer dano, ela se revela imediatamente no mapa.
 * **Invulnerabilidade de 5 Segundos (Piscar):** Perder 1 vida concede 5.0 segundos de i-frames com animação de piscar, impedindo danos consecutivos imediatos.
 * **Diálogo Bloqueante ao Coletar Itens de Moita:** Ao obter Corda, Fumo ou Candeeiro, uma caixa de diálogo é aberta e o jogo pausa até o fechamento com `[E]`/`[Enter]`.

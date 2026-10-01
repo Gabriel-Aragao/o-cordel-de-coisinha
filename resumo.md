@@ -138,6 +138,7 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 
 ### 2. Telas Interiores das 5 Casas:
 * As 5 casas no vilarejo são **espaços onde o personagem entra fisicamente (transportado para uma tela/cenário interior daquela casa)** ao cruzar a porta.
+* **Saída Segura e Anti-Loop:** Ao sair de uma casa, o herói é posicionado bem abaixo da porta na praça (com margem de segurança de +110px) e é ativado um cooldown de porta (0.6s), **prevenindo qualquer reentrada involuntária ou loop de entrar e sair**.
 * **Depósito:** Ao entrar na tela interior da casa, o herói aperta `E` para soltar e fixar o elemento nos nichos daquela casa.
 * **Remoção de Itens da Casa:**
   - O jogador pode capturar individualmente um item de dentro da casa apertando `E` e levá-lo para fora.

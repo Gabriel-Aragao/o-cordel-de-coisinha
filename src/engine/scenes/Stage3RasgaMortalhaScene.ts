@@ -7,7 +7,13 @@ import {
   drawMoradorBebado,
   drawMolduraCordel,
   drawInteriorCasaXilo,
-  drawBode
+  drawPalcoVioleirosXilo,
+  drawMesaMontagemXilo,
+  drawBode,
+  drawGalinha,
+  drawPorco,
+  drawJumento,
+  drawCachorro
 } from '../../renderer/xilogravura';
 import { NarrativeModalManager } from '../narrative';
 
@@ -81,6 +87,10 @@ export class Stage3RasgaMortalhaScene implements IScene {
   private carriedItem?: VillageEntityItem;
   private doorCooldown: number = 0;
 
+  // Timer de 5 minutos (300 segundos) e Som da Coruja a cada 30 segundos
+  private stageTimer: number = 300;
+  private owlSoundTimer: number = 0;
+
   private stateStatus: 'PLAYING' | 'SUCCESS' | 'FAILED' = 'PLAYING';
 
   // Sistema Narrativo de Cordel
@@ -89,9 +99,11 @@ export class Stage3RasgaMortalhaScene implements IScene {
   public init(_engine: IGameEngine): void {
     this.currentInteriorHouseIdx = null;
     this.player.x = 480;
-    this.player.y = 310;
+    this.player.y = 380;
     this.carriedItem = undefined;
     this.doorCooldown = 0;
+    this.stageTimer = 300;
+    this.owlSoundTimer = 0;
     this.stateStatus = 'PLAYING';
     this.animTime = 0;
     this.stepTimer = 0;
@@ -112,34 +124,36 @@ export class Stage3RasgaMortalhaScene implements IScene {
       { index: 5, corName: 'Branca', colorHex: '#f8fafc', x: arcPositions[4].x, y: arcPositions[4].y, width: 140, height: 110 }
     ];
 
+    // 4 Quadros/Mesas ampliados e distribuídos em arco na base para acomodar 5 itens com folga:
+    // Bodega (x: 135, y: 460), Bebidas (x: 365, y: 480), Fumos (x: 595, y: 480), Curral (x: 825, y: 460)
     this.allItems = [
-      // 5 Moradores (Mesa 1 em x: 280, y: 380)
-      { id: 'v_vaqueiro', type: 'morador', name: 'Vaqueiro', icon: '🤠', color: '#eab308', x: 220, y: 380, originX: 220, originY: 380 },
-      { id: 'v_rendeira', type: 'morador', name: 'Rendeira', icon: '👒', color: '#38bdf8', x: 250, y: 380, originX: 250, originY: 380 },
-      { id: 'v_cantador', type: 'morador', name: 'Cantador', icon: '🪕', color: '#f87171', x: 280, y: 380, originX: 280, originY: 380 },
-      { id: 'v_ferrador', type: 'morador', name: 'Ferrador', icon: '🔨', color: '#4ade80', x: 310, y: 380, originX: 310, originY: 380 },
-      { id: 'v_rezadeira', type: 'morador', name: 'Rezadeira', icon: '📿', color: '#f1f5f9', x: 340, y: 380, originX: 340, originY: 380 },
+      // 5 Moradores (Bodega dos Moradores: x: 135, y: 460)
+      { id: 'v_vaqueiro', type: 'morador', name: 'Vaqueiro', icon: '🤠', color: '#eab308', x: 55, y: 465, originX: 55, originY: 465 },
+      { id: 'v_rendeira', type: 'morador', name: 'Rendeira', icon: '👒', color: '#38bdf8', x: 95, y: 465, originX: 95, originY: 465 },
+      { id: 'v_cantador', type: 'morador', name: 'Cantador', icon: '🪕', color: '#f87171', x: 135, y: 465, originX: 135, originY: 465 },
+      { id: 'v_ferrador', type: 'morador', name: 'Ferrador', icon: '🔨', color: '#4ade80', x: 175, y: 465, originX: 175, originY: 465 },
+      { id: 'v_rezadeira', type: 'morador', name: 'Rezadeira', icon: '📿', color: '#f1f5f9', x: 215, y: 465, originX: 215, originY: 465 },
 
-      // 5 Bebidas (Mesa 2 em x: 460, y: 465)
-      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', color: '#38bdf8', x: 410, y: 465, originX: 410, originY: 465 },
-      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', color: '#facc15', x: 435, y: 465, originX: 435, originY: 465 },
-      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', color: '#f87171', x: 460, y: 465, originX: 460, originY: 465 },
-      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', color: '#4ade80', x: 485, y: 465, originX: 485, originY: 465 },
-      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', color: '#78350f', x: 510, y: 465, originX: 510, originY: 465 },
+      // 5 Bebidas (Mesa de Bebidas: x: 365, y: 485)
+      { id: 'b_agua', type: 'bebida', name: 'Água', icon: '💧', color: '#38bdf8', x: 295, y: 490, originX: 295, originY: 490 },
+      { id: 'b_garapa', type: 'bebida', name: 'Garapa', icon: '🍯', color: '#facc15', x: 330, y: 490, originX: 330, originY: 490 },
+      { id: 'b_cachaca', type: 'bebida', name: 'Cachaça', icon: '🍶', color: '#f87171', x: 365, y: 490, originX: 365, originY: 490 },
+      { id: 'b_umbu', type: 'bebida', name: 'Umbu', icon: '🍈', color: '#4ade80', x: 400, y: 490, originX: 400, originY: 490 },
+      { id: 'b_cafe', type: 'bebida', name: 'Café', icon: '☕', color: '#78350f', x: 435, y: 490, originX: 435, originY: 490 },
 
-      // 5 Fumos (Mesa 3 em x: 650, y: 465)
-      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', color: '#d97706', x: 600, y: 465, originX: 600, originY: 465 },
-      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', color: '#eab308', x: 625, y: 465, originX: 625, originY: 465 },
-      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', color: '#dc2626', x: 650, y: 465, originX: 650, originY: 465 },
-      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', color: '#16a34a', x: 675, y: 465, originX: 675, originY: 465 },
-      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', color: '#22c55e', x: 700, y: 465, originX: 700, originY: 465 },
+      // 5 Fumos (Mesa de Fumos: x: 595, y: 485)
+      { id: 'f_paieiro', type: 'fumo', name: 'Paieiro', icon: '🍂', color: '#d97706', x: 525, y: 490, originX: 525, originY: 490 },
+      { id: 'f_palha', type: 'fumo', name: 'Palha', icon: '🌾', color: '#eab308', x: 560, y: 490, originX: 560, originY: 490 },
+      { id: 'f_desfiado', type: 'fumo', name: 'Desfiado', icon: '🍁', color: '#dc2626', x: 595, y: 490, originX: 595, originY: 490 },
+      { id: 'f_arapiraca', type: 'fumo', name: 'Arapiraca', icon: '🌿', color: '#16a34a', x: 630, y: 490, originX: 630, originY: 490 },
+      { id: 'f_trevo', type: 'fumo', name: 'Trevo', icon: '🍀', color: '#22c55e', x: 665, y: 490, originX: 665, originY: 490 },
 
-      // 5 Animais (Curral 4 em x: 830, y: 380)
-      { id: 'a_bode', type: 'animal', name: 'Bode', icon: '🐐', color: '#cbd5e1', x: 760, y: 380, originX: 760, originY: 380 },
-      { id: 'a_galo', type: 'animal', name: 'Galo', icon: '🐓', color: '#ef4444', x: 790, y: 380, originX: 790, originY: 380 },
-      { id: 'a_tatu', type: 'animal', name: 'Tatu', icon: '🦔', color: '#a16207', x: 820, y: 380, originX: 820, originY: 380 },
-      { id: 'a_cavalo', type: 'animal', name: 'Cavalo', icon: '🐎', color: '#92400e', x: 850, y: 380, originX: 850, originY: 380 },
-      { id: 'a_canario', type: 'animal', name: 'Canário', icon: '🐤', color: '#facc15', x: 880, y: 380, originX: 880, originY: 380 }
+      // 5 Animais (Curral de Animais: x: 825, y: 460)
+      { id: 'a_bode', type: 'animal', name: 'Bode', icon: '🐐', color: '#cbd5e1', x: 745, y: 465, originX: 745, originY: 465 },
+      { id: 'a_galo', type: 'animal', name: 'Galo', icon: '🐓', color: '#ef4444', x: 785, y: 465, originX: 785, originY: 465 },
+      { id: 'a_tatu', type: 'animal', name: 'Tatu', icon: '🦔', color: '#a16207', x: 825, y: 465, originX: 825, originY: 465 },
+      { id: 'a_cavalo', type: 'animal', name: 'Cavalo', icon: '🐎', color: '#92400e', x: 865, y: 465, originX: 865, originY: 465 },
+      { id: 'a_canario', type: 'animal', name: 'Canário', icon: '🐤', color: '#facc15', x: 905, y: 465, originX: 905, originY: 465 }
     ];
 
     this.narrative.showIntro({
@@ -178,6 +192,43 @@ export class Stage3RasgaMortalhaScene implements IScene {
     }
 
     if (this.stateStatus !== 'PLAYING') {
+      return;
+    }
+
+    // 0. Timer da Fase (5 minutos = 300s) & Som da Rasga-Mortalha a cada 30 segundos
+    this.stageTimer -= dt;
+    this.owlSoundTimer += dt;
+
+    if (this.owlSoundTimer >= 30) {
+      this.owlSoundTimer = 0;
+      engine.sound.playRasgaCanto();
+      engine.juice.shake.addTrauma(0.2);
+    }
+
+    if (this.stageTimer <= 0) {
+      this.stageTimer = 0;
+      this.stateStatus = 'FAILED';
+      engine.sound.playDefeatJingle();
+      this.narrative.showOutro(
+        {
+          phaseNumber: 3,
+          title: 'O Mau Agouro da Rasga-Mortalha',
+          verses: [
+            'O tempo findou-se na escuridão da praça,',
+            'O grito da coruja espalhou sua desgraça;',
+            'Os moradores correram com medo da assombração,',
+            'Retorne ao Estúdio para tentar nova dedução!'
+          ],
+          itemReward: {
+            id: 'pena',
+            name: 'Pena Perdida',
+            icon: '🪶'
+          }
+        },
+        () => {
+          engine.switchScene('STUDIO');
+        }
+      );
       return;
     }
 
@@ -339,8 +390,9 @@ export class Stage3RasgaMortalhaScene implements IScene {
       engine.juice.shake.addTrauma(0.35);
     }
 
+    // Palco Central dos Violeiros em (x: 480, y: 280)
     if (input.interactReleased) {
-      if (Math.hypot(this.player.x - 90, this.player.y - 460) < 70) {
+      if (Math.hypot(this.player.x - 450, this.player.y - 280) < 65) {
         engine.messages.startDialog(
           'violeiro_1',
           'Mestre Cícero Violeiro',
@@ -368,7 +420,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
         return;
       }
 
-      if (Math.hypot(this.player.x - 170, this.player.y - 460) < 70) {
+      if (Math.hypot(this.player.x - 510, this.player.y - 280) < 65) {
         engine.messages.startDialog(
           'violeiro_2',
           'Severino Cantador',
@@ -496,7 +548,19 @@ export class Stage3RasgaMortalhaScene implements IScene {
           if (it.type === 'morador') {
             drawMoradorBebado(ctx, it.interiorX, it.interiorY, 36, 48, { colorTint: it.color });
           } else if (it.type === 'animal') {
-            drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
+            if (it.id === 'a_bode') {
+              drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
+            } else if (it.id === 'a_galinha') {
+              drawGalinha(ctx, it.interiorX, it.interiorY, 36, 36);
+            } else if (it.id === 'a_porco') {
+              drawPorco(ctx, it.interiorX, it.interiorY, 42, 34);
+            } else if (it.id === 'a_jumento') {
+              drawJumento(ctx, it.interiorX, it.interiorY, 44, 38);
+            } else if (it.id === 'a_cachorro') {
+              drawCachorro(ctx, it.interiorX, it.interiorY, 40, 34);
+            } else {
+              drawBode(ctx, it.interiorX, it.interiorY, 40, 34);
+            }
           } else {
             ctx.fillStyle = '#1e293b';
             ctx.fillRect(it.interiorX - 18, it.interiorY - 18, 36, 36);
@@ -570,34 +634,19 @@ export class Stage3RasgaMortalhaScene implements IScene {
       }
     }
 
-    // 4 Mesas / Áreas Interativas Ampliadas na Praça
-    ctx.fillStyle = '#27272a';
-    ctx.fillRect(190, 350, 180, 60);
-    ctx.strokeStyle = '#ca8a04';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(190, 350, 180, 60);
-    drawText(ctx, '🍻 BODEGA DOS MORADORES [E]', 280, 356, { font: 'bold 10px monospace', align: 'center', color: '#facc15' });
+    // Palco Central dos Violeiros no Centro da Praça
+    drawPalcoVioleirosXilo(ctx, 480, 270, 220, 85, { time: this.animTime });
+    drawVioleiro(ctx, 440, 260, 38, 44, { time: this.animTime, facing: 'right' });
+    drawText(ctx, '🪕 Violeiro 1 [E]', 440, 288, { font: 'bold 9px monospace', align: 'center', color: '#fde047' });
 
-    ctx.fillStyle = '#27272a';
-    ctx.fillRect(390, 435, 140, 60);
-    ctx.strokeStyle = '#0284c7';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(390, 435, 140, 60);
-    drawText(ctx, '🍶 BEBIDAS [E]', 460, 441, { font: 'bold 10px monospace', align: 'center', color: '#38bdf8' });
+    drawVioleiro(ctx, 520, 260, 38, 44, { time: this.animTime, facing: 'left' });
+    drawText(ctx, '🪕 Violeiro 2 [E]', 520, 288, { font: 'bold 9px monospace', align: 'center', color: '#93c5fd' });
 
-    ctx.fillStyle = '#27272a';
-    ctx.fillRect(580, 435, 140, 60);
-    ctx.strokeStyle = '#16a34a';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(580, 435, 140, 60);
-    drawText(ctx, '🍂 FUMOS [E]', 650, 441, { font: 'bold 10px monospace', align: 'center', color: '#4ade80' });
-
-    ctx.fillStyle = '#27272a';
-    ctx.fillRect(730, 350, 180, 60);
-    ctx.strokeStyle = '#ea580c';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(730, 350, 180, 60);
-    drawText(ctx, '🐐 CURRAL DE ANIMAIS [E]', 820, 356, { font: 'bold 10px monospace', align: 'center', color: '#fb923c' });
+    // 4 Mesas / Áreas Interativas Ampliadas em Arco na Base da Praça
+    drawMesaMontagemXilo(ctx, 140, 440, 180, 70, 'BODEGA DOS MORADORES', '🍻', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 360, 465, 180, 70, 'BEBIDAS & CAFÉ', '🍶', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 600, 465, 180, 70, 'FUMOS REGIONAIS', '🍂', { colorAccent: '#27272a' });
+    drawMesaMontagemXilo(ctx, 820, 440, 180, 70, 'CURRAL DE ANIMAIS', '🐐', { colorAccent: '#27272a' });
 
     for (const it of this.allItems) {
       if (it.assignedHouseIdx === undefined && (!this.carriedItem || this.carriedItem.id !== it.id)) {
@@ -605,7 +654,19 @@ export class Stage3RasgaMortalhaScene implements IScene {
         if (it.type === 'morador') {
           drawMoradorBebado(ctx, it.x, it.y + 8, 28, 38, { colorTint: it.color });
         } else if (it.type === 'animal') {
-          drawBode(ctx, it.x, it.y + 8, 30, 26);
+          if (it.id === 'a_bode') {
+            drawBode(ctx, it.x, it.y + 8, 30, 26);
+          } else if (it.id === 'a_galinha') {
+            drawGalinha(ctx, it.x, it.y + 8, 28, 28);
+          } else if (it.id === 'a_porco') {
+            drawPorco(ctx, it.x, it.y + 8, 32, 26);
+          } else if (it.id === 'a_jumento') {
+            drawJumento(ctx, it.x, it.y + 8, 34, 28);
+          } else if (it.id === 'a_cachorro') {
+            drawCachorro(ctx, it.x, it.y + 8, 30, 26);
+          } else {
+            drawBode(ctx, it.x, it.y + 8, 30, 26);
+          }
         } else {
           ctx.font = '18px monospace';
           ctx.textAlign = 'center';
@@ -615,12 +676,6 @@ export class Stage3RasgaMortalhaScene implements IScene {
         ctx.restore();
       }
     }
-
-    drawVioleiro(ctx, 90, 460, 42, 48, { time: this.animTime });
-    drawText(ctx, '🪕 Violeiro 1 [E]', 90, 490, { font: 'bold 10px monospace', align: 'center', color: '#fde047' });
-
-    drawVioleiro(ctx, 170, 460, 42, 48, { time: this.animTime });
-    drawText(ctx, '🪕 Violeiro 2 [E]', 170, 490, { font: 'bold 10px monospace', align: 'center', color: '#93c5fd' });
 
     drawRasgaMortalha(ctx, this.owl.x, this.owl.y, 48, 36, { time: this.animTime });
 

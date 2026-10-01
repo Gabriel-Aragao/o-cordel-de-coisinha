@@ -1920,6 +1920,302 @@ export function drawMesaMontagemXilo(
 }
 
 /**
+ * 🎪 PALCO CENTRAL DOS VIOLEIROS DE CORDEL (FASE 3)
+ */
+export function drawPalcoVioleirosXilo(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  options: { time?: number } = {}
+): void {
+  ctx.save();
+  const t = options.time || 0;
+
+  // Sombra profunda do tablado
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+  ctx.fillRect(x - w / 2 + 6, y - h / 2 + 8, w, h);
+
+  // Tablado de Madeira Rústica Entalhada
+  ctx.fillStyle = '#2c1a0e';
+  ctx.fillRect(x - w / 2, y - h / 2, w, h);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 3;
+  ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+
+  // Tábuas Verticais do Tablado
+  ctx.strokeStyle = '#180e07';
+  ctx.lineWidth = 1.5;
+  for (let px = x - w / 2 + 20; px < x + w / 2; px += 24) {
+    ctx.beginPath();
+    ctx.moveTo(px, y - h / 2 + 2);
+    ctx.lineTo(px, y + h / 2 - 2);
+    ctx.stroke();
+  }
+
+  // Moldura dourada de xilogravura no tablado
+  ctx.strokeStyle = '#b45309';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - w / 2 + 5, y - h / 2 + 5, w - 10, h - 10);
+
+  // Estandarte Superior: "PALCO DO REPENTE"
+  const bannerW = Math.min(220, w - 20);
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(x - bannerW / 2, y - h / 2 - 16, bannerW, 20);
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(x - bannerW / 2, y - h / 2 - 16, bannerW, 20);
+
+  ctx.fillStyle = '#fef08a';
+  ctx.font = 'bold 11px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🪕 PALCO DO REPENTE 🪕', x, y - h / 2 - 6);
+
+  // Candeeiros e Luzes Rústicas nas pontas
+  const flamePulse = Math.sin(t * 8) * 1.5;
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.arc(x - w / 2 + 14, y - h / 2 + 12, 4 + flamePulse, 0, Math.PI * 2);
+  ctx.arc(x + w / 2 - 14, y - h / 2 + 12, 4 + flamePulse, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
+/**
+ * 🐔 GALINHA DE CORDEL
+ */
+export function drawGalinha(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number = 28,
+  h: number = 28
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Corpo
+  ctx.fillStyle = '#f8fafc';
+  ctx.beginPath();
+  ctx.ellipse(0, 2, w * 0.35, h * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Cabeça e Crista
+  ctx.fillStyle = '#ef4444';
+  ctx.beginPath();
+  ctx.arc(w * 0.22, -h * 0.25, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Bico
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.moveTo(w * 0.35, -h * 0.15);
+  ctx.lineTo(w * 0.48, -h * 0.1);
+  ctx.lineTo(w * 0.35, -h * 0.05);
+  ctx.closePath();
+  ctx.fill();
+
+  // Olho
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w * 0.25, -h * 0.18, 2, 2);
+
+  // Patas
+  ctx.strokeStyle = '#d97706';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(-2, h * 0.28);
+  ctx.lineTo(-2, h * 0.44);
+  ctx.moveTo(4, h * 0.28);
+  ctx.lineTo(4, h * 0.44);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * 🐖 PORCO DE CORDEL
+ */
+export function drawPorco(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number = 34,
+  h: number = 26
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Corpo
+  ctx.fillStyle = '#f472b6';
+  ctx.beginPath();
+  ctx.ellipse(0, 0, w * 0.42, h * 0.35, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Focinho
+  ctx.fillStyle = '#ec4899';
+  ctx.beginPath();
+  ctx.ellipse(w * 0.36, 0, 4, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Narinas
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w * 0.36, -2, 1.5, 1.5);
+  ctx.fillRect(w * 0.36, 2, 1.5, 1.5);
+
+  // Olho
+  ctx.fillRect(w * 0.18, -h * 0.18, 2, 2);
+
+  // Orelha
+  ctx.fillStyle = '#db2777';
+  ctx.beginPath();
+  ctx.moveTo(w * 0.08, -h * 0.25);
+  ctx.lineTo(w * 0.18, -h * 0.45);
+  ctx.lineTo(w * 0.25, -h * 0.2);
+  ctx.closePath();
+  ctx.fill();
+
+  // Rabinho encaracolado
+  ctx.strokeStyle = '#db2777';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(-w * 0.42, -4, 4, 0, Math.PI);
+  ctx.stroke();
+
+  // Patas
+  ctx.fillStyle = '#db2777';
+  ctx.fillRect(-w * 0.28, h * 0.25, 4, 6);
+  ctx.fillRect(w * 0.18, h * 0.25, 4, 6);
+
+  ctx.restore();
+}
+
+/**
+ * 🫏 JUMENTO / BURRO SERTANEJO DE CORDEL
+ */
+export function drawJumento(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number = 36,
+  h: number = 30
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Corpo
+  ctx.fillStyle = '#78716c';
+  ctx.beginPath();
+  ctx.ellipse(0, 2, w * 0.4, h * 0.3, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Pescoço e Cabeça
+  ctx.fillStyle = '#78716c';
+  ctx.beginPath();
+  ctx.ellipse(w * 0.3, -h * 0.2, w * 0.18, h * 0.22, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Focinho branco
+  ctx.fillStyle = '#e7e5e4';
+  ctx.beginPath();
+  ctx.ellipse(w * 0.44, -h * 0.12, 5, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Orelhas longas de Jumento
+  ctx.fillStyle = '#57534e';
+  ctx.beginPath();
+  ctx.ellipse(w * 0.24, -h * 0.48, 3, 9, -0.2, 0, Math.PI * 2);
+  ctx.ellipse(w * 0.32, -h * 0.46, 3, 9, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Olho
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w * 0.32, -h * 0.24, 2, 2);
+
+  // Patas
+  ctx.fillStyle = '#44403c';
+  ctx.fillRect(-w * 0.25, h * 0.25, 4, 8);
+  ctx.fillRect(-w * 0.12, h * 0.25, 4, 8);
+  ctx.fillRect(w * 0.15, h * 0.25, 4, 8);
+  ctx.fillRect(w * 0.28, h * 0.25, 4, 8);
+
+  ctx.restore();
+}
+
+/**
+ * 🐕 CACHORRO VIRA-LATA DE CORDEL
+ */
+export function drawCachorro(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number = 32,
+  h: number = 26
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  // Corpo
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.ellipse(0, 2, w * 0.38, h * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Cabeça
+  ctx.fillStyle = '#b45309';
+  ctx.beginPath();
+  ctx.arc(w * 0.28, -h * 0.15, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Orelha caída
+  ctx.fillStyle = '#78350f';
+  ctx.beginPath();
+  ctx.ellipse(w * 0.22, -h * 0.18, 3, 6, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Focinho
+  ctx.fillStyle = '#d97706';
+  ctx.fillRect(w * 0.34, -h * 0.14, 5, 4);
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.fillRect(w * 0.38, -h * 0.16, 2, 2);
+
+  // Rabinho levantado
+  ctx.strokeStyle = '#b45309';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-w * 0.35, 0);
+  ctx.quadraticCurveTo(-w * 0.45, -h * 0.3, -w * 0.3, -h * 0.4);
+  ctx.stroke();
+
+  // Patas
+  ctx.fillStyle = '#78350f';
+  ctx.fillRect(-w * 0.22, h * 0.25, 3, 6);
+  ctx.fillRect(w * 0.18, h * 0.25, 3, 6);
+
+  ctx.restore();
+}
+
+/**
  * 🏠 INTERIOR DA CASA DE CORDEL (FASE 3 — 4 NICHOS / SLOTS DE XILOGRAVURA)
  */
 export interface InteriorHouseData {

@@ -1803,7 +1803,7 @@ export function drawTelaEncerramentoCordel(
 
   ctx.fillStyle = XILO_COLORS.black;
   ctx.font = 'bold 16px monospace';
-  ctx.fillText(`${itemMistico.icon} ${itemMistico.name.toUpperCase()} CONQUISTADO!`, x + w / 2, y + 145);
+  ctx.fillText(`${itemMistico.icon} ${itemMistico.name.toUpperCase()} CONQUISTADO?`, x + w / 2, y + 145);
   ctx.font = '11px monospace';
   ctx.fillStyle = '#525252';
   ctx.fillText(itemMistico.desc, x + w / 2, y + 163);

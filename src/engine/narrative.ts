@@ -236,7 +236,7 @@ export class NarrativeModalManager {
 
     ctx.fillStyle = '#854d0e';
     ctx.font = 'bold 15px monospace';
-    ctx.fillText(`${cfg.itemReward.icon} ${cfg.itemReward.name} CONQUISTADO!`, width / 2, modalY + 218);
+    ctx.fillText(`${cfg.itemReward.icon} ${cfg.itemReward.name} `, width / 2, modalY + 218);
 
     // Versos de Desfecho
     ctx.fillStyle = XILO_COLORS.black;

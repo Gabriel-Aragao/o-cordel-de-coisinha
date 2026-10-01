@@ -128,12 +128,12 @@ export class VictoryScene implements IScene {
 
       // Card de Selo
       ctx.fillStyle = XILO_COLORS.black;
-      ctx.fillRect(ix - 55, iy - 24, 110, 52);
+      ctx.fillRect(ix - 55, iy - 24, 130, 52);
       ctx.fillStyle = XILO_COLORS.kraftLight;
-      ctx.fillRect(ix - 52, iy - 21, 104, 46);
+      ctx.fillRect(ix - 52, iy - 21, 124, 46);
       ctx.strokeStyle = it.color;
       ctx.lineWidth = 1.5;
-      ctx.strokeRect(ix - 52, iy - 21, 104, 46);
+      ctx.strokeRect(ix - 52, iy - 21, 124, 46);
 
       // Desenho do Ícone Xilogravado
       it.draw(ctx, ix - 30, iy + 2, 22);
@@ -171,5 +171,5 @@ export class VictoryScene implements IScene {
     }
   }
 
-  public destroy(): void {}
+  public destroy(): void { }
 }

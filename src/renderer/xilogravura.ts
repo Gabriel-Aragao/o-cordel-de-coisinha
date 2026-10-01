@@ -2172,3 +2172,91 @@ export function drawCaixaDialogoXilo(
 
   ctx.restore();
 }
+
+/**
+ * 🪧 PLACA DE AVISO EM XILOGRAVURA (CORDEL)
+ * Placa rústica de madeira cravada no chão com entalhes e sinalização folclórica.
+ */
+export function drawPlacaAviso(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number = 34,
+  height: number = 34,
+  _label?: string,
+  options: XiloRenderOptions = {}
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const t = options.time || 0;
+  const sway = Math.sin(t * 2) * 0.02;
+  ctx.rotate(sway);
+
+  // 1. Sombra no chão de terra batida
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+  ctx.beginPath();
+  ctx.ellipse(0, height * 0.45, width * 0.45, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 2. Estaca / Mourão de Madeira fincada no chão
+  ctx.fillStyle = '#3b2615';
+  ctx.fillRect(-3.5, -height * 0.1, 7, height * 0.55);
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1.8;
+  ctx.strokeRect(-3.5, -height * 0.1, 7, height * 0.55);
+
+  // Ranhuras da estaca de madeira
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.beginPath();
+  ctx.moveTo(-0.5, 0);
+  ctx.lineTo(-0.5, height * 0.38);
+  ctx.stroke();
+
+  // 3. Tábua da Placa (madeira rústica entalhada)
+  const pw = width;
+  const ph = height * 0.58;
+  const py = -height * 0.22;
+
+  ctx.fillStyle = '#854d0e'; // Madeira envelhecida
+  ctx.fillRect(-pw / 2, py - ph / 2, pw, ph);
+
+  // Borda grossa preta de xilogravura
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 2.2;
+  ctx.strokeRect(-pw / 2, py - ph / 2, pw, ph);
+
+  // Entalhe interno amarelo kraft
+  ctx.strokeStyle = '#fef08a';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(-pw / 2 + 2.5, py - ph / 2 + 2.5, pw - 5, ph - 5);
+
+  // Pregos de ferro batido nos cantos
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.beginPath();
+  ctx.arc(-pw / 2 + 5, py, 1.8, 0, Math.PI * 2);
+  ctx.arc(pw / 2 - 5, py, 1.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 4. Ícone de Alerta / Topada (Triângulo de advertência)
+  ctx.fillStyle = '#eab308';
+  ctx.beginPath();
+  ctx.moveTo(0, py - ph * 0.32);
+  ctx.lineTo(-7, py + ph * 0.22);
+  ctx.lineTo(7, py + ph * 0.22);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = XILO_COLORS.black;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // Ponto de exclamação
+  ctx.fillStyle = XILO_COLORS.black;
+  ctx.font = 'bold 9px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('!', 0, py);
+
+  ctx.restore();
+}
+

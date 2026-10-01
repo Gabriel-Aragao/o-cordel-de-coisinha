@@ -27,6 +27,7 @@ import {
   drawMesaMontagemXilo,
   drawInteriorCasaXilo,
   drawCaixaDialogoXilo,
+  drawPlacaAviso,
 } from './xilogravura';
 
 export * from './xilogravura';
@@ -103,6 +104,8 @@ export function renderEntity(ctx: CanvasRenderingContext2D, entity: Entity, time
       pena: true,
       tinta: true,
     });
+  } else if (id.includes('placa') || label.includes('placa') || label.includes('topada')) {
+    drawPlacaAviso(ctx, entity.x, entity.y, entity.width || 34, entity.height || 34, entity.label, { time });
   } else {
     // 2. Fallback com contorno estilizado de Xilogravura
     if (entity.shape === 'rect') {

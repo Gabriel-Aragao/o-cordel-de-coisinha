@@ -44,7 +44,7 @@ interface BushEntity {
   x: number;
   y: number;
   radius: number;
-  type: 'normal' | 'cacto' | 'fruta';
+  type: 'normal' | 'cacto' | 'fruta' | 'candeeiro';
   isSearched: boolean;
 }
 
@@ -170,27 +170,25 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 270, w: 24, h: 540 },
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
-        // Corredor Espaçoso Obrigatório da Pedra de Tropeço (x: 880, y: 270 - exatamente igual à Fase 2)
-        { x: 820, y: 170, w: 240, h: 24 },
-        { x: 820, y: 370, w: 240, h: 24 },
+        // Corredor Espaçoso da Pedra na Saída para Lote 2a (largura ampla sem engasgos nas quinas)
+        { x: 820, y: 198, w: 230, h: 24 },
+        { x: 820, y: 342, w: 230, h: 24 },
         // Labirinto Interno com Corredores e Vãos Amplos
-        { x: 260, y: 160, w: 24, h: 180 },
-        { x: 260, y: 450, w: 24, h: 120 },
-        { x: 480, y: 370, w: 24, h: 200 },
-        { x: 640, y: 160, w: 24, h: 180 },
-        { x: 480, y: 140, w: 200, h: 24 },
-        { x: 400, y: 470, w: 140, h: 24 }
+        { x: 260, y: 270, w: 24, h: 260 },
+        { x: 425, y: 388, w: 24, h: 250 },
+        { x: 580, y: 285, w: 24, h: 240 },
+        { x: 432, y: 152, w: 320, h: 24 }
       ],
       gates: [
-        { x: 260, y: 310, w: 24, h: 110, isOpen: true },
-        { x: 640, y: 310, w: 24, h: 110, isOpen: false },
-        { x: 480, y: 230, w: 24, h: 90, isOpen: true }
+        { x: 260, y: 460, w: 24, h: 110, isOpen: true },
+        { x: 718, y: 270, w: 24, h: 110, isOpen: true },
+        { x: 580, y: 80, w: 24, h: 110, isOpen: false }
       ],
       bushes: [
-        { id: 'b4_0_1', x: 160, y: 140, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_0_2', x: 360, y: 420, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_0_3', x: 550, y: 120, radius: 36, type: 'normal', isSearched: false },
-        { id: 'b4_0_4', x: 740, y: 440, radius: 36, type: 'cacto', isSearched: false }
+        { id: 'b_0_1', x: 130, y: 100, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_0_2', x: 350, y: 320, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_0_3', x: 650, y: 100, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_0_4', x: 740, y: 440, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '1a': {
@@ -204,24 +202,21 @@ export class Stage4BotijaScene implements IScene {
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
         // Labirinto Interno Espaçoso
-        { x: 300, y: 180, w: 24, h: 180 },
-        { x: 300, y: 450, w: 24, h: 120 },
-        { x: 520, y: 340, w: 24, h: 200 },
-        { x: 740, y: 170, w: 24, h: 180 },
-        { x: 740, y: 450, w: 24, h: 120 },
-        { x: 440, y: 170, w: 200, h: 24 },
-        { x: 600, y: 430, w: 160, h: 24 }
+        { x: 300, y: 340, w: 24, h: 350 },
+        { x: 552, y: 390, w: 24, h: 250 },
+        { x: 740, y: 269, w: 24, h: 262 },
+        { x: 508, y: 150, w: 440, h: 24 }
       ],
       gates: [
-        { x: 300, y: 320, w: 24, h: 100, isOpen: true },
-        { x: 520, y: 180, w: 24, h: 100, isOpen: false },
-        { x: 740, y: 310, w: 24, h: 100, isOpen: true }
+        { x: 300, y: 80, w: 24, h: 110, isOpen: true },
+        { x: 552, y: 80, w: 24, h: 110, isOpen: false },
+        { x: 740, y: 458, w: 24, h: 110, isOpen: true }
       ],
       bushes: [
-        { id: 'b4_1a_1', x: 180, y: 380, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_1a_2', x: 420, y: 120, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_1a_3', x: 820, y: 350, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_1a_4', x: 620, y: 260, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_1a_1', x: 130, y: 410, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_1a_2', x: 420, y: 100, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_1a_3', x: 870, y: 80, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1a_4', x: 560, y: 220, radius: 36, type: 'cacto', isSearched: false }
       ]
     },
     '1b': {
@@ -236,22 +231,21 @@ export class Stage4BotijaScene implements IScene {
         { x: 210, y: 528, w: 420, h: 24 },
         { x: 750, y: 528, w: 420, h: 24 },
         // Labirinto Interno Espaçoso
-        { x: 280, y: 220, w: 24, h: 200 },
-        { x: 480, y: 150, w: 24, h: 160 },
-        { x: 480, y: 410, w: 24, h: 160 },
-        { x: 700, y: 300, w: 24, h: 220 },
-        { x: 380, y: 320, w: 180, h: 24 },
-        { x: 600, y: 450, w: 160, h: 24 }
+        { x: 270, y: 275, w: 24, h: 250 },
+        { x: 408, y: 332, w: 24, h: 365 },
+        { x: 780, y: 398, w: 24, h: 235 },
+        { x: 608, y: 162, w: 370, h: 24 }
       ],
       gates: [
-        { x: 280, y: 370, w: 24, h: 100, isOpen: true },
-        { x: 700, y: 140, w: 24, h: 100, isOpen: false },
-        { x: 380, y: 320, w: 90, h: 24, isOpen: true }
+        { x: 270, y: 458, w: 24, h: 110, isOpen: true },
+        { x: 780, y: 227, w: 24, h: 100, isOpen: true },
+        { x: 340, y: 388, w: 110, h: 24, isOpen: false }
       ],
       bushes: [
-        { id: 'b4_1b_1', x: 180, y: 160, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_1b_2', x: 380, y: 440, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_1b_3', x: 760, y: 400, radius: 36, type: 'cacto', isSearched: false }
+        { id: 'b_1b_fumo', x: 850, y: 470, radius: 36, type: 'candeeiro', isSearched: false },
+        { id: 'b_1b_1', x: 80, y: 470, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1b_2', x: 340, y: 470, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_1b_3', x: 600, y: 100, radius: 36, type: 'normal', isSearched: false }
       ]
     },
     '2a': {
@@ -267,22 +261,22 @@ export class Stage4BotijaScene implements IScene {
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
         // Labirinto Interno Espaçoso
-        { x: 260, y: 200, w: 24, h: 180 },
-        { x: 260, y: 450, w: 24, h: 120 },
-        { x: 500, y: 150, w: 240, h: 24 },
-        { x: 500, y: 390, w: 240, h: 24 },
-        { x: 720, y: 280, w: 24, h: 180 },
-        { x: 380, y: 300, w: 24, h: 160 }
+        { x: 160, y: 270, w: 24, h: 180 },
+        { x: 480, y: 388, w: 465, h: 24 },
+        { x: 820, y: 270, w: 24, h: 180 },
+        { x: 410, y: 112, w: 24, h: 170 },
+        { x: 550, y: 112, w: 24, h: 170 }
       ],
       gates: [
-        { x: 500, y: 150, w: 100, h: 24, isOpen: true },
-        { x: 720, y: 420, w: 24, h: 100, isOpen: false },
-        { x: 260, y: 340, w: 24, h: 100, isOpen: true }
+        { x: 480, y: 185, w: 110, h: 24, isOpen: true },
+        { x: 700, y: 458, w: 24, h: 110, isOpen: false },
+        { x: 260, y: 458, w: 24, h: 110, isOpen: true }
       ],
       bushes: [
-        { id: 'b4_2a_1', x: 160, y: 400, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_2a_2', x: 380, y: 120, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_2a_3', x: 780, y: 160, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_2a_1', x: 160, y: 420, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_2a_2', x: 350, y: 120, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2a_3', x: 820, y: 140, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_2a_4', x: 620, y: 470, radius: 36, type: 'fruta', isSearched: false }
       ]
     },
     '2b': {
@@ -297,22 +291,20 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
         // Labirinto Interno Espaçoso
-        { x: 300, y: 180, w: 24, h: 180 },
-        { x: 300, y: 440, w: 24, h: 140 },
-        { x: 560, y: 170, w: 24, h: 180 },
-        { x: 560, y: 410, w: 24, h: 160 },
-        { x: 760, y: 280, w: 24, h: 220 },
-        { x: 440, y: 280, w: 180, h: 24 }
+        { x: 408, y: 270, w: 24, h: 260 },
+        { x: 550, y: 270, w: 24, h: 260 },
+        { x: 760, y: 270, w: 24, h: 260 },
+        { x: 230, y: 270, w: 24, h: 260 },
       ],
       gates: [
-        { x: 560, y: 300, w: 24, h: 90, isOpen: false },
-        { x: 300, y: 320, w: 24, h: 90, isOpen: true },
-        { x: 760, y: 430, w: 24, h: 90, isOpen: false }
+        { x: 550, y: 82, w: 24, h: 110, isOpen: false },
+        { x: 408, y: 458, w: 24, h: 110, isOpen: true }
       ],
       bushes: [
-        { id: 'b4_2b_1', x: 180, y: 180, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_2b_2', x: 440, y: 420, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_2b_3', x: 800, y: 400, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_2b_1', x: 170, y: 120, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_2b_2', x: 280, y: 450, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_2b_3', x: 710, y: 120, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_2b_4', x: 810, y: 450, radius: 36, type: 'fruta', isSearched: false }
       ]
     },
     '3a': {
@@ -326,23 +318,20 @@ export class Stage4BotijaScene implements IScene {
         { x: 948, y: 105, w: 24, h: 210 },
         { x: 948, y: 435, w: 24, h: 210 },
         // Labirinto Interno Espaçoso
-        { x: 280, y: 200, w: 24, h: 180 },
-        { x: 280, y: 450, w: 24, h: 120 },
-        { x: 520, y: 180, w: 24, h: 180 },
-        { x: 520, y: 430, w: 24, h: 140 },
-        { x: 740, y: 280, w: 24, h: 220 },
-        { x: 400, y: 320, w: 180, h: 24 },
-        { x: 630, y: 180, w: 160, h: 24 }
+        { x: 365, y: 150, w: 400, h: 24 },
+        { x: 152, y: 270, w: 24, h: 270 },
+        { x: 550, y: 80, w: 24, h: 110 },
+        { x: 495, y: 390, w: 660, h: 24 },
+        { x: 810, y: 280, w: 24, h: 190 },
       ],
       gates: [
-        { x: 400, y: 320, w: 90, h: 24, isOpen: true },
-        { x: 740, y: 430, w: 24, h: 90, isOpen: false },
-        { x: 280, y: 340, w: 24, h: 90, isOpen: true }
+        { x: 880, y: 198, w: 110, h: 24, isOpen: true }
       ],
       bushes: [
-        { id: 'b4_3a_1', x: 180, y: 380, radius: 36, type: 'cacto', isSearched: false },
-        { id: 'b4_3a_2', x: 420, y: 160, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_3a_3', x: 760, y: 360, radius: 36, type: 'fruta', isSearched: false }
+        { id: 'b_3a_1', x: 820, y: 150, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3a_2', x: 890, y: 150, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3a_3', x: 890, y: 80, radius: 36, type: 'cacto', isSearched: false },
+        { id: 'b_3a_4', x: 820, y: 80, radius: 36, type: 'normal', isSearched: false }
       ]
     },
     '3b': {
@@ -356,22 +345,19 @@ export class Stage4BotijaScene implements IScene {
         { x: 12, y: 105, w: 24, h: 210 },
         { x: 12, y: 435, w: 24, h: 210 },
         // Labirinto Interno Espaçoso
-        { x: 260, y: 200, w: 24, h: 180 },
-        { x: 260, y: 450, w: 24, h: 120 },
-        { x: 500, y: 150, w: 24, h: 160 },
-        { x: 500, y: 390, w: 24, h: 160 },
-        { x: 720, y: 280, w: 24, h: 220 },
-        { x: 380, y: 300, w: 200, h: 24 }
+        { x: 270, y: 270, w: 24, h: 270 },
+        { x: 410, y: 270, w: 24, h: 270 },
+        { x: 550, y: 270, w: 24, h: 270 },
+        { x: 690, y: 270, w: 24, h: 270 }
       ],
       gates: [
-        { x: 260, y: 340, w: 24, h: 90, isOpen: true },
-        { x: 720, y: 430, w: 24, h: 90, isOpen: false },
-        { x: 380, y: 300, w: 90, h: 24, isOpen: true }
+        { x: 480, y: 270, w: 110, h: 24, isOpen: true }
       ],
       bushes: [
-        { id: 'b4_3b_1', x: 160, y: 180, radius: 36, type: 'fruta', isSearched: false },
-        { id: 'b4_3b_2', x: 420, y: 140, radius: 36, type: 'normal', isSearched: false },
-        { id: 'b4_3b_3', x: 760, y: 380, radius: 36, type: 'cacto', isSearched: false }
+        { id: 'b_3b_1', x: 80, y: 80, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3b_2', x: 480, y: 180, radius: 36, type: 'fruta', isSearched: false },
+        { id: 'b_3b_3', x: 880, y: 480, radius: 36, type: 'normal', isSearched: false },
+        { id: 'b_3b_4', x: 480, y: 380, radius: 36, type: 'fruta', isSearched: false }
       ]
     }
   };
@@ -896,7 +882,12 @@ export class Stage4BotijaScene implements IScene {
         if (!bush.isSearched) {
           bush.isSearched = true;
 
-          if (bush.type === 'fruta') {
+          if (bush.type === 'candeeiro' && !this.hasLantern) {
+            this.hasLantern = true;
+            this.message = '🏮 CANDEEIRO ENCONTRADO! Iluminação expandida na caatinga!';
+            engine.sound.playPickup();
+            engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+          } else if (bush.type === 'fruta') {
             if (this.heroHp < this.maxHeroHp) {
               this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
               this.message = '🍎 FRUTA REGIONAL! Você recuperou +1 HP!';
@@ -1046,10 +1037,30 @@ export class Stage4BotijaScene implements IScene {
       });
     }
 
+    // Iluminação do Candeeiro (Aura dourada expandida presente no Stage 1)
+    if (this.hasLantern) {
+      ctx.save();
+      const lanternGrad = ctx.createRadialGradient(
+        this.player.x,
+        this.player.y,
+        40,
+        this.player.x,
+        this.player.y,
+        320
+      );
+      lanternGrad.addColorStop(0, 'rgba(254, 240, 138, 0.35)');
+      lanternGrad.addColorStop(1, 'rgba(38, 23, 13, 0)');
+      ctx.fillStyle = lanternGrad;
+      ctx.beginPath();
+      ctx.arc(this.player.x, this.player.y, 320, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // Escuridão Total / Visão Restrita (fora da Igreja)
     if (!lot.isSanctuary) {
       ctx.save();
-      const lightRadius = this.hasLantern ? 240 : 85;
+      const lightRadius = this.hasLantern ? 320 : 85;
 
       // Máscara de Escuridão
       const darkCanvas = document.createElement('canvas');
@@ -1098,6 +1109,12 @@ export class Stage4BotijaScene implements IScene {
         color: '#facc15',
         align: 'center'
       });
+    } else if (this.hasLantern) {
+      drawText(ctx, '🏮 CANDEEIRO', this.player.x, this.player.y - 32, {
+        font: 'bold 9px monospace',
+        color: '#fef08a',
+        align: 'center'
+      });
     }
 
     // HUD Superior
@@ -1132,5 +1149,5 @@ export class Stage4BotijaScene implements IScene {
     this.narrative.render(ctx, 960, 460);
   }
 
-  public destroy(): void {}
+  public destroy(): void { }
 }

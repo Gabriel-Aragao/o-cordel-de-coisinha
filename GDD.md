@@ -100,11 +100,11 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ---
 
-### 🏺 FASE 4: A Botija de Mané Monteiro
+### 🏺 FASE 4: A Botija de Mané Monteiro (Assobios, Inversão & Ciclo da Fulô)
+* **Inversão de Controles nos Assobios:** Assobios periódicos da Cumade Fulozinha na Fase 4 provocam alternância de portões e inversão de controles idêntica à Fase 2.
+* **Ciclo Espacial da Fulô (5s / 3s):** Surge em posição aleatória no lote visitado pelo jogador, persegue por 5.0 segundos respeitando paredes sólidas, desaparece por 3.0 segundos e ressurge em outra posição aleatória do lote.
 * **Santuário da Igreja:** A Cumade Fulozinha **NÃO CONSEGUE ENTRAR** no Lote da Igreja.
-* **Escuridão Total & Candeeiro:** Área de visão curta no escuro; visão ampliada ao encontrar o Candeeiro em moita.
-* **Portões Alternantes & Inversão:** Mantidos em todos os lotes.
-* **Física da Fulô:** Respeita paredes sólidas e não atravessa obstáculos.
+* **Escuridão Total & Candeeiro:** Área de visão curta no escuro; visão ampliada ao encontrar o Candeeiro em moita com diálogo modal.
 * **Ciclo:** Spawn na Igreja ➔ Ir ao Lote 0 desenterrar a botija (-25% vel) ➔ Retornar à Igreja e entregar ao Beato ➔ **🖋️ Tinta Encantada**.
 
 ---

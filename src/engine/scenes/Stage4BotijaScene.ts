@@ -58,6 +58,7 @@ export class Stage4BotijaScene implements IScene {
   private heroHp: number = 3;
   private maxHeroHp: number = 3;
   private hurtCooldown: number = 0;
+  private invulnerableTimer: number = 0;
   private tripCooldown: number = 0;
 
   private player: Entity = {
@@ -368,6 +369,7 @@ export class Stage4BotijaScene implements IScene {
     this.player.y = 360;
     this.heroHp = 3;
     this.hurtCooldown = 0;
+    this.invulnerableTimer = 0;
     this.tripCooldown = 0;
     this.fuloCurrentLot = '2b';
     this.fuloLotChangeTimer = 4.0;
@@ -407,6 +409,7 @@ export class Stage4BotijaScene implements IScene {
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
     if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
+    if (this.invulnerableTimer > 0) this.invulnerableTimer -= dt;
     if (this.tripCooldown > 0) this.tripCooldown -= dt;
 
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
@@ -532,10 +535,11 @@ export class Stage4BotijaScene implements IScene {
         this.fulozinha.y = fuloTargetY;
       }
 
-      // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + knockback + invulnerabilidade de 1.5s)
+      // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + knockback + invulnerabilidade de 5.0s)
       const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
-      if (distToHero < 34 && this.hurtCooldown <= 0) {
+      if (distToHero < 34 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 1.5;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
         engine.sound.playChicote();
@@ -803,9 +807,10 @@ export class Stage4BotijaScene implements IScene {
     if (this.currentLot === '0' && !this.hasBotija) {
       const distToPedra = Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y);
 
-      // Efeito de Tropeço Cômico com Dano de 1 Vida (-1 HP) ao cruzar a pedra no corredor
-      if (distToPedra < 26 && this.hurtCooldown <= 0) {
+      // Efeito de Tropeço Cômico com Dano de 1 Vida (-1 HP) ao cruzar a pedra no corredor (5s de i-frames)
+      if (distToPedra < 26 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 2.0;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         const tripPhrases = [
           '🗣️ "Coisinha, tropeçou!"',
@@ -849,6 +854,21 @@ export class Stage4BotijaScene implements IScene {
             engine.sound.playItemDescobrir();
             engine.juice.shake.addTrauma(0.4);
             engine.juice.particles.emit('sparkle', this.pedraItem.x, this.pedraItem.y, { count: 20, speed: 60 });
+            // 3. Diálogo bloqueante ao desenterrar a botija
+            engine.messages.startDialog(
+              'item_botija',
+              'Botija de Mané Monteiro',
+              '🏺',
+              [
+                {
+                  speaker: 'Coisinha',
+                  avatarIcon: '🏺',
+                  text: '🏺 "Desenterrei a famosa Botija de Ouro de Mané Monteiro! O pote é pesado, preciso correr para a Igreja antes que a Cumade me pegue!"'
+                }
+              ],
+              undefined,
+              engine
+            );
           }
         } else {
           this.isDigging = false;
@@ -860,8 +880,10 @@ export class Stage4BotijaScene implements IScene {
     for (const bush of lot.bushes) {
       const distToBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
 
-      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0) {
+      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
+        bush.isSearched = true; // 1. Auto-revelação da moita
         this.hurtCooldown = 1.2;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -887,6 +909,21 @@ export class Stage4BotijaScene implements IScene {
             this.message = '🏮 CANDEEIRO ENCONTRADO! Iluminação expandida na caatinga!';
             engine.sound.playPickup();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 50 });
+            // 3. Diálogo bloqueante ao obter candeeiro
+            engine.messages.startDialog(
+              'item_candeeiro',
+              'Candeeiro Místico',
+              '🏮',
+              [
+                {
+                  speaker: 'Coisinha',
+                  avatarIcon: '🏮',
+                  text: '🏮 "Achei o candeeiro! Agora o círculo de luz clareia a escuridão da fazenda para encontrar a pedra!"'
+                }
+              ],
+              undefined,
+              engine
+            );
           } else if (bush.type === 'fruta') {
             if (this.heroHp < this.maxHeroHp) {
               this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
@@ -897,16 +934,19 @@ export class Stage4BotijaScene implements IScene {
             engine.sound.playFruitEat();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
           } else if (bush.type === 'cacto') {
-            this.heroHp = Math.max(0, this.heroHp - 1);
-            engine.sound.playHurtCacto();
-            engine.sound.playGrito();
-            engine.juice.shake.addTrauma(0.45);
-            if (this.heroHp <= 0) {
-              this.stateStatus = 'FAILED';
-              this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
-              engine.sound.playDefeatJingle();
-              setTimeout(() => engine.switchScene('STUDIO'), 2500);
-              return;
+            if (this.invulnerableTimer <= 0) {
+              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.heroHp = Math.max(0, this.heroHp - 1);
+              engine.sound.playHurtCacto();
+              engine.sound.playGrito();
+              engine.juice.shake.addTrauma(0.45);
+              if (this.heroHp <= 0) {
+                this.stateStatus = 'FAILED';
+                this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+                engine.sound.playDefeatJingle();
+                setTimeout(() => engine.switchScene('STUDIO'), 2500);
+                return;
+              }
             }
           } else {
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 35 });
@@ -1065,11 +1105,11 @@ export class Stage4BotijaScene implements IScene {
       // Máscara de Escuridão
       const darkCanvas = document.createElement('canvas');
       darkCanvas.width = 960;
-      darkCanvas.height = 540;
+      darkCanvas.height = 580;
       const dCtx = darkCanvas.getContext('2d');
       if (dCtx) {
         dCtx.fillStyle = 'rgba(3, 4, 8, 0.94)';
-        dCtx.fillRect(0, 0, 960, 540);
+        dCtx.fillRect(0, 0, 960, 580);
 
         // Abre o buraco de visão
         dCtx.globalCompositeOperation = 'destination-out';
@@ -1095,13 +1135,18 @@ export class Stage4BotijaScene implements IScene {
       ctx.restore();
     }
 
-    // Jogador Coisinha (com efeito de piscar durante invulnerabilidade)
+    // Jogador Coisinha (com efeito de piscar durante 5s de invulnerabilidade)
+    ctx.save();
+    if (this.invulnerableTimer > 0) {
+      ctx.globalAlpha = Math.sin(this.animTime * 24) > 0 ? 0.35 : 0.9;
+    }
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
       time: this.animTime,
-      invulnerableTimer: this.hurtCooldown
+      invulnerableTimer: this.invulnerableTimer
     });
+    ctx.restore();
 
     if (this.hasBotija) {
       drawItemBotija(ctx, this.player.x + 18, this.player.y - 10, 20);

@@ -375,6 +375,7 @@ export class Stage2FulozinhaScene implements IScene {
   public update(dt: number, input: InputState, engine: IGameEngine): void {
     this.animTime += dt;
     if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
+    if (this.invulnerableTimer > 0) this.invulnerableTimer -= dt;
 
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
       this.narrative.update(dt, input, engine);
@@ -609,9 +610,11 @@ export class Stage2FulozinhaScene implements IScene {
     for (const bush of lot.bushes) {
       const distToBush = Math.hypot(this.player.x - bush.x, this.player.y - bush.y);
 
-      // Colisão de proximidade com cactos causa dano involuntário
-      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0) {
+      // Colisão de proximidade com cactos causa dano involuntário (auto-revelação e 5s de i-frames)
+      if (bush.type === 'cacto' && distToBush < bush.radius + 12 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
+        bush.isSearched = true; // 1. Auto-revelação da moita
         this.hurtCooldown = 1.2;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playHurtCacto();
         engine.sound.playGrito();
@@ -639,6 +642,21 @@ export class Stage2FulozinhaScene implements IScene {
             engine.sound.playPickup();
             engine.sound.playItemDescobrir();
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 12, speed: 45 });
+            // 3. Diálogo bloqueante ao obter o Fumo de Rolo
+            engine.messages.startDialog(
+              'item_fumo',
+              'Fumo de Rolo Aromático',
+              '🍂',
+              [
+                {
+                  speaker: 'Coisinha',
+                  avatarIcon: '🍂',
+                  text: '🍂 "Achei o fumo de rolo perfumado! Agora posso levar até o toco sagrado no Lote 3b e apaziguar a Cumade Fulozinha!"'
+                }
+              ],
+              undefined,
+              engine
+            );
           } else if (bush.type === 'fruta') {
             if (this.heroHp < this.maxHeroHp) {
               this.heroHp = Math.min(this.maxHeroHp, this.heroHp + 1);
@@ -649,16 +667,19 @@ export class Stage2FulozinhaScene implements IScene {
             engine.sound.playFruitEat();
             engine.juice.particles.emit('sparkle', bush.x, bush.y, { count: 10, speed: 40 });
           } else if (bush.type === 'cacto') {
-            this.heroHp = Math.max(0, this.heroHp - 1);
-            engine.sound.playHurtCacto();
-            engine.sound.playGrito();
-            engine.juice.shake.addTrauma(0.45);
-            if (this.heroHp <= 0) {
-              this.stateStatus = 'FAILED';
-              this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
-              engine.sound.playDefeatJingle();
-              setTimeout(() => engine.switchScene('STUDIO'), 2500);
-              return;
+            if (this.invulnerableTimer <= 0) {
+              this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5s
+              this.heroHp = Math.max(0, this.heroHp - 1);
+              engine.sound.playHurtCacto();
+              engine.sound.playGrito();
+              engine.juice.shake.addTrauma(0.45);
+              if (this.heroHp <= 0) {
+                this.stateStatus = 'FAILED';
+                this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS DA CAATINGA!';
+                engine.sound.playDefeatJingle();
+                setTimeout(() => engine.switchScene('STUDIO'), 2500);
+                return;
+              }
             }
           } else {
             engine.juice.particles.emit('leaf', bush.x, bush.y, { count: 8, speed: 35 });
@@ -672,9 +693,10 @@ export class Stage2FulozinhaScene implements IScene {
       const distToPedra = Math.hypot(this.player.x - this.pedraItem.x, this.player.y - this.pedraItem.y);
       const distToPlaca = Math.hypot(this.player.x - this.placaItem.x, this.player.y - this.placaItem.y);
 
-      // Tropeço com Dano de 1 Vida (-1 HP)
-      if (distToPedra < 26 && this.hurtCooldown <= 0) {
+      // Tropeço com Dano de 1 Vida (-1 HP) (com 5s de i-frames)
+      if (distToPedra < 26 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
         this.hurtCooldown = 2.0;
+        this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
         this.heroHp = Math.max(0, this.heroHp - 1);
         engine.sound.playUIClick();
         engine.sound.playGrito();
@@ -745,9 +767,10 @@ export class Stage2FulozinhaScene implements IScene {
               engine.switchScene('STUDIO');
             }
           );
-        } else if (this.hurtCooldown <= 0) {
-          // Ataque de cadarço da Fulô: -1 HP + knockback + invulnerabilidade de 1.5s
+        } else if (this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
+          // Ataque de cadarço da Fulô: -1 HP + knockback + invulnerabilidade de 5.0s
           this.hurtCooldown = 1.5;
+          this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
           this.heroHp = Math.max(0, this.heroHp - 1);
           this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
           engine.sound.playChicote();
@@ -854,12 +877,17 @@ export class Stage2FulozinhaScene implements IScene {
     }
 
     // Herói Coisinha (com efeito de piscar durante invulnerabilidade)
+    ctx.save();
+    if (this.invulnerableTimer > 0) {
+      ctx.globalAlpha = Math.sin(this.animTime * 24) > 0 ? 0.35 : 0.9;
+    }
     drawCoisinha(ctx, this.player.x, this.player.y, this.player.width, this.player.height, {
       facing: this.facing,
       isMoving: this.isMoving,
       time: this.animTime,
       invulnerableTimer: this.invulnerableTimer
     });
+    ctx.restore();
 
     // HUD Superior
     drawText(ctx, `🌿 FASE 2: ${lot.name}`, 480, 20, {

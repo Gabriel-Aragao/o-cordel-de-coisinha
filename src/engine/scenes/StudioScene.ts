@@ -271,7 +271,7 @@ export class StudioScene implements IScene {
     });
 
     // 8. Cabeçalho e HUD
-    drawText(ctx, '🏛️ ESTÚDIO DE XILOGRAVURA MÍSTICO', 480, 20, {
+    drawText(ctx, '🏛️ ESTÚDIO DE XILOGRAVURA MALASSOMBRADO', 480, 20, {
       font: 'bold 16px monospace',
       align: 'center',
       color: '#f7d070'

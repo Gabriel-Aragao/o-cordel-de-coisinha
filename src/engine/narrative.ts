@@ -89,7 +89,7 @@ export class NarrativeModalManager {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 600): void {
+  public render(ctx: CanvasRenderingContext2D, width: number = 960, height: number = 580): void {
     if (this.isIntroActive && this.introConfig) {
       this.renderIntro(ctx, this.introConfig, width, height);
     } else if (this.isOutroActive && this.outroConfig) {
@@ -111,7 +111,7 @@ export class NarrativeModalManager {
 
     // Folheto Central com preenchimento vertical integral
     const modalW = Math.min(800, width - 48);
-    const modalH = Math.min(540, height - 36);
+    const modalH = Math.min(520, height - 32);
     const modalX = (width - modalW) / 2;
     const modalY = (height - modalH) / 2;
 
@@ -197,7 +197,7 @@ export class NarrativeModalManager {
 
     // Folheto Central de Celebração com preenchimento vertical integral
     const modalW = Math.min(780, width - 48);
-    const modalH = Math.min(540, height - 36);
+    const modalH = Math.min(520, height - 32);
     const modalX = (width - modalW) / 2;
     const modalY = (height - modalH) / 2;
 

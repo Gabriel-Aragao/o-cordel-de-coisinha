@@ -488,7 +488,7 @@ export class Stage3RasgaMortalhaScene implements IScene {
     if (this.currentInteriorHouseIdx !== null) {
       const house = this.houses.find(h => h.index === this.currentInteriorHouseIdx)!;
 
-      drawInteriorCasaXilo(ctx, 960, 600, house, { time: this.animTime });
+      drawInteriorCasaXilo(ctx, 960, 580, house, { time: this.animTime });
 
       for (const it of this.allItems) {
         if (it.assignedHouseIdx === house.index && it.interiorX !== undefined && it.interiorY !== undefined) {
@@ -543,8 +543,8 @@ export class Stage3RasgaMortalhaScene implements IScene {
     // =========================================================================
 
     ctx.fillStyle = '#1e1b18';
-    ctx.fillRect(0, 0, 960, 600);
-    drawMolduraCordel(ctx, 8, 8, 944, 584, { borderWeight: 3 });
+    ctx.fillRect(0, 0, 960, 580);
+    drawMolduraCordel(ctx, 8, 8, 944, 564, { borderWeight: 3 });
 
     for (const h of this.houses) {
       ctx.fillStyle = '#292524';

@@ -15,10 +15,13 @@ Coisinha é um visitante de uma feira de cordéis no sertão da Paraíba. Ao fol
 
 Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias do folclore nordestino espalhadas pelo estúdio, desvendar seus mistérios e reunir os **4 Instrumentos Sagrados da Xilogravura** (Carimbo, Folha, Pena e Tinta) para estampar seu próprio cordel de herói.
 
-### 1.2 Sistema Global de Diálogos, Layout & Controles
-* **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Falas diretas de NPCs e diálogos com censura são exibidos fora do canvas de jogo, em um painel inferior dedicado. Orientações de cordel e toasts de fundo foram removidos de todas as fases e estúdio para foco narrativo puro.
-* **Debounce de Falas:** Debounce de 0.3s por linha no avanço de diálogos impedindo pulos rápidos de estrofes intermediárias.
-* **Escala Vertical Integral (960x580px):** O canvas do jogo, folhetos de início/fim de fase e todos os cenários operam em 960x580px de altura.
+### 1.2 Sistema Global de Diálogos, Dano, Moitas & Controles
+* **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de cactos/espinhos e sofrer dano, ela se revela imediatamente no mapa.
+* **Invulnerabilidade de 5 Segundos (Piscar):** Perder 1 vida concede 5.0 segundos de i-frames com animação de piscar, impedindo danos consecutivos imediatos.
+* **Diálogo Bloqueante ao Coletar Itens de Moita:** Ao obter Corda, Fumo ou Candeeiro, uma caixa de diálogo é aberta e o jogo pausa até o fechamento com `[E]`/`[Enter]`.
+* **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Falas de NPCs e avisos de itens ocorrem exclusivamente fora do canvas no `#game-message-panel`.
+* **Debounce de Falas:** Debounce de 0.3s por linha no avanço de diálogos.
+* **Escala Vertical Integral (960x580px):** O canvas do jogo, folhetos e cenários operam em 960x580px.
 * **Ciclo de Fechamento de Diálogo:** Conclusão da última fala libera instantaneamente o movimento do herói sem travamento ou loop infinito de interação.
 * **Diálogo de Censura na 1ª Interação com NPCs:**
   - Primeira conversa com qualquer NPC falante (**Fazendeiro, Padre/Beato, Violeiros, Bêbados**):

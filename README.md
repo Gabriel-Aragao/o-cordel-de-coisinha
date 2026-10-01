@@ -87,12 +87,12 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
   - **Folheto de Cordel de Vitória:** Exibido em tela cheia ao completar as 5 casas, entregando a Pena Encantada.
 * **Recompensa (Sucesso):** 🪶 **Pena Encantada**.
 
-### 🏺 4. A Botija de Mané Monteiro (Escuridão, Candeeiro & Santuário)
+### 🏺 4. A Botija de Mané Monteiro (Escuridão, Assobios & Ciclo da Fulô)
 * **Objetivo:** Iniciar na Igreja (santuário seguro à direita do 1b), navegar pela fazenda no escuro até o Lote 0, desenterrar a botija e retornar à Igreja.
 * **Mecânicas Principais:**
-  - **Escuridão Total & Candeeiro:** Mapa escuro; raio de visão curto sem o Candeeiro e ampliado com o Candeeiro encontrado em moita.
-  - **Portões Alternantes & Inversão de Controles:** Mantidos integralmente.
-  - **Física da Fulô:** Respeita paredes sólidas e não entra no Santuário da Igreja.
+  - **Inversão de Controles nos Assobios:** Assobios da Fulô alternam portões e invertem os controles direcionais na escuridão.
+  - **Ciclo Dinâmico da Fulô:** Aparece em local aleatório de cada lote visitado, persegue por 5s, desaparece por 3s e ressurge em novo ponto aleatório.
+  - **Santuário da Igreja & Candeeiro:** Área imune na Igreja; Candeeiro no Lote 1b expande visão para 320px com diálogo explicativo.
 * **Recompensa (Sucesso):** 🖋️ **Tinta Encantada**.
 
 ### 🏆 Encerramento & Vitória

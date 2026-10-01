@@ -4,8 +4,7 @@
 > **Evento:** Tungão GameJam — X SEMIII (IFPB Campus Monteiro)  
 > **Tema:** O Velho Sertão  
 > **Gênero:** 2D Top-Down Adventure / Escape Room / Puzzle & Action  
-> **Liderança:** Humanos: Gabriel-Aragao (CTO / Product Owner) | Agentes: @gunpei (Produtor Ágil & PM)
-
+> **Equipe:** Humanos: Gabriel-Aragao (CTO/PO), andreyrianxl (Game Designer), Jennifer-Rebeca (Game Designer) | Agentes: @gunpei (PM), @ludens (Game Design), @draper (Direção Criativa), @cascudo (Folclorista), @maya (UI/UX), @alexey (Frontend), @carmack (Tech Lead), @gunther (Level Design), @koji (Áudio), @glitch (QA)
 ---
 
 ## 📖 Sinopse & Prólogo

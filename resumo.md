@@ -39,6 +39,18 @@ Ao se virar para procurar outra saída, Coisinha pisa sobre o primeiro cordel en
 * **Preenchimento Vertical Completo:** Os folhetos de introdução e de vitória ocupam toda a extensão vertical da tela de jogo (580px de altura), sem faixas pretas ou vazios na base/topo.
 * **Backgrounds de Cena em Altura Total:** Todos os cenários (incluindo praça e salas interiores da Fase 3) cobrem integralmente os 960x580 do canvas.
 
+### 3. Fase 3 — A Pena da Rasga-Mortalha (Enigma das 5 Casas):
+* **Palco Central dos Violeiros:** Os 2 violeiros ficam posicionados sobre um palco/tablado de madeira de xilogravura no centro da praça, cantando as pistas poéticas do repente.
+* **Distribuição dos Quadros em Arco na Base:** Os 4 quadros (Bodega dos Moradores, Mesa de Bebidas, Mesa de Fumos e Curral de Animais) ficam distribuídos em um arco harmonioso e ampliado na parte inferior da praça, com espaço de sobra para acomodar os 5 itens de cada categoria.
+* **Renderização Fiel de Emojis:**
+  - O item **Café** utiliza representação nítida (`☕ / 🫖`).
+  - Todos os 5 animais no Curral e nas casas (**Bode 🐐, Galo 🐓, Tatu 🦔, Cavalo 🐎, Canário 🐤**) renderizam seus respectivos emojis/ícones autênticos (eliminando a repetição do sprite de bode da Fase 1 para todos).
+* **Timer de 5 Minutos (300s) & Mau Agouro:**
+  - A Fase 3 possui um temporizador de **5 minutos** visível no HUD.
+  - Se o tempo expirar antes da resolução completa: a Rasga-Mortalha espalha mau agouro sobre Monteiro, exibe a tela de falha e redireciona o herói de volta ao Estúdio.
+* **Grito da Rasga-Mortalha (a cada 30s):** A coruja emite seu som característico de tecido rasgando a cada 30 segundos, reforçando a atmosfera tensa de meia-noite.
+* **Folheto de Cordel de Encerramento:** Ao completar os 20 nichos das 5 casas, o folheto de vitória é exibido em tela cheia (tanto no interior da casa quanto na praça), entregando a **Pena Encantada** antes do retorno ao estúdio.
+
 ### 4. Obtenção de Itens Especiais (Corda & Candeeiro):
 
 ### 4. Controles Universais:

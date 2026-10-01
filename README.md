@@ -20,11 +20,12 @@ Para retornar ao mundo real, Coisinha precisa entrar em cada uma das 4 história
 
 ## 🎭 Sistema Canônico de Diálogos & Controles
 
-1. **Zero Knockback / Zero Teletransporte ao Perder Vida:** O herói permanece na mesma posição ao sofrer dano, eliminando empurrões contra paredes.
-2. **Fuga da Cumade Fulozinha por 3s após Ataque (Fases 2 e 4):** Ao acertar o ataque, a Fulô foge na direção oposta por 3.0 segundos antes de perseguir novamente.
-3. **Invulnerabilidade de 5 Segundos (i-Frames):** Ao perder vida, o herói pisca por 5.0 segundos e fica imune a dano.
-4. **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de cactos/espinhos e perder vida, ela se revela no mapa.
-5. **Diálogo Bloqueante de Itens de Moita:** Ao coletar Corda, Fumo ou Candeeiro, uma caixa de diálogo é exibida e o jogo só continua após fechar com `[E]`/`[Enter]`.
+1. **Reset Total de Moitas ao Sair da Fase:** Ao sair ou reiniciar uma fase, todas as moitas voltam a ficar fechadas (`isSearched = false`), cactos escondidos e itens disponíveis novamente.
+2. **Zero Knockback / Zero Teletransporte ao Perder Vida:** O herói permanece na mesma posição ao sofrer dano, eliminando empurrões contra paredes.
+3. **Fuga da Cumade Fulozinha por 3s após Ataque (Fases 2 e 4):** Ao acertar o ataque, a Fulô foge na direção oposta por 3.0 segundos antes de perseguir novamente.
+4. **Invulnerabilidade de 5 Segundos (i-Frames):** Ao perder vida, o herói pisca por 5.0 segundos e fica imune a dano.
+5. **Auto-Revelação de Moitas de Espinhos:** Ao esbarrar em uma moita de cactos/espinhos e perder vida, ela se revela no mapa.
+6. **Diálogo Bloqueante de Itens de Moita:** Ao coletar Corda, Fumo ou Candeeiro, uma caixa de diálogo é exibida e o jogo só continua após fechar com `[E]`/`[Enter]`.
 6. **Painel de Diálogos Fora e Abaixo da Tela de Jogo:** Conversas com NPCs e modais de itens são exibidos fora do canvas.
 5. **Ritmo de Diálogo e Debounce de Linhas:** Proteção de 0.3s entre falas no release de `E`.
 6. **Escala Vertical Integral (960x580):** Canvas e cenários operam na resolução integral de 960x580px.

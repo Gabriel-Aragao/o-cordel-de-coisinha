@@ -79,7 +79,10 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
 
 ---
 
-### 🦉 FASE 3: A Pena da Rasga-Mortalha (Casas Interiores & Captura 'E')
+### 🦉 FASE 3: A Pena da Rasga-Mortalha (Casas Interiores, Palco Central, Quadros em Arco & Timer)
+* **Palco Central dos Violeiros:** Declamam 9 estrofes poéticas do repente no centro da praça.
+* **Quadros Ampliados em Arco:** Bodega dos Moradores, Bebidas, Fumos e Curral de Animais distribuídos em arco ampliado na base da praça.
+* **Emojis Autênticos de Animais & Café:** Bode (🐐), Galo (🐓), Tatu (🦔), Cavalo (🐎), Canário (🐤) com ícones fiéis, e representação nítida de Café.
 * **Captura Universal (`E`):** Bebidas, fumos, moradores bêbados e animais são capturados e soltos com a tecla `E` (1 elemento carregado por vez).
 * **Telas Interiores das Casas:** Cruzar a porta de qualquer casa transporta o jogador para a tela do interior daquela casa.
 * **Transição Segura & Anti-Loop:** Ao sair da casa, o herói é posicionado com margem de segurança abaixo da porta (`y + 110px`) com cooldown de transição de 0.6s, eliminando reentradas em loop.
@@ -88,8 +91,9 @@ Para escapar e voltar à realidade, Coisinha precisa mergulhar nas 4 histórias 
   - Apertar `E` próximo a um elemento já depositado o recaptura.
   - **Grito de Limpeza (`Espaço`):** Gritar dentro de uma casa expulsa todos os elementos dela de volta para suas respectivas mesas.
 * **Soltura Externa:** Soltar qualquer elemento fora de casas faz com que retorne automaticamente à mesa/curral de origem.
-* **2 Violeiros:** Declamam as 9 sextilhas de cordel (Violeiro 1: 4 estrofes; Violeiro 2: 5 estrofes).
-* **Vitória:** 5 casas com todos os 4 atributos corretos em seus interiores ➔ **🪶 Pena Encantada**.
+* **Timer de 5 Minutos (300s):** Se o tempo esgotar, a Rasga-Mortalha espalha mau agouro na vila, exibe tela de falha e retorna ao estúdio.
+* **Grito da Rasga-Mortalha (a cada 30s):** Som característico de tecido rasgando a cada 30 segundos.
+* **Folheto de Vitória:** Exibido em tela cheia ao completar as 5 casas ➔ **🪶 Pena Encantada**.
 
 ---
 

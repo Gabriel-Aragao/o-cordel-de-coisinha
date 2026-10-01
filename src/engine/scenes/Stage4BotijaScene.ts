@@ -89,7 +89,7 @@ export class Stage4BotijaScene implements IScene {
   };
 
   // A Fulô NUNCA entra na Igreja
-  private fuloState: 'PURSUIT' | 'VANISHED' | 'SANCTUARY_WAIT' = 'SANCTUARY_WAIT';
+  private fuloState: 'PURSUIT' | 'FLEE' | 'VANISHED' | 'SANCTUARY_WAIT' = 'SANCTUARY_WAIT';
   private fuloTimer: number = 0; // 5s perseguição / 3s invisível
   private isControlsInverted: boolean = false;
   private whistleTimer: number = 6.0;
@@ -602,22 +602,19 @@ export class Stage4BotijaScene implements IScene {
           this.fulozinha.y = fuloTargetY;
         }
 
-        // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + knockback + 5.0s invulnerabilidade)
+        // Colisão com o herói: Ataque de cadarço da Cumade Fulozinha (-1 HP + 5.0s invulnerabilidade + FUGA DA FULÔ POR 3.0s)
         const distToHero = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
         if (distToHero < 34 && this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
           this.hurtCooldown = 1.5;
           this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+          this.fuloState = 'FLEE'; // 2. Fuga da Fulô por 3.0 segundos
+          this.fuloTimer = 3.0;
           this.heroHp = Math.max(0, this.heroHp - 1);
           this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
           engine.sound.playChicote();
           engine.sound.playGrito();
           engine.juice.shake.addTrauma(0.5);
           engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 12, speed: 50 });
-
-          // Knockback empurra o herói para longe da Fulô
-          const knockAngle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-          this.player.x += Math.cos(knockAngle) * 55;
-          this.player.y += Math.sin(knockAngle) * 55;
 
           if (this.heroHp <= 0) {
             this.stateStatus = 'FAILED';
@@ -634,6 +631,84 @@ export class Stage4BotijaScene implements IScene {
           this.fuloTimer = 3.0; // 3 segundos de invisibilidade/desaparecimento
           engine.sound.playUIClick();
           engine.juice.particles.emit('leaf', this.fulozinha.x, this.fulozinha.y, { count: 18, speed: 50 });
+        }
+      } else if (this.fuloState === 'FLEE') {
+        this.fuloTimer -= dt;
+
+        // Fuga ativa da Fulô na direção OPOSTA ao herói, respeitando paredes
+        const angle = Math.atan2(this.fulozinha.y - this.player.y, this.fulozinha.x - this.player.x);
+        const fuloSpeed = (this.fulozinha.speed || 160) * 1.1;
+        const fuloHalfW = this.fulozinha.width / 2;
+        const fuloHalfH = this.fulozinha.height / 2;
+        const currentLotData = this.lots[this.currentLot];
+
+        // Teste de Colisão da Fulô no eixo X em fuga
+        const fuloTargetX = this.fulozinha.x + Math.cos(angle) * fuloSpeed * dt;
+        let fuloBlockedX = false;
+        for (const w of currentLotData.walls) {
+          if (
+            fuloTargetX + fuloHalfW > w.x - w.w / 2 &&
+            fuloTargetX - fuloHalfW < w.x + w.w / 2 &&
+            this.fulozinha.y + fuloHalfH > w.y - w.h / 2 &&
+            this.fulozinha.y - fuloHalfH < w.y + w.h / 2
+          ) {
+            fuloBlockedX = true;
+            break;
+          }
+        }
+        for (const g of currentLotData.gates) {
+          if (!g.isOpen) {
+            if (
+              fuloTargetX + fuloHalfW > g.x - g.w / 2 &&
+              fuloTargetX - fuloHalfW < g.x + g.w / 2 &&
+              this.fulozinha.y + fuloHalfH > g.y - g.h / 2 &&
+              this.fulozinha.y - fuloHalfH < g.y + g.h / 2
+            ) {
+              fuloBlockedX = true;
+              break;
+            }
+          }
+        }
+        if (!fuloBlockedX) {
+          this.fulozinha.x = Math.max(40, Math.min(920, fuloTargetX));
+        }
+
+        // Teste de Colisão da Fulô no eixo Y em fuga
+        const fuloTargetY = this.fulozinha.y + Math.sin(angle) * fuloSpeed * dt;
+        let fuloBlockedY = false;
+        for (const w of currentLotData.walls) {
+          if (
+            this.fulozinha.x + fuloHalfW > w.x - w.w / 2 &&
+            this.fulozinha.x - fuloHalfW < w.x + w.w / 2 &&
+            fuloTargetY + fuloHalfH > w.y - w.h / 2 &&
+            fuloTargetY - fuloHalfH < w.y + w.h / 2
+          ) {
+            fuloBlockedY = true;
+            break;
+          }
+        }
+        for (const g of currentLotData.gates) {
+          if (!g.isOpen) {
+            if (
+              this.fulozinha.x + fuloHalfW > g.x - g.w / 2 &&
+              this.fulozinha.x - fuloHalfW < g.x + g.w / 2 &&
+              fuloTargetY + fuloHalfH > g.y - g.h / 2 &&
+              fuloTargetY - fuloHalfH < g.y + g.h / 2
+            ) {
+              fuloBlockedY = true;
+              break;
+            }
+          }
+        }
+        if (!fuloBlockedY) {
+          this.fulozinha.y = Math.max(40, Math.min(500, fuloTargetY));
+        }
+
+        // Ao terminar os 3s de fuga, retorna à perseguição
+        if (this.fuloTimer <= 0) {
+          this.fuloState = 'PURSUIT';
+          this.fuloTimer = 5.0;
+          engine.juice.particles.emit('dust', this.fulozinha.x, this.fulozinha.y, { count: 8, speed: 40 });
         }
       } else if (this.fuloState === 'VANISHED') {
         this.fuloTimer -= dt;
@@ -921,7 +996,6 @@ export class Stage4BotijaScene implements IScene {
         engine.sound.playGrito();
         engine.juice.shake.addTrauma(0.4);
         engine.juice.particles.emit('dust', this.player.x, this.player.y + 18, { count: 8, speed: 40 });
-        this.player.x += (this.player.x > this.pedraItem.x ? 1 : -1) * 20;
 
         if (this.heroHp <= 0) {
           this.stateStatus = 'FAILED';
@@ -1159,15 +1233,15 @@ export class Stage4BotijaScene implements IScene {
       }
     }
 
-    // Fulô Furiosa (fora da Igreja e quando em perseguição)
-    if (!lot.isSanctuary && this.fuloState === 'PURSUIT') {
+    // Fulô Furiosa (fora da Igreja e quando em perseguição ou fuga)
+    if (!lot.isSanctuary && (this.fuloState === 'PURSUIT' || this.fuloState === 'FLEE')) {
       ctx.save();
       ctx.beginPath();
       ctx.arc(this.fulozinha.x, this.fulozinha.y, 80, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)';
+      ctx.strokeStyle = this.fuloState === 'FLEE' ? 'rgba(234, 179, 8, 0.5)' : 'rgba(239, 68, 68, 0.5)';
       ctx.lineWidth = 2;
       ctx.stroke();
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+      ctx.fillStyle = this.fuloState === 'FLEE' ? 'rgba(234, 179, 8, 0.12)' : 'rgba(239, 68, 68, 0.12)';
       ctx.fill();
       ctx.restore();
 

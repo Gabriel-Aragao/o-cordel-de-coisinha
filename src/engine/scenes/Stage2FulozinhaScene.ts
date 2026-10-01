@@ -57,6 +57,7 @@ export class Stage2FulozinhaScene implements IScene {
   private maxHeroHp: number = 3;
   private hurtCooldown: number = 0;
   private invulnerableTimer: number = 0;
+  private fuloFleeTimer: number = 0;
 
   private player: Entity = {
     id: 'hero',
@@ -341,6 +342,7 @@ export class Stage2FulozinhaScene implements IScene {
     this.heroHp = 3;
     this.hurtCooldown = 0;
     this.invulnerableTimer = 0;
+    this.fuloFleeTimer = 0;
     this.fulozinha.x = 750;
     this.fulozinha.y = 270;
     this.hasFumo = false;
@@ -376,6 +378,7 @@ export class Stage2FulozinhaScene implements IScene {
     this.animTime += dt;
     if (this.hurtCooldown > 0) this.hurtCooldown -= dt;
     if (this.invulnerableTimer > 0) this.invulnerableTimer -= dt;
+    if (this.fuloFleeTimer > 0) this.fuloFleeTimer -= dt;
 
     if (this.narrative.isIntroActive || this.narrative.isOutroActive) {
       this.narrative.update(dt, input, engine);
@@ -710,9 +713,6 @@ export class Stage2FulozinhaScene implements IScene {
         ];
         this.message = tripPhrases[Math.floor(Math.random() * tripPhrases.length)];
 
-        // Knockback cômico do tropeço
-        this.player.x += (this.player.x > this.pedraItem.x ? 1 : -1) * 20;
-
         if (this.heroHp <= 0) {
           this.stateStatus = 'FAILED';
           this.message = '💀 VOCÊ NÃO RESISTIU AOS ESPINHOS E TROPEÇOS DA CAATINGA!';
@@ -734,12 +734,22 @@ export class Stage2FulozinhaScene implements IScene {
 
     // 6. Comportamento da Cumade Fulozinha no Lote 3b
     if (this.currentLot === '3b') {
-      const angle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-      this.fulozinha.x += Math.cos(angle) * (this.fulozinha.speed || 155) * dt;
-      this.fulozinha.y += Math.sin(angle) * (this.fulozinha.speed || 155) * dt;
+      const isFleeing = this.fuloFleeTimer > 0;
+      // Se estiver em fuga (3s após ataque), move-se na direção OPOSTA ao herói; senão, persegue
+      const angle = isFleeing
+        ? Math.atan2(this.fulozinha.y - this.player.y, this.fulozinha.x - this.player.x)
+        : Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
+
+      const fuloSpeed = this.fulozinha.speed || 155;
+      const targetFuloX = this.fulozinha.x + Math.cos(angle) * fuloSpeed * dt;
+      const targetFuloY = this.fulozinha.y + Math.sin(angle) * fuloSpeed * dt;
+
+      // Restrições de limites de tela/lote para a Fulô
+      this.fulozinha.x = Math.max(50, Math.min(910, targetFuloX));
+      this.fulozinha.y = Math.max(50, Math.min(490, targetFuloY));
 
       const distToFulozinha = Math.hypot(this.player.x - this.fulozinha.x, this.player.y - this.fulozinha.y);
-      if (distToFulozinha < 36) {
+      if (distToFulozinha < 36 && !isFleeing) {
         if (this.hasFumo) {
           // SUCESSO!
           this.stateStatus = 'SUCCESS';
@@ -768,20 +778,16 @@ export class Stage2FulozinhaScene implements IScene {
             }
           );
         } else if (this.hurtCooldown <= 0 && this.invulnerableTimer <= 0) {
-          // Ataque de cadarço da Fulô: -1 HP + knockback + invulnerabilidade de 5.0s
+          // Ataque de cadarço da Fulô: -1 HP + 5.0s invulnerabilidade + FUGA DA FULÔ POR 3.0s
           this.hurtCooldown = 1.5;
-          this.invulnerableTimer = 3.0; // 2. Invulnerabilidade de 5 segundos
+          this.invulnerableTimer = 5.0; // 2. Invulnerabilidade de 5 segundos
+          this.fuloFleeTimer = 3.0; // 2. Fuga da Fulô por 3.0 segundos
           this.heroHp = Math.max(0, this.heroHp - 1);
           this.message = '🌿 A Cumade Fulozinha amarrou seus cadarços! (-1 HP)';
           engine.sound.playChicote();
           engine.sound.playGrito();
           engine.juice.shake.addTrauma(0.5);
           engine.juice.particles.emit('dust', this.player.x, this.player.y, { count: 10, speed: 50 });
-
-          // Knockback empurra o herói para longe da Fulô
-          const knockAngle = Math.atan2(this.player.y - this.fulozinha.y, this.player.x - this.fulozinha.x);
-          this.player.x += Math.cos(knockAngle) * 50;
-          this.player.y += Math.sin(knockAngle) * 50;
 
           if (this.heroHp <= 0) {
             this.stateStatus = 'FAILED';
